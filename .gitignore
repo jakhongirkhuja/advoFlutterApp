@@ -1,0 +1,23 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+**/build/
+coverage/
+
+# Android build artifacts
+*.apk
+*.aab
+
+# IDE
+.idea/
+*.iml
+
+# Misc
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
