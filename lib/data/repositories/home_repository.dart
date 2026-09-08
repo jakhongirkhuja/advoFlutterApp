@@ -1,12 +1,137 @@
 import 'dart:convert';
 
+import '../../core/config/app_config.dart';
 import '../api/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/home/lawyer.dart';
+import '../models/home/service_category.dart';
+import '../models/appointments/appointment.dart';
 
 class HomeRepository {
   final ApiClient apiClient;
 
   HomeRepository(this.apiClient);
+
+  Future<List<Lawyer>> getPopularLawyers() async {
+    // TODO(Dio): Replace this dummy list with the home lawyers endpoint.
+    // Example:
+    // final response = await apiClient.get('home/lawyers');
+    // return (response.data['items'] as List)
+    //     .map((item) => Lawyer.fromJson(item))
+    //     .toList();
+    return [
+      Lawyer(
+        id: 1,
+        name: 'Aziz Karimov',
+        title: 'Advokat',
+        experienceYears: 8,
+        rating: 4.9,
+        reviewsCount: 128,
+        tags: ['Fuqarolik huquqi', 'Biznes huquqi'],
+        pricePerMinute: 150000,
+        imageUrl: '${AppConfig.mediaBaseUrl}/media/lawyers/1.png',
+        isVerified: true,
+        isBookmarked: true,
+        comment_count: 12,
+      ),
+      Lawyer(
+        id: 2,
+        name: 'Dilshod Yusupov',
+        title: 'Advokat',
+        experienceYears: 6,
+        rating: 4.7,
+        reviewsCount: 102,
+        tags: ['Mehnat huquqi', 'Iqtisodiy jinoyatlar'],
+        pricePerMinute: 120000,
+        imageUrl: '${AppConfig.mediaBaseUrl}/media/lawyers/2.png',
+        isVerified: true,
+        comment_count: 7,
+      ),
+      Lawyer(
+        id: 3,
+        name: 'Gulnora Tursunova',
+        title: 'Advokat',
+        experienceYears: 10,
+        rating: 4.8,
+        reviewsCount: 150,
+        tags: ['Oilaviy huquq', 'Meros huquqi'],
+        pricePerMinute: 200000,
+        imageUrl: '${AppConfig.mediaBaseUrl}/media/lawyers/3.png',
+        isVerified: true,
+        comment_count: 18,
+      ),
+      Lawyer(
+        id: 4,
+        name: 'Javohir Mamatov',
+        title: 'Advokat',
+        experienceYears: 5,
+        rating: 4.6,
+        reviewsCount: 89,
+        tags: ['Soliq huquqi', 'Ijro huquqi'],
+        pricePerMinute: 100000,
+        imageUrl: '${AppConfig.mediaBaseUrl}/media/lawyers/4.png',
+        isVerified: true,
+        comment_count: 25,
+      ),
+    ];
+  }
+
+  Future<List<ServiceCategory>> getServiceCategories() async {
+    // TODO(Dio): Replace this dummy list with the home services endpoint.
+    // Example:
+    // final response = await apiClient.get('home/services');
+    // return (response.data['items'] as List)
+    //     .map((item) => ServiceCategory.fromJson(item))
+    //     .toList();
+    return [
+      ServiceCategory(id: 1, title: 'Huquqiy maslahat', iconPath: ''),
+      ServiceCategory(id: 2, title: 'Oila huquqi', iconPath: ''),
+      ServiceCategory(id: 3, title: 'Fuqarolik huquqi', iconPath: ''),
+      ServiceCategory(id: 4, title: 'Sud va nizolar', iconPath: ''),
+    ];
+  }
+
+  Future<List<Appointment>> getAppointments() async {
+    // TODO(Dio): Replace this dummy list with `apiClient.get('appointments')`.
+    return const [
+      Appointment(
+        id: 1,
+        lawyerName: 'Javohir Mamatov',
+        lawyerTitle: 'Yuridik maslahatchi',
+        dateLabel: 'Bugun',
+        timeLabel: '16:00',
+        status: 'Kelgusi',
+        consultationType: 'Video konsultatsiya',
+        topic: 'Huquqiy maslahat',
+        rating: 4.6,
+        experienceYears: 5,
+      ),
+      Appointment(
+        id: 2,
+        lawyerName: 'Javohir Mamatov',
+        lawyerTitle: 'Yuridik maslahatchi',
+        dateLabel: '16.03.2026',
+        timeLabel: '14:00',
+        status: 'O‘tgan',
+        consultationType: 'Video konsultatsiya',
+        topic: 'Huquqiy maslahat',
+        rating: 4.6,
+        experienceYears: 5,
+      ),
+      Appointment(
+        id: 3,
+        lawyerName: 'Dilshod Yusupov',
+        lawyerTitle: 'Advokat',
+        dateLabel: '22.03.2026',
+        timeLabel: '11:30',
+        status: 'Bekor qilingan',
+        consultationType: 'Telefon konsultatsiya',
+        topic: 'Mehnat huquqi',
+        rating: 4.7,
+        experienceYears: 6,
+      ),
+    ];
+  }
 
   Future<List<Map<String, dynamic>>> getNews({
     int limit = 5,

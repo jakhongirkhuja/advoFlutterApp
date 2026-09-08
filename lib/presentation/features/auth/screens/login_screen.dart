@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../widgets/public_bottom_navigation_bar.dart';
 
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -74,6 +75,24 @@ class _LoginScreenState extends State<LoginScreen> {
     final localizations = AppLocalizations.of(context);
 
     return Scaffold(
+      bottomNavigationBar: PublicBottomNavigationBar(
+        onHomeTap: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRouter.home,
+            (route) => false,
+          );
+        },
+        onAppointmentsTap: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRouter.appointments,
+            (route) => false,
+          );
+        },
+        onServicesTap: () => Navigator.pushNamed(context, AppRouter.services),
+        onProfileTap: () {},
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),

@@ -35,11 +35,6 @@ class AuthViewModel extends ChangeNotifier {
     {'name': 'O\'zbekcha', 'code': 'uz', 'flag': '🇺🇿'},
     {'name': 'English', 'code': 'en', 'flag': '🇺🇸'},
     {'name': 'Русский', 'code': 'ru', 'flag': '🇷🇺'},
-    {'name': '한국어', 'code': 'ko', 'flag': '🇰🇷'},
-    {'name': 'Türkçe', 'code': 'tr', 'flag': '🇹🇷'},
-    {'name': 'العربية', 'code': 'ar', 'flag': '🇸🇦'},
-    {'name': 'Deutsch', 'code': 'de', 'flag': '🇩🇪'},
-    {'name': '中文', 'code': 'zh', 'flag': '🇨🇳'},
   ];
 
   void _checkSavedUser() async {

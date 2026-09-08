@@ -13,7 +13,12 @@ class AppLocalizations {
     'en': {
       'welcome': 'Welcome',
       'services': 'Services',
+      'appointments': 'Appointments',
       'home': 'Home',
+      'greeting': 'Welcome back!',
+      'legal_services': 'Legal services',
+      'popular_lawyers': 'Popular lawyers',
+      'coming_soon': 'This section will be available soon',
       'chat': 'Chat',
       'community': 'Community',
       'profile': 'Profile',
@@ -373,7 +378,12 @@ class AppLocalizations {
     'uz': {
       'welcome': 'Xush kelibsiz!',
       'services': 'Xizmatlar',
+      'appointments': 'Qabullar',
       'home': 'Asosiy',
+      'greeting': 'Assalomu alaykum!',
+      'legal_services': 'Huquqiy xizmatlar',
+      'popular_lawyers': 'Mashhur advokatlar',
+      'coming_soon': 'Bu bo‘lim tez orada ishga tushadi',
       'chat': 'Chat',
       'community': 'Jamoa',
       'profile': 'Profil',
@@ -721,7 +731,12 @@ class AppLocalizations {
     'ru': {
       'welcome': 'Добро пожаловать',
       'services': 'Услуги',
+      'appointments': 'Приёмы',
       'home': 'Главная',
+      'greeting': 'Здравствуйте!',
+      'legal_services': 'Юридические услуги',
+      'popular_lawyers': 'Популярные адвокаты',
+      'coming_soon': 'Этот раздел скоро будет доступен',
       'chat': 'Чат',
       'community': 'Сообщество',
       'profile': 'Профиль',
@@ -1556,7 +1571,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   bool isSupported(Locale locale) =>
-      ['en', 'uz', 'ru', 'ko', 'tr', 'ar', 'de', 'zh']
+      ['en', 'uz', 'ru']
           .contains(locale.languageCode);
 
   @override

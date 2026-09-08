@@ -1,6 +1,6 @@
 # Vatandoshlar
 
-Vatandoshlar is a Flutter application currently focused on a clean authentication shell. The active user flow is phone-number login with OTP verification. The project also keeps the core services required for the next development stage: localization, API access, FCM notifications, and authenticated location synchronization.
+Vatandoshlar is a Flutter application with a minimal home/profile shell and phone-number authentication. The active user flow is phone-number login with OTP verification. The project also keeps the core services required for the next development stage: localization, API access, FCM notifications, and authenticated location synchronization.
 
 ## Current scope
 
@@ -14,9 +14,11 @@ Vatandoshlar is a Flutter application currently focused on a clean authenticatio
 - Current-location sharing after authentication
 - Foreground location synchronization
 
-All copied feature screens were removed. The only active UI screens are:
+All copied feature screens were removed. The active UI screens are:
 
 ```text
+lib/presentation/features/home/screens/home_screen.dart
+lib/presentation/features/profile/screens/profile_screen.dart
 lib/presentation/features/auth/screens/login_screen.dart
 lib/presentation/features/auth/screens/otp_screen.dart
 ```
@@ -134,6 +136,6 @@ The project currently reports lint/info suggestions from the analyzer but no Dar
 
 ## Development notes
 
-- The application intentionally stays on the login shell after authentication until the next feature area is implemented.
+- The application opens on Home. Profile opens Login for unauthenticated users and the profile shell for authenticated users.
 - The OTP screen is retained because it is part of the login connection flow.
 - Notification and location services are initialized at application startup, while foreground location tracking is enabled only for authenticated users.

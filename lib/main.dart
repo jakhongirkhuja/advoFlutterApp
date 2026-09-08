@@ -14,8 +14,11 @@ import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'data/api/api_client.dart';
 import 'data/repositories/auth_repository.dart';
-import 'presentation/features/auth/screens/login_screen.dart';
+import 'data/repositories/home_repository.dart';
 import 'presentation/features/auth/viewmodels/auth_viewmodel.dart';
+import 'presentation/features/home/screens/home_screen.dart';
+import 'presentation/features/home/viewmodels/home_viewmodel.dart';
+import 'presentation/features/appointments/viewmodels/appointments_viewmodel.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -55,6 +58,12 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => AuthViewModel(AuthRepository(apiClient)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => HomeViewModel(HomeRepository(apiClient)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AppointmentsViewModel(HomeRepository(apiClient)),
         ),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
@@ -118,14 +127,9 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
       theme: AppTheme.lightTheme,
       locale: localeProvider.locale,
       supportedLocales: const [
-        Locale('en'),
         Locale('uz'),
+        Locale('en'),
         Locale('ru'),
-        Locale('ko'),
-        Locale('tr'),
-        Locale('ar'),
-        Locale('de'),
-        Locale('zh'),
       ],
       localizationsDelegates: const [
         AppLocalizationsDelegate(),
@@ -139,10 +143,6 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
   }
 
   Widget _buildInitialScreen(AuthViewModel authViewModel) {
-    if (authViewModel.status == AuthStatus.initial ||
-        authViewModel.status == AuthStatus.loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    return const LoginScreen();
+    return const HomeScreen();
   }
 }
