@@ -23,7 +23,12 @@ class HomeViewModel extends ChangeNotifier {
 
   String _locationName = 'Toshkent shahri';
   String get locationName => _locationName;
-
+  Future<void> loadServices() async{
+    _isLoading = true;
+    notifyListeners();
+    _isLoading = false;
+    notifyListeners();
+  }
   Future<void> loadHome() async {
     _isLoading = true;
     notifyListeners();

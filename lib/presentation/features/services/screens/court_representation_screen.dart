@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/home/lawyer.dart';
+import '../../../widgets/lawyer_card.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
 class CourtRepresentationScreen extends StatelessWidget {
@@ -43,7 +45,7 @@ class CourtRepresentationScreen extends StatelessWidget {
           if (home.isLoading)
             const SizedBox(height: 300, child: Center(child: CircularProgressIndicator(strokeWidth: 2)))
           else
-            ...home.popularLawyers.map((lawyer) => _LawyerCard(lawyer: lawyer)),
+            ...home.popularLawyers.map((lawyer) => LawyerCard(lawyer: lawyer)),
         ],
       ),
     );
@@ -122,48 +124,7 @@ class _AboutDropdownState extends State<_AboutDropdown> {
   }
 }
 
-class _LawyerCard extends StatelessWidget {
-  final Lawyer lawyer;
 
-  const _LawyerCard({required this.lawyer});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(19)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _Avatar(lawyer: lawyer),
-          const SizedBox(width: 9),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Flexible(child: Text(lawyer.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-              const SizedBox(width: 3),
-              const Icon(Icons.verified, size: 13, color: Color(0xFF16A36D)),
-            ]),
-            const SizedBox(height: 2),
-            Text('${lawyer.title} · ${lawyer.experienceYears} yil tajriba', style: const TextStyle(fontSize: 9, color: Color(0xFF777777))),
-            const SizedBox(height: 2),
-            Row(children: [const Icon(Icons.star, size: 13, color: Color(0xFFFFB900)), const SizedBox(width: 3), Text('${lawyer.rating}  (${lawyer.reviewsCount} ta sharh)', style: const TextStyle(fontSize: 9, color: Color(0xFF555555)))]),
-          ])),
-          IconButton(onPressed: () {}, padding: EdgeInsets.zero, constraints: const BoxConstraints.tightFor(width: 30, height: 30), icon: const Icon(Icons.bookmark_border, size: 19, color: Color(0xFF777777))),
-        ]),
-        const SizedBox(height: 7),
-        Row(children: [
-          ...lawyer.tags.take(2).map((tag) => Padding(padding: const EdgeInsets.only(right: 5), child: _Tag(tag))),
-          if (lawyer.tags.length > 2) _Tag('+${lawyer.tags.length - 2}'),
-        ]),
-        const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1, color: Color(0xFFE8E8E8))),
-        Row(children: [
-          Expanded(child: Text('${lawyer.pricePerMinute} so‘m/dan', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500))),
-          SizedBox(height: 34, child: FilledButton(onPressed: () => Navigator.pushNamed(context, AppRouter.lawyerProfile, arguments: lawyer), style: FilledButton.styleFrom(backgroundColor: AppTheme.buttonGold, foregroundColor: Colors.white, minimumSize: const Size(0, 34), tapTargetSize: MaterialTapTargetSize.shrinkWrap, padding: const EdgeInsets.symmetric(horizontal: 18), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))), child: const Text('Ko‘rish', style: TextStyle(fontSize: 11)))),
-        ]),
-      ]),
-    );
-  }
-}
 
 class _Avatar extends StatelessWidget {
   final Lawyer lawyer;
