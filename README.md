@@ -12,7 +12,7 @@ Vatandoshlar is a Flutter application currently focused on a clean authenticatio
 - Firebase Cloud Messaging notifications
 - FCM token registration and refresh handling
 - Current-location sharing after authentication
-- Foreground and background location synchronization
+- Foreground location synchronization
 
 All copied feature screens were removed. The only active UI screens are:
 
@@ -30,7 +30,7 @@ lib/
 │   ├── localization/                  # Locale provider and translations
 │   ├── routes/app_router.dart          # Login and OTP routes
 │   ├── services/
-│   │   ├── location_sync_service.dart  # Foreground/background location sync
+│   │   ├── location_sync_service.dart  # Foreground location sync
 │   │   └── notification_service.dart   # FCM and local notifications
 │   └── theme/app_theme.dart
 ├── data/
@@ -86,9 +86,9 @@ Do not commit private production credentials or sensitive Firebase configuration
 
 ## Location setup
 
-The app requests location permission after successful authentication and synchronizes the current location through the authenticated API client. Background synchronization uses Workmanager.
+The app requests location permission after successful authentication and synchronizes the current location through the authenticated API client while the app is active.
 
-Android permissions are declared in `android/app/src/main/AndroidManifest.xml`, including foreground and background location permissions. iOS location permission descriptions and background modes are configured in `ios/Runner/Info.plist`.
+Android and iOS location permission descriptions are configured in the platform files. Location sync is foreground-only.
 
 The backend must support these authenticated endpoints:
 
@@ -136,4 +136,4 @@ The project currently reports lint/info suggestions from the analyzer but no Dar
 
 - The application intentionally stays on the login shell after authentication until the next feature area is implemented.
 - The OTP screen is retained because it is part of the login connection flow.
-- Notification and location services are initialized at application startup, while location tracking is enabled only for authenticated users.
+- Notification and location services are initialized at application startup, while foreground location tracking is enabled only for authenticated users.

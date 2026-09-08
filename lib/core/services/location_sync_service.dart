@@ -1,45 +1,18 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
 
 import '../../data/api/api_client.dart';
 import '../../data/repositories/home_repository.dart';
-
-@pragma('vm:entry-point')
-void locationSyncCallbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    WidgetsFlutterBinding.ensureInitialized();
-    LocationSyncService.instance._log(
-      'background dispatcher fired for task=$task input=$inputData',
-    );
-
-    try {
-      await LocationSyncService.instance.runBackgroundTask(task);
-      LocationSyncService.instance._log(
-        'background dispatcher completed for task=$task',
-      );
-      return true;
-    } catch (e) {
-      LocationSyncService.instance._log(
-        'background dispatcher failed for task=$task error=$e',
-      );
-      return false;
-    }
-  });
-}
 
 class LocationSyncService {
   LocationSyncService._();
 
   static final LocationSyncService instance = LocationSyncService._();
 
-  static const String _taskUniqueName = 'user-location-sync-periodic';
-  static const String _taskName = 'user-location-sync';
   static const String _authEnabledKey = 'location_sync_auth_enabled';
   static const String _lastSentAtKey = 'location_sync_last_sent_at';
   static const String _lastObservedAtKey = 'location_sync_last_observed_at';
@@ -65,10 +38,7 @@ class LocationSyncService {
     _initialized = true;
     _log('initialize requested');
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      await Workmanager().initialize(locationSyncCallbackDispatcher);
-      _log('workmanager initialized for ${Platform.operatingSystem}');
-    }
+    _log('foreground location sync initialized');
   }
 
   Future<void> updateTrackingState({required bool isAuthenticated}) async {
@@ -86,7 +56,6 @@ class LocationSyncService {
     }
 
     await _ensureLocationPermissionForTracking();
-    await _ensureBackgroundTaskRegistered();
 
     if (_isForegroundLifecycle(_lastLifecycleState)) {
       _startForegroundTimer();
@@ -109,17 +78,6 @@ class LocationSyncService {
     }
 
     _stopForegroundTimer();
-    await _ensureBackgroundTaskRegistered();
-  }
-
-  Future<void> runBackgroundTask(String task) async {
-    if (task != _taskName) {
-      _log('ignoring unknown task=$task');
-      return;
-    }
-
-    _log('running background task=$task');
-    await syncNow(source: 'background_task');
   }
 
   Future<void> syncNow({String source = 'manual'}) async {
@@ -146,19 +104,9 @@ class LocationSyncService {
         return;
       }
 
-      final requireAlwaysPermission =
-          Platform.isIOS && source == 'background_task';
-      final permission = await _ensureLocationPermission(
-        requireAlways: requireAlwaysPermission,
-      );
-      if (!_allowsLocation(
-        permission,
-        requireAlways: requireAlwaysPermission,
-      )) {
-        _log(
-          'syncNow skipped source=$source '
-          'reason=permission_$permission requireAlways=$requireAlwaysPermission',
-        );
+      final permission = await _ensureLocationPermission();
+      if (!_allowsLocation(permission)) {
+        _log('syncNow skipped source=$source reason=permission_$permission');
         return;
       }
 
@@ -246,8 +194,10 @@ class LocationSyncService {
     try {
       _log('requesting current position for background sync');
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 20),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 20),
+        ),
       );
       _log(
         'current position resolved lat=${position.latitude} lng=${position.longitude} '
@@ -267,44 +217,9 @@ class LocationSyncService {
     }
   }
 
-  Future<void> _ensureBackgroundTaskRegistered() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.getBool(_authEnabledKey).orFalse) {
-      return;
-    }
-
-    if (!(Platform.isAndroid || Platform.isIOS)) {
-      return;
-    }
-
-    if (Platform.isIOS) {
-      final permission = await Geolocator.checkPermission();
-      if (permission != LocationPermission.always) {
-        _log(
-          'skipping background task registration on ios until always permission is granted',
-        );
-        return;
-      }
-    }
-
-    _log('registering periodic background task');
-    await Workmanager().cancelByUniqueName(_taskUniqueName);
-    await Workmanager().registerPeriodicTask(
-      _taskUniqueName,
-      _taskName,
-      frequency: movingInterval,
-      initialDelay: movingInterval,
-      constraints: Constraints(networkType: NetworkType.connected),
-    );
-  }
-
   Future<void> _disableTracking() async {
     _log('disabling location tracking');
     _stopForegroundTimer();
-
-    if (Platform.isAndroid || Platform.isIOS) {
-      await Workmanager().cancelByUniqueName(_taskUniqueName);
-    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_lastSentAtKey);
@@ -336,45 +251,23 @@ class LocationSyncService {
   }
 
   Future<void> _ensureLocationPermissionForTracking() async {
-    if (Platform.isIOS) {
-      final permission = await _ensureLocationPermission(requireAlways: true);
-      _log('ios tracking permission status after ensure: $permission');
-      return;
-    }
-
-    final permission = await _ensureLocationPermission(requireAlways: false);
+    final permission = await _ensureLocationPermission();
     _log('tracking permission status after ensure: $permission');
   }
 
-  Future<LocationPermission> _ensureLocationPermission({
-    required bool requireAlways,
-  }) async {
+  Future<LocationPermission> _ensureLocationPermission() async {
     var permission = await Geolocator.checkPermission();
-    _log('current permission status=$permission requireAlways=$requireAlways');
+    _log('current permission status=$permission');
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       _log('permission after request=$permission');
     }
 
-    if (Platform.isIOS &&
-        requireAlways &&
-        permission == LocationPermission.whileInUse) {
-      _log('ios permission is whileInUse, requesting upgrade to always');
-      permission = await Geolocator.requestPermission();
-      _log('ios permission after always-upgrade request=$permission');
-    }
-
     return permission;
   }
 
-  bool _allowsLocation(
-    LocationPermission permission, {
-    required bool requireAlways,
-  }) {
-    if (requireAlways) {
-      return permission == LocationPermission.always;
-    }
+  bool _allowsLocation(LocationPermission permission) {
     return permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse;
   }

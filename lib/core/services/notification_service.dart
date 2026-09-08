@@ -17,7 +17,7 @@ class NotificationService {
       android: AndroidInitializationSettings('@mipmap/launcher_icon'),
       iOS: DarwinInitializationSettings(),
     );
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
 
     final android = _plugin
         .resolvePlatformSpecificImplementation<
@@ -64,10 +64,10 @@ class NotificationService {
     if (title == null && body == null) return;
 
     await _plugin.show(
-      message.hashCode,
-      title ?? 'Vatandoshlar',
-      body ?? '',
-      const NotificationDetails(
+      id: message.hashCode,
+      title: title ?? 'Vatandoshlar',
+      body: body ?? '',
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
