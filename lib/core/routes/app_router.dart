@@ -10,7 +10,11 @@ import '../../presentation/features/services/screens/court_representation_screen
 import '../../presentation/features/services/screens/lawyer_profile_screen.dart';
 import '../../presentation/features/services/screens/appointment_create_screen.dart';
 import '../../presentation/features/services/screens/templates_screen.dart';
+import '../../presentation/features/services/screens/organizations_screen.dart';
+import '../../presentation/features/services/screens/organization_profile_screen.dart';
+import '../../presentation/features/common/screens/utility_screens.dart';
 import '../../data/models/home/lawyer.dart';
+import '../../data/models/services/organization.dart';
 class CourtRepresentationArgs {
   final String title;
   final String about;
@@ -35,6 +39,12 @@ class AppRouter {
   static const lawyerProfile = '/lawyer-profile';
   static const appointmentCreate = '/appointments/create';
   static const templates = '/services/templates';
+  static const organizations = '/services/organizations';
+  static const organizationProfile = '/organization-profile';
+  static const savedLawyers = '/saved-lawyers';
+  static const notifications = '/notifications';
+  static const search = '/search';
+  static const filters = '/filters';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -69,6 +79,23 @@ class AppRouter {
         );
       case templates:
         return MaterialPageRoute(builder: (_) => const TemplatesScreen());
+      case organizations:
+        return MaterialPageRoute(builder: (_) => const OrganizationsScreen());
+      case organizationProfile:
+        final organization = settings.arguments;
+        return MaterialPageRoute(
+          builder: (_) => organization is Organization
+              ? OrganizationProfileScreen(organization: organization)
+              : const OrganizationsScreen(),
+        );
+      case savedLawyers:
+        return MaterialPageRoute(builder: (_) => const SavedLawyersScreen());
+      case notifications:
+        return MaterialPageRoute(builder: (_) => const NotificationsScreen());
+      case search:
+        return MaterialPageRoute(builder: (_) => const SearchScreen());
+      case filters:
+        return MaterialPageRoute(builder: (_) => const FilterScreen());
       case otp:
         final phone = settings.arguments;
         return MaterialPageRoute(

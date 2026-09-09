@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../data/models/home/lawyer.dart';
-import '../../../widgets/header_navigation.dart';
 import '../../../widgets/header_screen.dart';
 import '../../../widgets/lawyer_card.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
@@ -113,9 +109,9 @@ class _CourtRepresentationScreenState extends State<CourtRepresentationScreen> {
               HeaderScreen(
                 title: widget.title,
                 firstActionIconPath: 'assets/icons/search.svg',
-                onFirstActionTap: () {},
+                onFirstActionTap: () => Navigator.pushNamed(context, AppRouter.search),
                 secondActionIconPath: 'assets/icons/filter.svg',
-                onSecondActionTap: (){},
+                onSecondActionTap: () => Navigator.pushNamed(context, AppRouter.filters),
               ),
 
             ],

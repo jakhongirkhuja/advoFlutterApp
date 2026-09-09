@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../widgets/header_navigation.dart';
+import '../../../../core/routes/app_router.dart';
 import '../../../widgets/header_screen.dart';
 
 class TemplatesScreen extends StatelessWidget {
@@ -41,9 +41,9 @@ class TemplatesScreen extends StatelessWidget {
               HeaderScreen(
                 title: 'Hujjat shablonlari',
                 firstActionIconPath: 'assets/icons/search.svg',
-                onFirstActionTap: () {},
+                onFirstActionTap: () => Navigator.pushNamed(context, AppRouter.search),
                 secondActionIconPath: 'assets/icons/filter.svg',
-                onSecondActionTap: () {},
+                onSecondActionTap: () => Navigator.pushNamed(context, AppRouter.filters),
               ),
             ],
           ),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/home/lawyer.dart';
 import '../models/home/service_category.dart';
 import '../models/appointments/appointment.dart';
+import '../models/services/organization.dart';
 
 class HomeRepository {
   final ApiClient apiClient;
@@ -88,6 +89,61 @@ class HomeRepository {
       ServiceCategory(id: 2, title: 'Oila huquqi', iconPath: ''),
       ServiceCategory(id: 3, title: 'Fuqarolik huquqi', iconPath: ''),
       ServiceCategory(id: 4, title: 'Sud va nizolar', iconPath: ''),
+    ];
+  }
+
+  Future<List<Organization>> getOrganizations() async {
+    // TODO(Dio): Replace this dummy list with `apiClient.get('organizations')`.
+    return const [
+      Organization(
+        id: 1,
+        name: 'ADVO Legal Group',
+        type: 'Yuridik firma',
+        lawyerCount: 15,
+        rating: 4.7,
+        reviewsCount: 42,
+        tags: ['Mehnat huquqi', 'Iqtisodiy jinoyatlar'],
+        // imageUrl: '${AppConfig.mediaBaseUrl}/media/organizations/1.png',
+        imageUrl: '${AppConfig.dummyImageBaseUrl}/organization-1/320/240',
+
+        address: 'Toshkent shahri, Yunusobod tumani',
+        isVerified: true,
+        latitude: 41.3382,
+        longitude: 69.3347,
+        services: ['Sudda vakillik', 'Da’vo arizasini tayyorlash', 'Sudga tayyorgarlik', 'Apellyatsiya shikoyati'],
+      ),
+      Organization(
+        id: 2,
+        name: 'Jasur Legal Services',
+        type: 'Yuridik maslahat',
+        lawyerCount: 10,
+        rating: 4.5,
+        reviewsCount: 35,
+        tags: ['Oilaviy huquq', 'Biznes huquqi'],
+        // imageUrl: '${AppConfig.mediaBaseUrl}/media/organizations/2.png',
+        imageUrl: '${AppConfig.dummyImageBaseUrl}/organization-2/320/240',
+        address: 'Toshkent shahri, Shayxontohur tumani',
+        isVerified: true,
+        latitude: 41.3198,
+        longitude: 69.2425,
+        services: ['Huquqiy maslahat', 'Sudda vakillik', 'Mehnat nizolari'],
+      ),
+      Organization(
+        id: 3,
+        name: 'Legal Experts Uzbekistan',
+        type: 'Yuridik maslahat',
+        lawyerCount: 14,
+        rating: 4.9,
+        reviewsCount: 40,
+        tags: ['Fuqarolik huquqi', 'Sud ishlari'],
+        // imageUrl: '${AppConfig.mediaBaseUrl}/media/organizations/3.png',
+        address: 'Toshkent shahri, Mirzo Ulug‘bek tumani',
+        imageUrl: '${AppConfig.dummyImageBaseUrl}/organization-3/320/240',
+        isVerified: true,
+        latitude: 41.3275,
+        longitude: 69.2812,
+        services: ['Fuqarolik huquqi', 'Shartnoma tayyorlash', 'Sud maslahatlari'],
+      ),
     ];
   }
 

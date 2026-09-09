@@ -6,7 +6,6 @@ import 'package:vatandoshlar/presentation/widgets/section_header.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../presentation/widgets/public_bottom_navigation_bar.dart';
-import '../../../widgets/header_navigation.dart';
 import '../../../widgets/header_screen.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
@@ -30,6 +29,10 @@ class ServicesScreen extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
                 children: [
                   _FeaturePanel(
+                    onOrganizationsTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.organizations,
+                    ),
                     onTemplatesTap: () => Navigator.pushNamed(
                       context,
                       AppRouter.templates,
@@ -97,9 +100,9 @@ class ServicesScreen extends StatelessWidget {
                 showBackIcon: false,
                 title: 'Xizmatlar',
                 firstActionIconPath: 'assets/icons/bookmark.svg',
-                onFirstActionTap: () {},
+                onFirstActionTap: () => Navigator.pushNamed(context, AppRouter.savedLawyers),
                 secondActionIconPath: 'assets/icons/notification.svg',
-                onSecondActionTap: (){},
+                onSecondActionTap: () => Navigator.pushNamed(context, AppRouter.notifications),
               ),
               Positioned(
                 left: 0,
@@ -139,9 +142,10 @@ class ServicesScreen extends StatelessWidget {
 }
 
 class _FeaturePanel extends StatelessWidget {
+  final VoidCallback onOrganizationsTap;
   final VoidCallback onTemplatesTap;
 
-  const _FeaturePanel({required this.onTemplatesTap});
+  const _FeaturePanel({required this.onOrganizationsTap, required this.onTemplatesTap});
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +170,7 @@ class _FeaturePanel extends StatelessWidget {
                     icon: 'assets/icons/compains.svg',
                     title: 'Tashkilotlar',
                     subtitle: 'Ishonchli yuridik tashkilotlarni toping',
+                    onTap: onOrganizationsTap,
                   ),
                 ),
                 SizedBox(width: 6),

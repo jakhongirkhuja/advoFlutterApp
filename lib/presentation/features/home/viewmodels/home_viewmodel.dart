@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../../../data/models/home/lawyer.dart';
 import '../../../../data/models/home/service_category.dart';
+import '../../../../data/models/services/organization.dart';
 import '../../../../data/repositories/home_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
@@ -23,9 +24,12 @@ class HomeViewModel extends ChangeNotifier {
 
   String _locationName = 'Toshkent shahri';
   String get locationName => _locationName;
-  Future<void> loadServices() async{
+  List<Organization> _organizations = const [];
+  List<Organization> get organizations => _organizations;
+  Future<void> loadServices() async {
     _isLoading = true;
     notifyListeners();
+    _organizations = await repository.getOrganizations();
     _isLoading = false;
     notifyListeners();
   }

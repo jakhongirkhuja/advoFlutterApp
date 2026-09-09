@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../core/routes/app_router.dart';
+import '../../core/config/app_config.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/home/lawyer.dart';
 
@@ -36,7 +37,7 @@ class LawyerCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Image.network(
-                  'https://loremflickr.com/320/240/',
+                  '${AppConfig.dummyImageBaseUrl}/lawyer-${lawyer.id}/320/240',
                   fit: BoxFit.cover,
                   errorBuilder: (context, exception, stackTrace) {
                     return Center(

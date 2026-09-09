@@ -4,4 +4,5 @@ class AppConfig {
 
   static const String apiBaseUrl = 'https://apivatandosh.7z7.uz/api/v1/';
   static const String mediaBaseUrl = 'https://apivatandosh.7z7.uz';
+  static const String dummyImageBaseUrl = 'https://picsum.photos/seed';
 }

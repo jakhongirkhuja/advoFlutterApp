@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../data/models/home/lawyer.dart';
 import '../../../../data/models/home/service_category.dart';
 import '../../../widgets/header_navigation.dart';
 import '../../../widgets/lawyer_card.dart';
@@ -157,9 +156,9 @@ class _TopBar extends StatelessWidget {
         ),
         HeaderNavigation(
           firstIconPath: 'assets/icons/bookmark.svg',
-          firstIconOnTap: () {},
+          firstIconOnTap: () => Navigator.pushNamed(context, AppRouter.savedLawyers),
           secondIconPath: 'assets/icons/notification.svg',
-          secondIconOnTap: () {},
+          secondIconOnTap: () => Navigator.pushNamed(context, AppRouter.notifications),
         ),
       ],
     );
@@ -173,7 +172,9 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRouter.search),
+      child: Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(61)),
       clipBehavior: Clip.antiAlias,
       child: TextField(
@@ -192,6 +193,7 @@ class _SearchField extends StatelessWidget {
             borderSide: const BorderSide(color: Colors.transparent, width: 0),
           ),
         ),
+      ),
       ),
     );
   }
