@@ -9,6 +9,7 @@ import '../../presentation/features/services/screens/services_screen.dart';
 import '../../presentation/features/services/screens/court_representation_screen.dart';
 import '../../presentation/features/services/screens/lawyer_profile_screen.dart';
 import '../../presentation/features/services/screens/appointment_create_screen.dart';
+import '../../presentation/features/services/screens/templates_screen.dart';
 import '../../data/models/home/lawyer.dart';
 class CourtRepresentationArgs {
   final String title;
@@ -33,6 +34,7 @@ class AppRouter {
   static const courtRepresentation = '/services/court-representation';
   static const lawyerProfile = '/lawyer-profile';
   static const appointmentCreate = '/appointments/create';
+  static const templates = '/services/templates';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -65,6 +67,8 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => lawyer is Lawyer ? AppointmentCreateScreen(lawyer: lawyer) : const ServicesScreen(),
         );
+      case templates:
+        return MaterialPageRoute(builder: (_) => const TemplatesScreen());
       case otp:
         final phone = settings.arguments;
         return MaterialPageRoute(

@@ -7,6 +7,7 @@ import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/home/lawyer.dart';
 import '../../../widgets/header_navigation.dart';
+import '../../../widgets/header_screen.dart';
 import '../../../widgets/lawyer_card.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
@@ -38,127 +39,85 @@ class _CourtRepresentationScreenState extends State<CourtRepresentationScreen> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => {},
-          child: Column(
+          child: Stack(
             children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    ListView(
-                      padding: const EdgeInsets.fromLTRB(12, 70, 12, 24),
+              ListView(
+                padding: const EdgeInsets.fromLTRB(12, 70, 12, 24),
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 13,
+                    ),
+                    child: Column(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 13,
-                          ),
-                          child: Column(
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _isExpanded = !_isExpanded;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(22),
+                          child: Row(
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _isExpanded = !_isExpanded;
-                                  });
-                                },
-                                borderRadius: BorderRadius.circular(22),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        widget.about,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    AnimatedRotation(
-                                      turns: _isExpanded ? 0.5 : 0.0,
-                                      duration: const Duration(
-                                        milliseconds: 200,
-                                      ),
-                                      child: const Icon(
-                                        Icons.keyboard_arrow_down,
-                                        size: 17,
-                                        color: Color(0xFF777777),
-                                      ),
-                                    ),
-                                  ],
+                              Expanded(
+                                child: Text(
+                                  widget.about,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                              ?_isExpanded
-                                  ? Align(
-                                      child: Text(widget.description),
-                                      alignment: Alignment.topLeft,
-                                    )
-                                  : null,
+                              AnimatedRotation(
+                                turns: _isExpanded ? 0.5 : 0.0,
+                                duration: const Duration(
+                                  milliseconds: 200,
+                                ),
+                                child: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 17,
+                                  color: Color(0xFF777777),
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        if (home.isLoading)
-                          const SizedBox(
-                            height: 300,
-                            child: Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        else
-                          ...home.popularLawyers.map(
-                            (lawyer) => LawyerCard(lawyer: lawyer),
-                          ),
+                        ?_isExpanded
+                            ? Align(
+                                child: Text(widget.description),
+                                alignment: Alignment.topLeft,
+                              )
+                            : null,
                       ],
                     ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              AppTheme.pageBackground,
-                              Color(0xFFF5F5F5).withValues(alpha: 0.4),
-                            ],
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            HeaderNavigation(
-                              firstIconPath: 'assets/icons/back.svg',
-                              moveBack: true,
-                              firstIconOnTap: () {},
-                            ),
-                            Text(
-                              widget.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            HeaderNavigation(
-                              firstIconPath: 'assets/icons/search.svg',
-                              firstIconOnTap: () {},
-                              secondIconPath: 'assets/icons/filter.svg',
-                              secondIconOnTap: () {},
-                            ),
-                          ],
-                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (home.isLoading)
+                    const SizedBox(
+                      height: 300,
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
+                    )
+                  else
+                    ...home.popularLawyers.map(
+                      (lawyer) => LawyerCard(lawyer: lawyer),
                     ),
-                  ],
-                ),
+                ],
               ),
+              HeaderScreen(
+                title: widget.title,
+                firstActionIconPath: 'assets/icons/search.svg',
+                onFirstActionTap: () {},
+                secondActionIconPath: 'assets/icons/filter.svg',
+                onSecondActionTap: (){},
+              ),
+
             ],
           ),
         ),

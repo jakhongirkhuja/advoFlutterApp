@@ -7,6 +7,7 @@ import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../presentation/widgets/public_bottom_navigation_bar.dart';
 import '../../../widgets/header_navigation.dart';
+import '../../../widgets/header_screen.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
 class ServicesScreen extends StatelessWidget {
@@ -21,133 +22,101 @@ class ServicesScreen extends StatelessWidget {
         bottom: false,
         child: RefreshIndicator(
           onRefresh: viewModel.loadServices,
-          child: Column(
+          child: Stack(
             children: [
-              Expanded(
-                child: Stack(
-                  children: [
+              ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                // Guarantees pull-to-refresh behavior
+                padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
+                children: [
+                  _FeaturePanel(
+                    onTemplatesTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.templates,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const SectionHeader(title: 'Xizmat turlari'),
+                  const SizedBox(height: 12),
+                  _ServiceRow(
+                    icon: Icons.people_outline,
+                    title: 'Huquqiy maslahat',
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.courtRepresentation,
+                      arguments: CourtRepresentationArgs(
+                        title: 'Huquqiy maslahat',
+                        about: 'Huquqiy maslahat Haqida ma\'lumot',
+                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                      ),
+                    ),
+                  ),
+                  _ServiceRow(
+                    icon: Icons.family_restroom,
+                    title: 'Oila huquqi',
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.courtRepresentation,
+                      arguments: CourtRepresentationArgs(
+                        title: 'Oila huquqi',
+                        about: 'Oila huquqi Haqida ma\'lumot',
+                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                      ),
+                    ),
+                  ),
+                  _ServiceRow(
+                    icon: Icons.groups_outlined,
+                    title: 'Fuqarolik huquqi',
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.courtRepresentation,
+                      arguments: CourtRepresentationArgs(
+                        title: 'Fuqarolik huquqi',
+                        about: 'Fuqarolik huquqi Haqida ma\'lumot',
+                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                      ),
+                    ),
+                  ),
+                  _ServiceRow(
+                    icon: Icons.gavel,
+                    title: 'Sud va nizolar',
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.courtRepresentation,
+                      arguments: CourtRepresentationArgs(
+                        title: 'Sud va nizolar',
+                        about: 'Sud va nizolar Haqida ma\'lumot',
+                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                      ),
+                    ),
+                  ),
 
-                    ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      // Guarantees pull-to-refresh behavior
-                      padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
-                      children: [
-                        const _FeaturePanel(),
-                        const SizedBox(height: 12),
-                        const SectionHeader(title: 'Xizmat turlari'),
-                        const SizedBox(height: 12),
-                        _ServiceRow(
-                          icon: Icons.people_outline,
-                          title: 'Huquqiy maslahat',
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            AppRouter.courtRepresentation,
-                            arguments: CourtRepresentationArgs(
-                              title: 'Huquqiy maslahat',
-                              about: 'Huquqiy maslahat Haqida ma\'lumot',
-                              description: 'Batafsil tavsif bu yerda joylashadi.',
-                            ),
-                          ),
-                        ),
-                        _ServiceRow(
-                          icon: Icons.family_restroom,
-                          title: 'Oila huquqi',
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            AppRouter.courtRepresentation,
-                            arguments: CourtRepresentationArgs(
-                              title: 'Oila huquqi',
-                              about: 'Oila huquqi Haqida ma\'lumot',
-                              description: 'Batafsil tavsif bu yerda joylashadi.',
-                            ),
-                          ),
-                        ),
-                        _ServiceRow(
-                          icon: Icons.groups_outlined,
-                          title: 'Fuqarolik huquqi',
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            AppRouter.courtRepresentation,
-                            arguments: CourtRepresentationArgs(
-                              title: 'Fuqarolik huquqi',
-                              about: 'Fuqarolik huquqi Haqida ma\'lumot',
-                              description: 'Batafsil tavsif bu yerda joylashadi.',
-                            ),
-                          ),
-                        ),
-                        _ServiceRow(
-                          icon: Icons.gavel,
-                          title: 'Sud va nizolar',
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            AppRouter.courtRepresentation,
-                            arguments: CourtRepresentationArgs(
-                              title: 'Sud va nizolar',
-                              about: 'Sud va nizolar Haqida ma\'lumot',
-                              description: 'Batafsil tavsif bu yerda joylashadi.',
-                            ),
-                          ),
-                        ),
+                ],
+              ),
+              HeaderScreen(
+                showBackIcon: false,
+                title: 'Xizmatlar',
+                firstActionIconPath: 'assets/icons/bookmark.svg',
+                onFirstActionTap: () {},
+                secondActionIconPath: 'assets/icons/notification.svg',
+                onSecondActionTap: (){},
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 45,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFF5F5F5).withValues(alpha: 0.0),
+                        const Color(0xFFF5F5F5),
                       ],
                     ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              AppTheme.pageBackground,
-                              Color(0xFFF5F5F5).withValues(alpha: 0.4),
-                            ],
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Xizmatlar',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            HeaderNavigation(
-                              firstIconPath: 'assets/icons/bookmark.svg',
-                              firstIconOnTap: () {},
-                              secondIconPath: 'assets/icons/notification.svg',
-                              secondIconOnTap: () {},
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      height: 45,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFF5F5F5).withValues(alpha: 0.0),
-                              const Color(0xFFF5F5F5),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -170,7 +139,9 @@ class ServicesScreen extends StatelessWidget {
 }
 
 class _FeaturePanel extends StatelessWidget {
-  const _FeaturePanel();
+  final VoidCallback onTemplatesTap;
+
+  const _FeaturePanel({required this.onTemplatesTap});
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +160,7 @@ class _FeaturePanel extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              children: const [
+              children: [
                 Expanded(
                   child: _FeatureTile(
                     icon: 'assets/icons/compains.svg',
@@ -208,11 +179,12 @@ class _FeaturePanel extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            const _FeatureTile(
+            _FeatureTile(
               icon: 'assets/icons/templetes.svg',
               title: 'Hujjatlar shablonlari',
               subtitle: 'Tayyor huquqiy hujjat shablonlaridan foydalaning',
               expanded: true,
+              onTap: onTemplatesTap,
             ),
           ],
         ),
@@ -226,24 +198,29 @@ class _FeatureTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool expanded;
+  final VoidCallback? onTap;
 
   const _FeatureTile({
     required this.icon,
     required this.title,
     required this.subtitle,
     this.expanded = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 140,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: 140,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Align(
@@ -269,6 +246,7 @@ class _FeatureTile extends StatelessWidget {
             style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
           ),
         ],
+        ),
       ),
     );
   }

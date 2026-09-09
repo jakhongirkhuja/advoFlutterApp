@@ -17,7 +17,7 @@ class AppTheme {
   static const Color textSecondary = Color(0xFF555555);
   static const Color textMuted = Color(0xFF777777);
   static const Color textLight = Color(0xFF999999);
-  static const Color divider = Color(0xFFECECEC);
+  static const Color divider = Color(0xFFE8E4E3);
   static const Color success = Color(0xFF16A36D);
   static const Color star = Color(0xFFFFB900);
   static const Color danger = Color(0xFFD64545);
