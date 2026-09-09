@@ -23,38 +23,14 @@ class ServicesScreen extends StatelessWidget {
           onRefresh: viewModel.loadServices,
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Xizmatlar',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    HeaderNavigation(
-                      firstIconPath: 'assets/icons/bookmark.svg',
-                      firstIconOnTap: () {},
-                      secondIconPath: 'assets/icons/notification.svg',
-                      secondIconOnTap: () {},
-                    ),
-                  ],
-                ),
-              ),
               Expanded(
                 child: Stack(
                   children: [
+
                     ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       // Guarantees pull-to-refresh behavior
-                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 18),
+                      padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
                       children: [
                         const _FeaturePanel(),
                         const SizedBox(height: 12),
@@ -63,40 +39,41 @@ class ServicesScreen extends StatelessWidget {
                         _ServiceRow(
                           icon: Icons.people_outline,
                           title: 'Huquqiy maslahat',
-                          onTap: () {},
-                        ),
-                        _ServiceRow(
-                          icon: Icons.family_restroom,
-                          title: 'Oila huquqi',
-                          onTap: () {},
-                        ),
-                        _ServiceRow(
-                          icon: Icons.groups_outlined,
-                          title: 'Fuqarolik huquqi',
-                          onTap: () {},
-                        ),
-                        _ServiceRow(
-                          icon: Icons.gavel,
-                          title: 'Sud va nizolar',
                           onTap: () => Navigator.pushNamed(
                             context,
                             AppRouter.courtRepresentation,
+                            arguments: CourtRepresentationArgs(
+                              title: 'Huquqiy maslahat',
+                              about: 'Huquqiy maslahat Haqida ma\'lumot',
+                              description: 'Batafsil tavsif bu yerda joylashadi.',
+                            ),
                           ),
                         ),
                         _ServiceRow(
-                          icon: Icons.people_outline,
-                          title: 'Huquqiy maslahat',
-                          onTap: () {},
-                        ),
-                        _ServiceRow(
                           icon: Icons.family_restroom,
                           title: 'Oila huquqi',
-                          onTap: () {},
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            AppRouter.courtRepresentation,
+                            arguments: CourtRepresentationArgs(
+                              title: 'Oila huquqi',
+                              about: 'Oila huquqi Haqida ma\'lumot',
+                              description: 'Batafsil tavsif bu yerda joylashadi.',
+                            ),
+                          ),
                         ),
                         _ServiceRow(
                           icon: Icons.groups_outlined,
                           title: 'Fuqarolik huquqi',
-                          onTap: () {},
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            AppRouter.courtRepresentation,
+                            arguments: CourtRepresentationArgs(
+                              title: 'Fuqarolik huquqi',
+                              about: 'Fuqarolik huquqi Haqida ma\'lumot',
+                              description: 'Batafsil tavsif bu yerda joylashadi.',
+                            ),
+                          ),
                         ),
                         _ServiceRow(
                           icon: Icons.gavel,
@@ -104,9 +81,53 @@ class ServicesScreen extends StatelessWidget {
                           onTap: () => Navigator.pushNamed(
                             context,
                             AppRouter.courtRepresentation,
+                            arguments: CourtRepresentationArgs(
+                              title: 'Sud va nizolar',
+                              about: 'Sud va nizolar Haqida ma\'lumot',
+                              description: 'Batafsil tavsif bu yerda joylashadi.',
+                            ),
                           ),
                         ),
                       ],
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppTheme.pageBackground,
+                              Color(0xFFF5F5F5).withValues(alpha: 0.4),
+                            ],
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Xizmatlar',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            HeaderNavigation(
+                              firstIconPath: 'assets/icons/bookmark.svg',
+                              firstIconOnTap: () {},
+                              secondIconPath: 'assets/icons/notification.svg',
+                              secondIconOnTap: () {},
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                     Positioned(
                       left: 0,

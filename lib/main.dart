@@ -121,7 +121,7 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
     }
 
     return MaterialApp(
-      title: 'Vatandoshlar',
+      title: 'Advo',
       navigatorKey: AppRouter.navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

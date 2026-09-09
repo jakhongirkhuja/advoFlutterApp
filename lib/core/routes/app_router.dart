@@ -10,7 +10,17 @@ import '../../presentation/features/services/screens/court_representation_screen
 import '../../presentation/features/services/screens/lawyer_profile_screen.dart';
 import '../../presentation/features/services/screens/appointment_create_screen.dart';
 import '../../data/models/home/lawyer.dart';
+class CourtRepresentationArgs {
+  final String title;
+  final String about;
+  final String description;
 
+  CourtRepresentationArgs({
+    required this.title,
+    required this.about,
+    required this.description,
+  });
+}
 class AppRouter {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -36,8 +46,15 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
       case services:
         return MaterialPageRoute(builder: (_) => const ServicesScreen());
-      case courtRepresentation:
-        return MaterialPageRoute(builder: (_) => const CourtRepresentationScreen());
+      case AppRouter.courtRepresentation:
+        final args = settings.arguments as CourtRepresentationArgs;
+        return MaterialPageRoute(
+          builder: (_) => CourtRepresentationScreen(
+            title: args.title,
+            about: args.about,
+            description: args.description,
+          ),
+        );
       case lawyerProfile:
         final lawyer = settings.arguments;
         return MaterialPageRoute(
