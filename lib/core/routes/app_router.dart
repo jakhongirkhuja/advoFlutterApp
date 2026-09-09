@@ -42,6 +42,7 @@ class AppRouter {
   static const organizations = '/services/organizations';
   static const organizationProfile = '/organization-profile';
   static const savedLawyers = '/saved-lawyers';
+  static const lawyers = '/lawyers';
   static const notifications = '/notifications';
   static const search = '/search';
   static const filters = '/filters';
@@ -90,6 +91,8 @@ class AppRouter {
         );
       case savedLawyers:
         return MaterialPageRoute(builder: (_) => const SavedLawyersScreen());
+      case lawyers:
+        return MaterialPageRoute(builder: (_) => const LawyersScreen());
       case notifications:
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
       case search:

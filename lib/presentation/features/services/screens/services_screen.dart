@@ -33,6 +33,10 @@ class ServicesScreen extends StatelessWidget {
                       context,
                       AppRouter.organizations,
                     ),
+                    onLawyersTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.lawyers,
+                    ),
                     onTemplatesTap: () => Navigator.pushNamed(
                       context,
                       AppRouter.templates,
@@ -143,9 +147,10 @@ class ServicesScreen extends StatelessWidget {
 
 class _FeaturePanel extends StatelessWidget {
   final VoidCallback onOrganizationsTap;
+  final VoidCallback onLawyersTap;
   final VoidCallback onTemplatesTap;
 
-  const _FeaturePanel({required this.onOrganizationsTap, required this.onTemplatesTap});
+  const _FeaturePanel({required this.onOrganizationsTap, required this.onLawyersTap, required this.onTemplatesTap});
 
   @override
   Widget build(BuildContext context) {
@@ -179,6 +184,7 @@ class _FeaturePanel extends StatelessWidget {
                     icon: 'assets/icons/lawyer.svg',
                     title: 'Advokatlar',
                     subtitle: 'Tajribali advokatlarni toping',
+                    onTap: onLawyersTap,
                   ),
                 ),
               ],

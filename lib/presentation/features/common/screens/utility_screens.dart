@@ -25,6 +25,22 @@ class SavedLawyersScreen extends StatelessWidget {
   }
 }
 
+class LawyersScreen extends StatelessWidget {
+  const LawyersScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final lawyers = context.watch<HomeViewModel>().popularLawyers;
+    return _UtilityScaffold(
+      title: 'Advokatlar',
+      activeItem: 'services',
+      child: lawyers.isEmpty
+          ? const _EmptyState(icon: Icons.people_outline, text: 'Advokatlar topilmadi')
+          : Column(children: lawyers.map((lawyer) => LawyerCard(lawyer: lawyer)).toList()),
+    );
+  }
+}
+
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
@@ -163,7 +179,7 @@ class _UtilityScaffold extends StatelessWidget {
       body: SafeArea(
         child: Stack(children: [ListView(padding: const EdgeInsets.fromLTRB(12, 70, 12, 20), children: [child]), HeaderScreen(title: title, firstActionIconPath: 'assets/icons/search.svg', onFirstActionTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchScreen())))]),
       ),
-      bottomNavigationBar: PublicBottomNavigationBar(activeItem: activeItem),
+
     );
   }
 }
