@@ -9,6 +9,9 @@ class Appointment {
   final String topic;
   final double rating;
   final int experienceYears;
+  final int? reviewsCount;
+  final String? avatarUrl;
+  final String? countdownTime;
 
   const Appointment({
     required this.id,
@@ -21,6 +24,9 @@ class Appointment {
     required this.topic,
     required this.rating,
     required this.experienceYears,
+    this.reviewsCount,
+    this.avatarUrl,
+    this.countdownTime,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
