@@ -8,6 +8,7 @@ import '../../../../presentation/widgets/public_bottom_navigation_bar.dart';
 import '../../../widgets/header_screen.dart';
 import '../viewmodels/appointments_viewmodel.dart';
 import '../../../../data/models/appointments/appointment.dart';
+import 'appointment_detail_screen.dart';
 
 class AppointmentsScreen extends StatelessWidget {
   const AppointmentsScreen({super.key});
@@ -43,7 +44,7 @@ class AppointmentsScreen extends StatelessWidget {
               ),
             ),
             HeaderScreen(
-              title: 'Qabular',
+              title: 'Qabullar',
               firstActionIconPath: 'assets/icons/search.svg',
               onFirstActionTap: () =>
                   Navigator.pushNamed(context, AppRouter.search),
@@ -315,11 +316,13 @@ class _AppointmentCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              Text(
-                                '${appointment.experienceYears} yil tajriba',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppTheme.textChoco,
+                              Expanded(
+                                child: Text(
+                                  '${appointment.experienceYears} yil tajriba',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppTheme.textChoco,
+                                  ),
                                 ),
                               ),
                             ],
@@ -377,16 +380,22 @@ class _AppointmentCard extends StatelessWidget {
                           label: 'Tafsilot',
                           color: const Color(0xFFF4F4F4),
                           textColor: Colors.black87,
-                          onPressed: () {},
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AppointmentDetailScreen(
+                                appointment: appointment,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       if(appointment.countdownTime!=null)const SizedBox(width: 10),
                       if(appointment.countdownTime!=null) Expanded(
-                        child: _CardButton(
-                          label: 'Qoldi: ${appointment.countdownTime}',
-                          color: const Color(0xFFD8B26E),
-                          textColor: Colors.white,
-                          onPressed: () {},
+                        child: AppointmentActionButton(
+                          appointment: appointment,
+                          backgroundColor: const Color(0xFFD8B26E),
+                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -478,12 +487,14 @@ class _CardButton extends StatelessWidget {
   final String label;
   final Color color;
   final Color textColor;
+  final Widget? child;
   final VoidCallback? onPressed;
 
   const _CardButton({
     required this.label,
     required this.color,
     required this.textColor,
+    this.child,
     this.onPressed,
   });
 
@@ -498,14 +509,7 @@ class _CardButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
         ),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-        ),
-      ),
+      child: child ?? Text(label, style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 13)),
     );
   }
 }

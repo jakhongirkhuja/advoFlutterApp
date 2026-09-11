@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:vatandoshlar/presentation/widgets/section_header.dart';
+import 'package:Vatandoshlar/presentation/widgets/section_header.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';

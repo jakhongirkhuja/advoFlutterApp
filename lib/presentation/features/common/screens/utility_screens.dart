@@ -14,7 +14,7 @@ class SavedLawyersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lawyers = context.watch<HomeViewModel>().popularLawyers;
+    final lawyers = context.watch<HomeViewModel>().savedLawyers;
     return _UtilityScaffold(
       title: 'Saqlanganlar',
       child: lawyers.isEmpty

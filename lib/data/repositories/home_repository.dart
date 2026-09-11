@@ -162,7 +162,8 @@ class HomeRepository {
         rating: 4.6,
         reviewsCount: 89,
         experienceYears: 5,
-        countdownTime: '01 : 25 : 21',
+        countdownTime: '00 : 00 : 10',
+        meetingUrl: 'https://meet.google.com/abc-defg-hij',
       ),
       Appointment(
         id: 2,

@@ -12,6 +12,7 @@ class Appointment {
   final int? reviewsCount;
   final String? avatarUrl;
   final String? countdownTime;
+  final String? meetingUrl;
 
   const Appointment({
     required this.id,
@@ -27,6 +28,7 @@ class Appointment {
     this.reviewsCount,
     this.avatarUrl,
     this.countdownTime,
+    this.meetingUrl,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Appointment {
       topic: json['topic'] as String,
       rating: (json['rating'] as num).toDouble(),
       experienceYears: json['experience_years'] as int,
+      meetingUrl: json['meeting_url'] as String?,
     );
   }
 }

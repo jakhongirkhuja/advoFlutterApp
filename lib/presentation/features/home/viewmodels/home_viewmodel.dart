@@ -19,6 +19,19 @@ class HomeViewModel extends ChangeNotifier {
   List<Lawyer> _popularLawyers = const [];
   List<Lawyer> get popularLawyers => _popularLawyers;
 
+  final Set<int> _savedLawyerIds = <int>{};
+  List<Lawyer> get savedLawyers =>
+      _popularLawyers.where((lawyer) => _savedLawyerIds.contains(lawyer.id)).toList();
+
+  bool isLawyerSaved(int lawyerId) => _savedLawyerIds.contains(lawyerId);
+
+  void toggleLawyerBookmark(int lawyerId) {
+    if (!_savedLawyerIds.add(lawyerId)) {
+      _savedLawyerIds.remove(lawyerId);
+    }
+    notifyListeners();
+  }
+
   List<ServiceCategory> _serviceCategories = const [];
   List<ServiceCategory> get serviceCategories => _serviceCategories;
 
@@ -45,6 +58,9 @@ class HomeViewModel extends ChangeNotifier {
     ]);
 
     _popularLawyers = results[0] as List<Lawyer>;
+    _savedLawyerIds
+      ..clear()
+      ..addAll(_popularLawyers.where((lawyer) => lawyer.isBookmarked).map((lawyer) => lawyer.id));
     _serviceCategories = results[1] as List<ServiceCategory>;
     _locationName = await _loadLocationName();
     _isLoading = false;
