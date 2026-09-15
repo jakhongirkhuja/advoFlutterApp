@@ -48,7 +48,9 @@ class HeaderNavigation extends StatelessWidget {
           children: [
             InkWell(
               customBorder: const CircleBorder(),
-              onTap: moveBack ? () => Navigator.pop(context) : firstIconOnTap,
+              // HeaderScreen supplies the correct behavior for both normal
+              // back navigation and in-screen state changes.
+              onTap: firstIconOnTap,
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: SvgPicture.asset(firstIconPath),

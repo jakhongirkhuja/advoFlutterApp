@@ -139,9 +139,16 @@ class _TopBar extends StatelessWidget {
                 children: [
                   SvgPicture.asset('assets/icons/marker.svg'),
                   const SizedBox(width: 2),
-                  Text(
-                    locationName,
-                    style: TextStyle(fontSize: 11, color: Color(0xFF777777)),
+                  Expanded(
+                    child: Text(
+                      locationName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF777777),
+                      ),
+                    ),
                   ),
                 ],
               ),

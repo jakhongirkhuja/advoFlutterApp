@@ -4,6 +4,7 @@ import '../../presentation/features/auth/screens/login_screen.dart';
 import '../../presentation/features/auth/screens/otp_screen.dart';
 import '../../presentation/features/home/screens/home_screen.dart';
 import '../../presentation/features/profile/screens/profile_screen.dart';
+import '../../presentation/features/profile/screens/profile_content.dart';
 import '../../presentation/features/appointments/screens/appointments_screen.dart';
 import '../../presentation/features/services/screens/services_screen.dart';
 import '../../presentation/features/services/screens/court_representation_screen.dart';
@@ -14,6 +15,7 @@ import '../../presentation/features/services/screens/organizations_screen.dart';
 import '../../presentation/features/services/screens/organization_profile_screen.dart';
 import '../../presentation/features/common/screens/utility_screens.dart';
 import '../../data/models/home/lawyer.dart';
+import '../../data/models/auth/user_model.dart';
 import '../../data/models/services/organization.dart';
 class CourtRepresentationArgs {
   final String title;
@@ -33,6 +35,8 @@ class AppRouter {
   static const otp = '/otp';
   static const home = '/home';
   static const profile = '/profile';
+  static const profileDetails = '/profile/details';
+  static const profileEdit = '/profile/edit';
   static const appointments = '/appointments';
   static const services = '/services';
   static const courtRepresentation = '/services/court-representation';
@@ -55,6 +59,20 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case profileDetails:
+        final user = settings.arguments;
+        return MaterialPageRoute(
+          builder: (_) => user is UserModel
+              ? ProfileDetailsScreen(user: user)
+              : const ProfileScreen(),
+        );
+      case profileEdit:
+        final user = settings.arguments;
+        return MaterialPageRoute(
+          builder: (_) => user is UserModel
+              ? ProfileEditScreen(user: user)
+              : const ProfileScreen(),
+        );
       case appointments:
         return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
       case services:

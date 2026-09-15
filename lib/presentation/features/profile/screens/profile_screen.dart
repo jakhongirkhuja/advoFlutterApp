@@ -5,6 +5,7 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../auth/viewmodels/auth_viewmodel.dart';
+import 'profile_content.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -12,47 +13,13 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthViewModel>();
-    final localeProvider = context.watch<LocaleProvider>();
-    final localizations = AppLocalizations.of(context);
 
     if (auth.status != AuthStatus.authenticated) {
       return const LoginScreen();
     }
 
     final user = auth.currentUser;
-    return Scaffold(
-      appBar: AppBar(title: Text(localizations?.translate('profile') ?? 'Profil')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              user?.fio.isNotEmpty == true
-                  ? user!.fio
-                  : (localizations?.translate('profile') ?? 'Profil'),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(user?.phoneNumber ?? ''),
-            const SizedBox(height: 24),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.language),
-              title: Text(localizations?.translate('language') ?? 'Til'),
-              subtitle: Text(_languageName(localeProvider.currentLanguageCode)),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showLanguagePicker(context, localeProvider),
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => context.read<AuthViewModel>().logout(),
-              child: Text(localizations?.translate('logout') ?? 'Tizimdan chiqish'),
-            ),
-          ],
-        ),
-      ),
-    );
+    return user == null ? const LoginScreen() : ProfileContent(user: user);
   }
 
   String _languageName(String code) {

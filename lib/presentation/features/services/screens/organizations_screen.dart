@@ -51,7 +51,7 @@ class _OrganizationsScreenState extends State<OrganizationsScreen> {
                   else
                     ...viewModel.organizations.map(
                       (organization) =>
-                          _OrganizationCard(organization: organization),
+                          OrganizationCard(organization: organization),
                     ),
                 ],
               ),
@@ -72,10 +72,10 @@ class _OrganizationsScreenState extends State<OrganizationsScreen> {
   }
 }
 
-class _OrganizationCard extends StatelessWidget {
+class OrganizationCard extends StatelessWidget {
   final Organization organization;
 
-  const _OrganizationCard({required this.organization});
+  const OrganizationCard({required this.organization});
 
   @override
   Widget build(BuildContext context) {
@@ -194,15 +194,23 @@ class _OrganizationCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: 42,
-                height: 42,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.pageBackground,
-                  borderRadius: BorderRadius.circular(40),
+              InkWell(
+                onTap: () => context.read<HomeViewModel>().toggleOrganizationBookmark(organization.id),
+                borderRadius: BorderRadius.circular(40),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.pageBackground,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: SvgPicture.asset(
+                    context.watch<HomeViewModel>().isOrganizationSaved(organization.id)
+                        ? 'assets/icons/bookmarkfilled.svg'
+                        : 'assets/icons/bookmark.svg',
+                  ),
                 ),
-                child: SvgPicture.asset('assets/icons/bookmarkfilled.svg'),
               ),
             ],
           ),

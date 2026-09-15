@@ -6,23 +6,63 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../widgets/header_navigation.dart';
 import '../../../widgets/header_screen.dart';
 import '../../../widgets/lawyer_card.dart';
+import '../../services/screens/organizations_screen.dart';
 import '../../../widgets/public_bottom_navigation_bar.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
-class SavedLawyersScreen extends StatelessWidget {
+class SavedLawyersScreen extends StatefulWidget {
   const SavedLawyersScreen({super.key});
 
   @override
+  State<SavedLawyersScreen> createState() => _SavedLawyersScreenState();
+}
+
+class _SavedLawyersScreenState extends State<SavedLawyersScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<HomeViewModel>().loadSavedItems();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final lawyers = context.watch<HomeViewModel>().savedLawyers;
+    final viewModel = context.watch<HomeViewModel>();
+    final lawyers = viewModel.savedLawyers;
+    final organizations = viewModel.savedOrganizations;
+    final hasSavedItems = lawyers.isNotEmpty || organizations.isNotEmpty;
     return _UtilityScaffold(
       title: 'Saqlanganlar',
-      child: lawyers.isEmpty
-          ? const _EmptyState(icon: Icons.bookmark_border, text: 'Saqlangan advokatlar yo‘q')
-          : Column(children: lawyers.take(3).map((lawyer) => LawyerCard(lawyer: lawyer)).toList()),
+      child: !hasSavedItems
+          ? const _EmptyState(icon: Icons.bookmark_border, text: 'Saqlangan tashkilot yoki advokatlar yo‘q')
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (organizations.isNotEmpty) ...[
+                  const _SavedSectionTitle('Tashkilotlar'),
+                  ...organizations.map((organization) => OrganizationCard(organization: organization)),
+                ],
+                if (lawyers.isNotEmpty) ...[
+                  const _SavedSectionTitle('Advokatlar'),
+                  ...lawyers.map((lawyer) => LawyerCard(lawyer: lawyer)),
+                ],
+              ],
+            ),
       activeItem: 'home',
     );
   }
+}
+
+class _SavedSectionTitle extends StatelessWidget {
+  final String title;
+  const _SavedSectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 10, top: 4),
+        child: Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+      );
 }
 
 class LawyersScreen extends StatelessWidget {

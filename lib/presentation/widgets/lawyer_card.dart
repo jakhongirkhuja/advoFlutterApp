@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/routes/app_router.dart';
 import '../../core/config/app_config.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/home/lawyer.dart';
+import '../features/home/viewmodels/home_viewmodel.dart';
 
 class LawyerCard extends StatelessWidget {
   final Lawyer lawyer;
@@ -14,6 +16,7 @@ class LawyerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSaved = context.watch<HomeViewModel>().isLawyerSaved(lawyer.id);
     return Container(
       padding: const EdgeInsets.all(12),
       margin: EdgeInsets.only(bottom: 12),
@@ -39,18 +42,13 @@ class LawyerCard extends StatelessWidget {
                 child: Image.network(
                   '${AppConfig.dummyImageBaseUrl}/lawyer-${lawyer.id}/320/240',
                   fit: BoxFit.cover,
-                  errorBuilder: (context, exception, stackTrace) {
-                    return Center(
-                      child: Text(
-                        _initials(lawyer.name),
-                        style: const TextStyle(
-                          color: Color(0xFF31527A),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    );
-                  },
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 74,
+                    height: 74,
+                    color: AppTheme.avatarBackground,
+                    alignment: Alignment.center,
+                    child: Image.asset('assets/images/default_user.jpg'),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -127,15 +125,21 @@ class LawyerCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: 42,
-                height: 42,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
+              InkWell(
+                onTap: () => context.read<HomeViewModel>().toggleLawyerBookmark(lawyer.id),
+                borderRadius: BorderRadius.circular(40),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
                     color: AppTheme.pageBackground,
-                    borderRadius: BorderRadius.circular(40)
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: SvgPicture.asset(
+                    isSaved ? 'assets/icons/bookmarkfilled.svg' : 'assets/icons/bookmark.svg',
+                  ),
                 ),
-                child: SvgPicture.asset('assets/icons/bookmarkfilled.svg'),
               )
             ],
           ),
