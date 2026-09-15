@@ -4,7 +4,15 @@ import '../../presentation/features/auth/screens/login_screen.dart';
 import '../../presentation/features/auth/screens/otp_screen.dart';
 import '../../presentation/features/home/screens/home_screen.dart';
 import '../../presentation/features/profile/screens/profile_screen.dart';
-import '../../presentation/features/profile/screens/profile_content.dart';
+import '../../presentation/features/profile/screens/profile_details_screen.dart';
+import '../../presentation/features/profile/screens/profile_edit_screen.dart';
+import '../../presentation/features/profile/screens/privacy_policy_screen.dart';
+import '../../presentation/features/profile/screens/help_center_screen.dart';
+import '../../presentation/features/profile/screens/trust_number_screen.dart';
+import '../../presentation/features/profile/screens/partnership_screen.dart';
+import '../../presentation/features/profile/screens/history_screen.dart';
+import '../../presentation/features/profile/screens/active_devices_screen.dart';
+import '../../presentation/features/profile/screens/suggestions_screen.dart';
 import '../../presentation/features/appointments/screens/appointments_screen.dart';
 import '../../presentation/features/services/screens/services_screen.dart';
 import '../../presentation/features/services/screens/court_representation_screen.dart';
@@ -37,6 +45,13 @@ class AppRouter {
   static const profile = '/profile';
   static const profileDetails = '/profile/details';
   static const profileEdit = '/profile/edit';
+  static const profilePrivacy = '/profile/privacy';
+  static const helpCenter = '/profile/help';
+  static const trustNumber = '/profile/trust-number';
+  static const partnership = '/profile/partnership';
+  static const history = '/profile/history';
+  static const activeDevices = '/profile/active-devices';
+  static const suggestions = '/profile/suggestions';
   static const appointments = '/appointments';
   static const services = '/services';
   static const courtRepresentation = '/services/court-representation';
@@ -63,16 +78,30 @@ class AppRouter {
         final user = settings.arguments;
         return MaterialPageRoute(
           builder: (_) => user is UserModel
-              ? ProfileDetailsScreen(user: user)
+              ? ProfileDetailsRouteScreen(user: user)
               : const ProfileScreen(),
         );
       case profileEdit:
         final user = settings.arguments;
         return MaterialPageRoute(
           builder: (_) => user is UserModel
-              ? ProfileEditScreen(user: user)
+              ? ProfileEditRouteScreen(user: user)
               : const ProfileScreen(),
         );
+      case profilePrivacy:
+        return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
+      case helpCenter:
+        return MaterialPageRoute(builder: (_) => const HelpCenterScreen());
+      case trustNumber:
+        return MaterialPageRoute(builder: (_) => const TrustNumberScreen());
+      case partnership:
+        return MaterialPageRoute(builder: (_) => const PartnershipScreen());
+      case history:
+        return MaterialPageRoute(builder: (_) => const HistoryScreen());
+      case activeDevices:
+        return MaterialPageRoute(builder: (_) => const ActiveDevicesScreen());
+      case suggestions:
+        return MaterialPageRoute(builder: (_) => const SuggestionsScreen());
       case appointments:
         return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
       case services:

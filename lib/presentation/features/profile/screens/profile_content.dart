@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/phone_formatter.dart';
@@ -42,6 +43,7 @@ class ProfileDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => _ProfileShell(
     title: 'Shaxsiy ma’lumotlar',
+    showBottomNavigation: false,
     onEdit: () =>
         Navigator.pushNamed(context, AppRouter.profileEdit, arguments: user),
     child: _Details(
@@ -91,6 +93,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) => _ProfileShell(
     title: 'Shaxsiy ma’lumotlar',
+    showBottomNavigation: false,
     child: _Details(
       user: widget.user,
       editing: true,
@@ -120,6 +123,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 class _ProfileShell extends StatelessWidget {
   final String title;
   final bool showBack;
+  final bool showBottomNavigation;
   final VoidCallback? onEdit;
   final Widget child;
 
@@ -127,6 +131,7 @@ class _ProfileShell extends StatelessWidget {
     required this.title,
     required this.child,
     this.showBack = true,
+    this.showBottomNavigation = true,
     this.onEdit,
   });
 
@@ -150,17 +155,19 @@ class _ProfileShell extends StatelessWidget {
         ],
       ),
     ),
-    bottomNavigationBar: PublicBottomNavigationBar(
-      activeItem: 'profile',
-      onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppRouter.home,
-        (route) => false,
-      ),
-      onAppointmentsTap: () =>
-          Navigator.pushNamed(context, AppRouter.appointments),
-      onProfileTap: () {},
-    ),
+    bottomNavigationBar: showBottomNavigation
+        ? PublicBottomNavigationBar(
+            activeItem: 'profile',
+            onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRouter.home,
+              (route) => false,
+            ),
+            onAppointmentsTap: () =>
+                Navigator.pushNamed(context, AppRouter.appointments),
+            onProfileTap: () {},
+          )
+        : null,
   );
 }
 
@@ -232,21 +239,72 @@ class _Menu extends StatelessWidget {
     children: [
       _Banner(user: user),
       const SizedBox(height: 12),
-      _Tile(icon: 'assets/icons/verified_user_outlined.svg', title: 'Profilni tasdiqlash'),
-      _Tile(icon: 'assets/icons/description_outlined.svg', title: 'Hujjat shablonlarim'),
-      _Tile(icon: 'assets/icons/history.svg', title: 'Tarix'),
+      _Tile(
+        icon: 'assets/icons/verified_user_outlined.svg',
+        title: 'Profilni tasdiqlash',
+      ),
+      _Tile(
+        icon: 'assets/icons/description_outlined.svg',
+        title: 'Hujjat shablonlarim',
+        onTap: () => Navigator.pushNamed(context, AppRouter.templates),
+      ),
+      _Tile(
+        icon: 'assets/icons/history.svg',
+        title: 'Tarix',
+        onTap: () => Navigator.pushNamed(context, AppRouter.history),
+      ),
       _Tile(
         icon: 'assets/icons/card_giftcard_outlined.svg',
         title: 'Loyihaga hissa qo‘shish',
       ),
-
-      _Tile(icon: 'assets/icons/lightbulb_outline.svg', title: 'Ilova bo‘yicha takliflar'),
-      _Tile(icon: 'assets/icons/campaign_outlined.svg', title: 'Reklama va hamkorlik'),
-      _Tile(icon: 'assets/icons/devices_other.svg', title: 'Faol qurilmalar'),
-      _Tile(icon: 'assets/icons/language.svg', title: 'Til', undertitle: 'Ozbekcha'),
-      _Tile(icon: 'assets/icons/lock_outline.svg', title: 'Maxfiylik siyosati'),
-      _Tile(icon: 'assets/icons/phone_verify.svg', title: 'Ishonch raqami'),
-      _Tile(icon: 'assets/icons/help_outline.svg', title: 'Yordam markazi'),
+      // _Tile(
+      //   icon: 'assets/icons/notification.svg',
+      //   title: 'Bildirishnoma',
+      //   trailing: const _NotificationSwitch(),
+      // ),
+      _Tile(
+        icon: 'assets/icons/lightbulb_outline.svg',
+        title: 'Ilova bo‘yicha takliflar',
+        onTap: () => Navigator.pushNamed(context, AppRouter.suggestions),
+      ),
+      _Tile(
+        icon: 'assets/icons/campaign_outlined.svg',
+        title: 'Reklama va hamkorlik',
+        onTap: () => Navigator.pushNamed(context, AppRouter.partnership),
+      ),
+      _Tile(
+        icon: 'assets/icons/devices_other.svg',
+        title: 'Faol qurilmalar',
+        onTap: () => Navigator.pushNamed(context, AppRouter.activeDevices),
+      ),
+      _Tile(
+        icon: 'assets/icons/language.svg',
+        title: 'Til',
+        undertitle: _languageName(
+          context.watch<LocaleProvider>().currentLanguageCode,
+        ),
+        onTap: () => _showLanguagePicker(context),
+      ),
+      _Tile(
+        icon: 'assets/icons/lock_outline.svg',
+        title: 'Maxfiylik siyosati',
+        onTap: () => Navigator.pushNamed(context, AppRouter.profilePrivacy),
+      ),
+      _Tile(
+        icon: 'assets/icons/phone_verify.svg',
+        title: 'Ishonch raqami',
+        onTap: () => Navigator.pushNamed(context, AppRouter.trustNumber),
+      ),
+      _Tile(
+        icon: 'assets/icons/help_outline.svg',
+        title: 'Yordam markazi',
+        onTap: () => Navigator.pushNamed(context, AppRouter.helpCenter),
+      ),
+      _Tile(
+        icon: 'assets/icons/verified_user_outlined.svg',
+        title: 'Shaxsiy ma’lumotlar',
+        onTap: onDetails,
+      ),
       _Tile(
         icon: 'assets/icons/logout.svg',
         title: 'Tizimdan chiqish',
@@ -255,6 +313,147 @@ class _Menu extends StatelessWidget {
       ),
     ],
   );
+
+  String _languageName(String code) {
+    final language = LocaleProvider.supportedLanguages.firstWhere(
+      (item) => item['code'] == code,
+      orElse: () => LocaleProvider.supportedLanguages.first,
+    );
+    return language['name'] ?? 'O‘zbekcha';
+  }
+
+  Future<void> _showLanguagePicker(BuildContext context) async {
+    final localeProvider = context.read<LocaleProvider>();
+    var selectedCode = localeProvider.currentLanguageCode;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFFF5F6F8),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Tilni o‘zgartirish',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1F2937),
+                        ),
+                      ),
+                    ),
+
+                    Material(
+                      color: const Color(0xFFEAF0F7),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        onTap: () => Navigator.pop(sheetContext),
+                        customBorder: const CircleBorder(),
+                        child: const SizedBox(
+                          width: 34,
+                          height: 34,
+                          child: Icon(Icons.close, size: 17),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ...LocaleProvider.supportedLanguages.map((language) {
+                  final code = language['code']!;
+                  final selected = selectedCode == code;
+                  final label = code == 'uz'
+                      ? 'O‘zbek tili'
+                      : code == 'ru'
+                          ? 'Rus tili'
+                          : 'Ingliz tili';
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: InkWell(
+                      onTap: () => setModalState(() => selectedCode = code),
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        height: 56,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? const Color(0xFFEAF3FF)
+                              : const Color(0xFFF8FAFC),
+                          border: Border.all(
+                            color: selected
+                                ? const Color(0xFF2F80FF)
+                                : const Color(0xFFE0E7EF),
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 17,
+                              backgroundColor: Colors.white,
+                              child: Text(
+                                language['flag'] ?? '',
+                                style: const TextStyle(fontSize: 17),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                            Icon(
+                              selected
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: selected
+                                  ? const Color(0xFF2F80FF)
+                                  : const Color(0xFFE0E7EF),
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 26),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF2F80FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await localeProvider.setLocale(Locale(selectedCode));
+                      if (sheetContext.mounted) Navigator.pop(sheetContext);
+                    },
+                    child: const Text('Saqlash', style: TextStyle(fontSize: 16),),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _Banner extends StatelessWidget {
@@ -351,38 +550,50 @@ class _Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
-    child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(6),
+    child: Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: exit ? Color(0xffFFE2E2) : AppTheme.pageBackground,
-            radius: 21,
-            child: SvgPicture.asset(icon),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(28),
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          child: Row(
             children: [
-              Text(title, style: const TextStyle(fontSize: 16)),
-              if(undertitle!=null) ...[
-                Text(undertitle!, style: const TextStyle(fontSize: 14, color: Color(0xff475569) )),
-              ]
+              CircleAvatar(
+                backgroundColor: exit
+                    ? Color(0xffFFE2E2)
+                    : AppTheme.pageBackground,
+                radius: 21,
+                child: SvgPicture.asset(icon),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 16)),
+                  if (undertitle != null) ...[
+                    Text(
+                      undertitle!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xff475569),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              Spacer(),
+              trailing ??
+                  Icon(
+                    Icons.chevron_right,
+                    size: 18,
+                    color: exit ? Color(0xffE7000B) : AppTheme.textMuted,
+                  ),
             ],
           ),
-          Spacer(),
-          trailing ??
-              Icon(
-                Icons.chevron_right,
-                size: 18,
-                color: exit ? Color(0xffE7000B) : AppTheme.textMuted,
-              ),
-        ],
+        ),
       ),
     ),
   );

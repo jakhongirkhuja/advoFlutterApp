@@ -11,7 +11,16 @@ import '../../../../data/models/appointments/appointment.dart';
 import 'appointment_detail_screen.dart';
 
 class AppointmentsScreen extends StatelessWidget {
-  const AppointmentsScreen({super.key});
+  final String title;
+  final bool showBottomNavigation;
+  final bool showSearchAction;
+
+  const AppointmentsScreen({
+    super.key,
+    this.title = 'Qabullar',
+    this.showBottomNavigation = true,
+    this.showSearchAction = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +53,11 @@ class AppointmentsScreen extends StatelessWidget {
               ),
             ),
             HeaderScreen(
-              title: 'Qabullar',
-              firstActionIconPath: 'assets/icons/search.svg',
-              onFirstActionTap: () =>
-                  Navigator.pushNamed(context, AppRouter.search),
+              title: title,
+              firstActionIconPath: showSearchAction ? 'assets/icons/search.svg' : null,
+              onFirstActionTap: showSearchAction
+                  ? () => Navigator.pushNamed(context, AppRouter.search)
+                  : null,
               showBackIcon: false,
             ),
 
@@ -59,15 +69,17 @@ class AppointmentsScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: PublicBottomNavigationBar(
-        activeItem: 'appointments',
-        onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
-          context,
-          AppRouter.home,
-          (route) => false,
-        ),
-        onProfileTap: () => Navigator.pushNamed(context, AppRouter.profile),
-      ),
+      bottomNavigationBar: showBottomNavigation
+          ? PublicBottomNavigationBar(
+              activeItem: 'appointments',
+              onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRouter.home,
+                (route) => false,
+              ),
+              onProfileTap: () => Navigator.pushNamed(context, AppRouter.profile),
+            )
+          : null,
     );
   }
 }
