@@ -1,0 +1,223 @@
+import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../../core/theme/app_theme.dart';
+import '../../../widgets/header_screen.dart';
+
+class ProfileVerificationScreen extends StatefulWidget {
+  const ProfileVerificationScreen({super.key});
+
+  @override
+  State<ProfileVerificationScreen> createState() =>
+      _ProfileVerificationScreenState();
+}
+
+class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
+  final Map<String, XFile?> _files = {
+    'Passport (old tomoni)': null,
+    'Passport (orqa tomoni)': null,
+    'Hujjat ushlab turgan selfi': null,
+  };
+
+  Future<void> _pickFile(String title) async {
+    final file = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(label: 'Rasmlar', extensions: ['jpg', 'jpeg', 'png']),
+      ],
+    );
+    if (!mounted || file == null) return;
+    setState(() => _files[title] = file);
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: Colors.white,
+    body: SafeArea(
+      child: Stack(
+        children: [
+          const Positioned.fill(
+            child: ColoredBox(color: AppTheme.pageBackground),
+          ),
+          Positioned.fill(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(12, 66, 12, 94),
+              children: [
+                Column(
+                  children: [
+                    CustomIconDesign(icon: 'assets/icons/verify.svg', mainColor: Color(0xff15985B), secondaryColor: Color(0xff40DB93)),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Profilingizni tasdiqlang',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Hujjatlaringizni yuklang va ADVO’da\nko‘proq imkoniyatlardan foydalaning.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 29),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Column(
+                    children: _files.keys
+                        .map(
+                          (title) => _UploadCard(
+                            title: title,
+                            file: _files[title],
+                            onTap: () => _pickFile(title),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child:  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset('assets/images/info.png'),
+                          Text(
+                            'Eslatma',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '✅ Yorug‘ joyda, matn aniq ko‘rinsin',
+                        style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                      ),
+                      Text(
+                        '✅ Yuzingiz va hujjat birga ko‘rinsin',
+                        style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                      ),
+                      Text(
+                        '🚫 Noodatiy yoki chala rasmlar rad etiladi',
+                        style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                      ),
+                      SizedBox(height: 7),
+                      Center(
+                        child: Text(
+                          '🔒 Hujjatlar xavfsiz serverga yuklanadi va faqat moderatorlar ko‘radi.\n1–3 kun ichida tekshiramiz',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 8,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const HeaderScreen(title: 'Profilni tasdiqlash'),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: SizedBox(
+                height: 40,
+                child: FilledButton(
+                  onPressed: () {},
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF2F80FF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                  ),
+                  child: const Text('Yuborish', style: TextStyle(fontSize: 10)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _UploadCard extends StatelessWidget {
+  final String title;
+  final XFile? file;
+  final VoidCallback onTap;
+
+  const _UploadCard({
+    required this.title,
+    required this.file,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.only(bottom: 6),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(13),
+
+        decoration: BoxDecoration(
+          color: AppTheme.pageBackground,
+          border: Border.all(color: const Color(0xFFDCE3EC)),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/document_upload.svg',
+              width: 18,
+              height: 18,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              file?.name ?? 'Rasmni shu yerga yuklang',
+              style: const TextStyle(
+                fontSize: 8,
+                color: AppTheme.textSecondary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}

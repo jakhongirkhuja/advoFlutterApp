@@ -117,7 +117,7 @@ class _HistoryAppointmentCard extends StatelessWidget {
                             height: 74,
                             color: AppTheme.avatarBackground,
                             alignment: Alignment.center,
-                            child: const Icon(Icons.person, size: 36),
+                            child: Image.asset('assets/images/default_user.jpg'),
                           )
                         : Image.network(
                             appointment.avatarUrl!,

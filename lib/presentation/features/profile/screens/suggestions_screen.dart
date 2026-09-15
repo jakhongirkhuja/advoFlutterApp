@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:file_selector/file_selector.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../widgets/custom_icon_design.dart';
@@ -14,6 +15,7 @@ class SuggestionsScreen extends StatefulWidget {
 
 class _SuggestionsScreenState extends State<SuggestionsScreen> {
   final _suggestionController = TextEditingController();
+  XFile? _selectedFile;
 
   @override
   void dispose() {
@@ -44,27 +46,32 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                       style: TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 4),
-                    Container(
-                      padding: EdgeInsets.all(13),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF4F8FE),
-                        border: Border.all(color: const Color(0xFFDCE3EC)),
-                        borderRadius: BorderRadius.circular(11),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset('assets/icons/doc.svg'),
-                          SizedBox(height: 6),
-                          Text(
-                            'Shu yerga yuklang',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xff475569),
+                    GestureDetector(
+                      onTap: _pickFile,
+                      child: Container(
+                        padding: const EdgeInsets.all(13),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF4F8FE),
+                          border: Border.all(color: const Color(0xFFDCE3EC)),
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset('assets/icons/doc.svg'),
+                            const SizedBox(height: 6),
+                            Text(
+                              _selectedFile?.name ?? 'Shu yerga yuklang',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xff475569),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -77,7 +84,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                       decoration: InputDecoration(
                         hintText: 'Qisqacha izoh',
                         hintStyle: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 16,
                           color: Color(0xFF8392A7),
                         ),
                         filled: true,
@@ -137,11 +144,39 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
 
   Future<void> _submit() async {
     final success = _suggestionController.text.trim().isNotEmpty;
+
+    // TODO: Send the selected file and comment through the API.
+    // final request = FormData.fromMap({
+    //   'comment': _suggestionController.text.trim(),
+    //   'file': await MultipartFile.fromFile(_selectedFile!.path),
+    // });
+    // await apiClient.post('/suggestions', data: request);
+
     await showDialog<void>(
       context: context,
       barrierColor: Colors.black54,
       builder: (_) => _SuggestionResultDialog(success: success),
     );
+  }
+
+  Future<void> _pickFile() async {
+    try {
+      const acceptedTypes = <XTypeGroup>[
+        XTypeGroup(
+          label: 'Rasmlar va hujjatlar',
+          extensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+        ),
+      ];
+      final file = await openFile(acceptedTypeGroups: acceptedTypes);
+
+      if (!mounted || file == null) return;
+      setState(() => _selectedFile = file);
+    } on Exception catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Faylni tanlab bo‘lmadi')),
+      );
+    }
   }
 }
 

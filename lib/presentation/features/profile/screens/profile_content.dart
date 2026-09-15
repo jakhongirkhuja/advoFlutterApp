@@ -242,11 +242,12 @@ class _Menu extends StatelessWidget {
       _Tile(
         icon: 'assets/icons/verified_user_outlined.svg',
         title: 'Profilni tasdiqlash',
+        onTap: () => Navigator.pushNamed(context, AppRouter.profileVerification),
       ),
       _Tile(
         icon: 'assets/icons/description_outlined.svg',
         title: 'Hujjat shablonlarim',
-        onTap: () => Navigator.pushNamed(context, AppRouter.templates),
+        onTap: () => Navigator.pushNamed(context, AppRouter.profileTemplates),
       ),
       _Tile(
         icon: 'assets/icons/history.svg',

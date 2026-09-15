@@ -444,7 +444,7 @@ class _Payment extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: 50,
+                  height: 50,
                   child: Image.asset(iconPath, fit: BoxFit.contain,)),
               Container(
                 height: 1,

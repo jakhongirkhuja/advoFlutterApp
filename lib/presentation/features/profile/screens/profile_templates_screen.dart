@@ -1,0 +1,307 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../../core/theme/app_theme.dart';
+import '../../../widgets/header_screen.dart';
+import 'profile_template_form_screen.dart';
+import 'profile_template_preview_screen.dart';
+
+class ProfileTemplatesScreen extends StatelessWidget {
+  const ProfileTemplatesScreen({super.key});
+  Future<void> _handleRefresh() async {
+    // TODO: Add your refresh/data fetching logic here
+    await Future.delayed(const Duration(seconds: 1));
+  }
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: AppTheme.pageBackground,
+    body: SafeArea(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: RefreshIndicator(
+              onRefresh: _handleRefresh,
+              edgeOffset: 70,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(12, 70, 12, 24),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundColor: const Color(0xFFF1F5F9),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SvgPicture.asset('assets/icons/doc.svg'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const ProfileTemplatePreviewScreen(
+                                          name: 'Ism Familiya Otangizning ismi',
+                                          phone: '+998 90 123 45 67',
+                                          company: 'ABC MChJ',
+                                          position: 'Menejer',
+                                          manager: 'Rahbarning ism-familiyasi',
+                                          date: '01.01.2026',
+                                          reason: 'Shaxsiy sabablar',
+                                        ),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Ishdan bo‘shash arizasi',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2,),
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'DOCX',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppTheme.textSecondary,
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 6,
+                                          height: 6,
+                                          margin: EdgeInsets.symmetric(horizontal: 6),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.pageBackground,
+                                            borderRadius: BorderRadius.circular(3),
+                                          ),
+                                        ),
+                                        const Text(
+                                          'PDF',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppTheme.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppTheme.pageBackground,
+                            border: Border.all(color: const Color(0xffE2E8F0)),
+                            borderRadius: BorderRadius.circular(11),
+                          ),
+                          child: const Text(
+                            'Ishdan bo‘shash uchun tayyor ariza shabloni',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ),
+              
+                        Container(
+                          height: 1,
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          color: Color(0xffE2E8F0),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8FFF5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Text(
+                                'Sotib olingan',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF00A86B),
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                  const ProfileTemplateFormScreen(),
+                                ),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xff2B7FFF),
+                                  borderRadius: BorderRadius.circular(42),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                                child: Text('To\'ldirish', style:  TextStyle(color: Colors.white, fontSize: 16),),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const HeaderScreen(title: 'Shablonlarim'),
+        ],
+      ),
+    ),
+  );
+}
+
+/*
+  The form and preview are separate screens in profile_template_form_screen.dart.
+*/
+/*
+    backgroundColor: AppTheme.pageBackground,
+    body: SafeArea(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(12, 62, 12, 74),
+              children: const [
+                _IntroCard(),
+                _FormCard(title: 'Shaxsiy ma’lumotlar', fields: ['F.I.Sh.', 'Telefon raqam']),
+                _FormCard(title: 'Ish joyi', fields: ['Tashkilot nomi', 'Lavozimingiz', 'Rahbarning F.I.Sh.']),
+                _FormCard(title: 'Ariza ma’lumotlari', fields: ['Ishdan bo‘shash sanasi', 'Ishdan bo‘shash sababi (ixtiyoriy)']),
+              ],
+            ),
+          ),
+          const HeaderScreen(title: 'Ishdan bo‘shash arizasi'),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 8,
+            child: SizedBox(
+              height: 44,
+              child: FilledButton(
+                onPressed: () => setState(() => _page = 2),
+                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2F80FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22))),
+                child: const Text('Davom etish', style: TextStyle(fontSize: 10)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildPreview(BuildContext context) => Scaffold(
+    backgroundColor: AppTheme.pageBackground,
+    body: SafeArea(
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 62, 12, 70),
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              child: const SingleChildScrollView(
+                child: Text(
+                  'Ishdan bo‘shash arizasi\n\nHurmatli rahbar,\n\nMeni egallab turgan lavozimimdan bo‘shatishingizni so‘rayman.\n\nSana: ______________\nImzo: ______________',
+                  style: TextStyle(fontSize: 10, height: 1.5),
+                ),
+              ),
+            ),
+          ),
+          const HeaderScreen(title: 'Ishdan bo‘shash arizasi'),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 8,
+            child: Row(children: [
+              Expanded(child: OutlinedButton(onPressed: () => setState(() => _page = 1), child: const Text('Tahrirlash', style: TextStyle(fontSize: 10)))),
+              const SizedBox(width: 8),
+              Expanded(child: FilledButton(onPressed: () {}, child: const Text('Yuklab olish', style: TextStyle(fontSize: 10)))),
+            ]),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _IntroCard extends StatelessWidget {
+  const _IntroCard();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 8),
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+    child: const Row(children: [
+      CircleAvatar(radius: 16, backgroundColor: Color(0xFFF1F5F9), child: Icon(Icons.description_outlined, size: 17, color: AppTheme.textSecondary)),
+      SizedBox(width: 8),
+      Text('Ishdan bo‘shash arizasi', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+    ]),
+  );
+}
+
+class _FormCard extends StatelessWidget {
+  final String title;
+  final List<String> fields;
+  const _FormCard({required this.title, required this.fields});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 8),
+    padding: const EdgeInsets.fromLTRB(8, 10, 8, 4),
+    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+      ...fields.map((field) => Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: TextField(
+          maxLines: field.contains('sababi') ? 2 : 1,
+          style: const TextStyle(fontSize: 10),
+          decoration: InputDecoration(
+            labelText: field,
+            hintText: field == 'Telefon raqam' ? '+998 __ ___ __ __' : 'Ma’lumot kiriting...',
+            labelStyle: const TextStyle(fontSize: 9),
+            hintStyle: const TextStyle(fontSize: 9, color: AppTheme.textSecondary),
+            isDense: true,
+            filled: true,
+            fillColor: AppTheme.pageBackground,
+            contentPadding: const EdgeInsets.all(9),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+          ),
+        ),
+      )),
+    ]),
+  );
+}
+*/

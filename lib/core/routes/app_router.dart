@@ -18,6 +18,9 @@ import '../../presentation/features/services/screens/services_screen.dart';
 import '../../presentation/features/services/screens/court_representation_screen.dart';
 import '../../presentation/features/services/screens/lawyer_profile_screen.dart';
 import '../../presentation/features/services/screens/appointment_create_screen.dart';
+import '../../presentation/features/profile/screens/profile_templates_screen.dart';
+import '../../presentation/features/profile/screens/profile_verification_screen.dart';
+import '../../presentation/features/profile/screens/profile_verification_screen.dart';
 import '../../presentation/features/services/screens/templates_screen.dart';
 import '../../presentation/features/services/screens/organizations_screen.dart';
 import '../../presentation/features/services/screens/organization_profile_screen.dart';
@@ -58,6 +61,8 @@ class AppRouter {
   static const lawyerProfile = '/lawyer-profile';
   static const appointmentCreate = '/appointments/create';
   static const templates = '/services/templates';
+  static const profileTemplates = '/profile/templates';
+  static const profileVerification = '/profile/verification';
   static const organizations = '/services/organizations';
   static const organizationProfile = '/organization-profile';
   static const savedLawyers = '/saved-lawyers';
@@ -127,6 +132,10 @@ class AppRouter {
         );
       case templates:
         return MaterialPageRoute(builder: (_) => const TemplatesScreen());
+      case profileTemplates:
+        return MaterialPageRoute(builder: (_) => const ProfileTemplatesScreen());
+      case profileVerification:
+        return MaterialPageRoute(builder: (_) => const ProfileVerificationScreen());
       case organizations:
         return MaterialPageRoute(builder: (_) => const OrganizationsScreen());
       case organizationProfile:
