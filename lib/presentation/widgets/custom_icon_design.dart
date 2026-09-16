@@ -7,8 +7,9 @@ class CustomIconDesign extends StatelessWidget {
   final Color mainColor;
   final Color secondaryColor;
   final double padding;
+  final bool home;
   const CustomIconDesign({
-    super.key, required this.icon, required this.mainColor, required this.secondaryColor, this.padding = 10.0,
+    super.key, required this.icon, required this.mainColor, required this.secondaryColor, this.padding = 10.0, this.home=false
   });
 
   @override
@@ -17,7 +18,7 @@ class CustomIconDesign extends StatelessWidget {
       padding: EdgeInsets.all(1),
       decoration: BoxDecoration(
         border: Border.all(color: mainColor, width: 1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(home?12:16),
         boxShadow: [
           BoxShadow(
             color: const Color(0xff0A0D12).withValues(alpha: 0.3),
@@ -44,11 +45,11 @@ class CustomIconDesign extends StatelessWidget {
 
       ),
       child: Container(
-        width: 55,
-        height: 55,
+        width: home?38:55,
+        height: home?38:55,
         padding: EdgeInsets.all(padding),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(home?12:16),
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

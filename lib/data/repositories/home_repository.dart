@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import '../../core/config/app_config.dart';
 import '../api/api_client.dart';
@@ -85,10 +86,34 @@ class HomeRepository {
     //     .map((item) => ServiceCategory.fromJson(item))
     //     .toList();
     return [
-      ServiceCategory(id: 1, title: 'Huquqiy maslahat', iconPath: ''),
-      ServiceCategory(id: 2, title: 'Oila huquqi', iconPath: ''),
-      ServiceCategory(id: 3, title: 'Fuqarolik huquqi', iconPath: ''),
-      ServiceCategory(id: 4, title: 'Sud va nizolar', iconPath: ''),
+      ServiceCategory(
+        id: 1,
+        title: 'Yuridik tashkilotlar',
+        iconPath: 'assets/icons/maslahat.svg',
+        mainColor: Color(0xff1C8AFF),
+        secondaryColor: Color(0xff69AFFF),
+      ),
+      ServiceCategory(
+        id: 2,
+        title: 'Tajribali advokatlar',
+        iconPath: 'assets/icons/oila.svg',
+        mainColor: Color(0xff15985B),
+        secondaryColor: Color(0xff40DB93),
+      ),
+      ServiceCategory(
+        id: 3,
+        title: 'Hujjatlar shablonlari',
+        iconPath: 'assets/icons/fuqoro.svg',
+        mainColor: Color(0xff1E9389),
+        secondaryColor: Color(0xff52CFC4),
+      ),
+      ServiceCategory(
+        id: 4,
+        title: 'Yevro pratakol',
+        iconPath: 'assets/icons/jinoyat.svg',
+        mainColor: Color(0xffFFBA00),
+        secondaryColor: Color(0xffE17100),
+      ),
     ];
   }
 
@@ -110,7 +135,12 @@ class HomeRepository {
         isVerified: true,
         latitude: 41.3382,
         longitude: 69.3347,
-        services: ['Sudda vakillik', 'Da’vo arizasini tayyorlash', 'Sudga tayyorgarlik', 'Apellyatsiya shikoyati'],
+        services: [
+          'Sudda vakillik',
+          'Da’vo arizasini tayyorlash',
+          'Sudga tayyorgarlik',
+          'Apellyatsiya shikoyati',
+        ],
       ),
       Organization(
         id: 2,
@@ -142,7 +172,11 @@ class HomeRepository {
         isVerified: true,
         latitude: 41.3275,
         longitude: 69.2812,
-        services: ['Fuqarolik huquqi', 'Shartnoma tayyorlash', 'Sud maslahatlari'],
+        services: [
+          'Fuqarolik huquqi',
+          'Shartnoma tayyorlash',
+          'Sud maslahatlari',
+        ],
       ),
     ];
   }

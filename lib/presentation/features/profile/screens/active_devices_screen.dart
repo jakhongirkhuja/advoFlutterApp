@@ -48,89 +48,119 @@ class ActiveDevicesScreen extends StatelessWidget {
     ),
   );
 
-  Future<void> _showDeviceDetails(BuildContext context, String name, String ip, String? time) async {
+  Future<void> _showDeviceDetails(
+      BuildContext context,
+      String name,
+      String ip,
+      String? time,
+      ) async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ),
-              CustomIconDesign(icon: name.startsWith('iPhone')
-                  ? 'assets/icons/ios.svg'
-                  : 'assets/icons/android.svg', mainColor: Color(0xFF1C8AFF), secondaryColor: Color(0xFF69AFFF)),
-              const SizedBox(height: 7),
-              Column(
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  time!=null? Text(
-                    time,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ): SizedBox(),
-                ],
-              ),
+      builder: (_) => Container(
+        margin: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: InkWell(
 
-              const SizedBox(height: 24),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: AppTheme.backgroundWhite,
-                  borderRadius: BorderRadius.circular(46),
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: AppTheme.pageBackground,
+                          borderRadius: BorderRadius.circular(32)
+                        ),
+                        child: const Icon(Icons.close, size: 24,)),
+                  ),
                 ),
-                child: Row(
+                CustomIconDesign(
+                  icon: name.startsWith('iPhone')
+                      ? 'assets/icons/ios.svg'
+                      : 'assets/icons/android.svg',
+                  mainColor: const Color(0xFF1C8AFF),
+                  secondaryColor: const Color(0xFF69AFFF),
+                ),
+                const SizedBox(height: 7),
+                Column(
                   children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: Colors.white,
-                      child: SvgPicture.asset('assets/icons/ip.svg'),
-                    ),
-                    const SizedBox(width: 12),
                     Text(
-                      ip,
-                      style: TextStyle(fontSize: 16),
+                      name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
+                    time != null
+                        ? Text(
+                      time,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.textSecondary,
+                      ),
+                    )
+                        : const SizedBox(),
                   ],
                 ),
-              ),
-              const SizedBox(height: 63),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.backgroundWhite, // Restored original inner container color
+                    borderRadius: BorderRadius.circular(46),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: Colors.white,
+                        child: SvgPicture.asset('assets/icons/ip.svg'),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        ip,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 63), // Restored original height spacing
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Chiqarib yuborish',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Chiqarib yuborish', style: TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w500
-                  ),),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

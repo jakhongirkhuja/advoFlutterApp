@@ -1,3 +1,4 @@
+import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                           AppLocalizations.of(
                             context,
                           )?.translate('legal_services') ??
-                          'Huquqiy xizmatlar',
+                          'Xizmatlar',
                       action:
                           AppLocalizations.of(context)?.translate('see_all') ??
                           'Barchasi',
@@ -87,8 +88,20 @@ class HomeScreen extends StatelessWidget {
               if (viewModel.isLoading)
                 const _HomeLoadingCard()
               else
-                ...viewModel.popularLawyers.map(
-                  (lawyer) => LawyerCard(lawyer: lawyer),
+                SizedBox(
+                  height: 300,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
+                    itemCount: viewModel.popularLawyers.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) => SizedBox(
+                      width: 320,
+                      child: LawyerCard(
+                        lawyer: viewModel.popularLawyers[index],
+                      ),
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -163,9 +176,11 @@ class _TopBar extends StatelessWidget {
         ),
         HeaderNavigation(
           firstIconPath: 'assets/icons/bookmark.svg',
-          firstIconOnTap: () => Navigator.pushNamed(context, AppRouter.savedLawyers),
+          firstIconOnTap: () =>
+              Navigator.pushNamed(context, AppRouter.savedLawyers),
           secondIconPath: 'assets/icons/notification.svg',
-          secondIconOnTap: () => Navigator.pushNamed(context, AppRouter.notifications),
+          secondIconOnTap: () =>
+              Navigator.pushNamed(context, AppRouter.notifications),
         ),
       ],
     );
@@ -182,25 +197,25 @@ class _SearchField extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, AppRouter.search),
       child: Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(61)),
-      clipBehavior: Clip.antiAlias,
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Color(0xFF999999), fontSize: 14),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: SvgPicture.asset('assets/icons/search.svg'),
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(61),
-            borderSide: const BorderSide(color: Colors.transparent, width: 0),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(61)),
+        clipBehavior: Clip.antiAlias,
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Color(0xFF999999), fontSize: 14),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: SvgPicture.asset('assets/icons/search.svg'),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(61),
+              borderSide: const BorderSide(color: Colors.transparent, width: 0),
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -228,7 +243,7 @@ class _ServicesGrid extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 3,
           mainAxisSpacing: 3,
-          childAspectRatio: 1.55,
+          childAspectRatio: 1.45,
         ),
         itemBuilder: (context, index) {
           final category = categories[index];
@@ -239,7 +254,7 @@ class _ServicesGrid extends StatelessWidget {
               onTap: onTap == null ? null : () => onTap!(category),
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: const Color(0xFFECECEC)),
@@ -250,17 +265,20 @@ class _ServicesGrid extends StatelessWidget {
                   children: [
                     Align(
                       alignment: Alignment.topRight,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppTheme.pageBackground,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(10),
-                        child: SvgPicture.asset(_serviceIcon(index)),
+                      child: CustomIconDesign(
+                        icon: category.iconPath,
+                        mainColor: category.mainColor,
+                        secondaryColor: category.secondaryColor,
+                        home: true,
+                        padding: 6,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 8, bottom: 8),
+                      padding: const EdgeInsets.only(
+                        left: 7,
+                        bottom: 7,
+                        right: 20,
+                      ),
                       child: Text(
                         category.title,
                         maxLines: 2,
@@ -279,16 +297,6 @@ class _ServicesGrid extends StatelessWidget {
         },
       ),
     );
-  }
-
-  String _serviceIcon(int index) {
-    var icons = [
-      'assets/icons/maslahat.svg',
-      'assets/icons/oila.svg',
-      'assets/icons/fuqoro.svg',
-      'assets/icons/jinoyat.svg',
-    ];
-    return icons[index];
   }
 }
 

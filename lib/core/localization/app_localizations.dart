@@ -381,7 +381,7 @@ class AppLocalizations {
       'appointments': 'Qabullar',
       'home': 'Asosiy',
       'greeting': 'Assalomu alaykum!',
-      'legal_services': 'Huquqiy xizmatlar',
+      'legal_services': 'Xizmatlar',
       'popular_lawyers': 'Mashhur advokatlar',
       'coming_soon': 'Bu bo‘lim tez orada ishga tushadi',
       'chat': 'Chat',

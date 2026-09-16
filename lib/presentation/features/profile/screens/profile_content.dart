@@ -257,6 +257,7 @@ class _Menu extends StatelessWidget {
       _Tile(
         icon: 'assets/icons/card_giftcard_outlined.svg',
         title: 'Loyihaga hissa qo‘shish',
+        onTap: () => Navigator.pushNamed(context, AppRouter.profileContribution),
       ),
       // _Tile(
       //   icon: 'assets/icons/notification.svg',
@@ -301,11 +302,11 @@ class _Menu extends StatelessWidget {
         title: 'Yordam markazi',
         onTap: () => Navigator.pushNamed(context, AppRouter.helpCenter),
       ),
-      _Tile(
-        icon: 'assets/icons/verified_user_outlined.svg',
-        title: 'Shaxsiy ma’lumotlar',
-        onTap: onDetails,
-      ),
+      // _Tile(
+      //   icon: 'assets/icons/verified_user_outlined.svg',
+      //   title: 'Shaxsiy ma’lumotlar',
+      //   onTap: onDetails,
+      // ),
       _Tile(
         icon: 'assets/icons/logout.svg',
         title: 'Tizimdan chiqish',
@@ -329,14 +330,16 @@ class _Menu extends StatelessWidget {
 
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFFF5F6F8),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       builder: (sheetContext) => StatefulBuilder(
         builder: (context, setModalState) => Container(
+          margin: const EdgeInsets.fromLTRB(6, 0, 6, 0),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F6F8),
+            borderRadius: BorderRadius.only(topRight: Radius.circular(28), topLeft: Radius.circular(28)),
+          ),
           child: SafeArea(
             top: false,
             child: Column(
@@ -354,7 +357,6 @@ class _Menu extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     Material(
                       color: const Color(0xFFEAF0F7),
                       shape: const CircleBorder(),
@@ -377,8 +379,8 @@ class _Menu extends StatelessWidget {
                   final label = code == 'uz'
                       ? 'O‘zbek tili'
                       : code == 'ru'
-                          ? 'Rus tili'
-                          : 'Ingliz tili';
+                      ? 'Rus tili'
+                      : 'Ingliz tili';
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: InkWell(
@@ -445,7 +447,7 @@ class _Menu extends StatelessWidget {
                       await localeProvider.setLocale(Locale(selectedCode));
                       if (sheetContext.mounted) Navigator.pop(sheetContext);
                     },
-                    child: const Text('Saqlash', style: TextStyle(fontSize: 16),),
+                    child: const Text('Saqlash', style: TextStyle(fontSize: 16)),
                   ),
                 ),
               ],

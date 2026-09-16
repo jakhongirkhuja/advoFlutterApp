@@ -6,6 +6,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../widgets/header_screen.dart';
 
+enum _VerificationStatus { notUploaded, ready, underReview, verified, rejected }
+
 class ProfileVerificationScreen extends StatefulWidget {
   const ProfileVerificationScreen({super.key});
 
@@ -20,15 +22,38 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
     'Passport (orqa tomoni)': null,
     'Hujjat ushlab turgan selfi': null,
   };
+  final Map<String, _VerificationStatus> _statuses = {
+    'Passport (old tomoni)': _VerificationStatus.notUploaded,
+    'Passport (orqa tomoni)': _VerificationStatus.notUploaded,
+    'Hujjat ushlab turgan selfi': _VerificationStatus.notUploaded,
+  };
+
+  bool _isVerified(String title) =>
+      _statuses[title] == _VerificationStatus.verified;
 
   Future<void> _pickFile(String title) async {
+    if (_isVerified(title)) return;
+
     final file = await openFile(
       acceptedTypeGroups: const [
         XTypeGroup(label: 'Rasmlar', extensions: ['jpg', 'jpeg', 'png']),
       ],
     );
     if (!mounted || file == null) return;
-    setState(() => _files[title] = file);
+    setState(() {
+      _files[title] = file;
+      _statuses[title] = _VerificationStatus.ready;
+    });
+  }
+
+  void _submitFiles() {
+    setState(() {
+      for (final title in _files.keys) {
+        if (_files[title] != null && !_isVerified(title)) {
+          _statuses[title] = _VerificationStatus.underReview;
+        }
+      }
+    });
   }
 
   @override
@@ -79,7 +104,11 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                           (title) => _UploadCard(
                             title: title,
                             file: _files[title],
-                            onTap: () => _pickFile(title),
+                            status: _statuses[title]!,
+                            onTap: _isVerified(title)
+                                ? null
+                                : () => _pickFile(title),
+                            icon: 'assets/icons/document_upload.svg',
                           ),
                         )
                         .toList(),
@@ -108,33 +137,69 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 6),
-                      Text(
-                        '✅ Yorug‘ joyda, matn aniq ko‘rinsin',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+
+                      Row(
+                        spacing: 6,
+                        children: [
+                          SvgPicture.asset('assets/icons/note_ok.svg'),
+                          Text(
+                            'Yorug‘ joyda, matn aniq ko‘rinsin',
+                            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '✅ Yuzingiz va hujjat birga ko‘rinsin',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                      SizedBox(height: 8),
+                      Row(
+                        spacing: 6,
+                        children: [
+                          SvgPicture.asset('assets/icons/note_ok.svg'),
+                          Text(
+                            'Yuzingiz va hujjat birga ko‘rinsin',
+                            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '🚫 Noodatiy yoki chala rasmlar rad etiladi',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                      SizedBox(height: 8),
+                      Row(
+                        spacing: 6,
+                        children: [
+                          SvgPicture.asset('assets/icons/note_fail.svg'),
+                          Text(
+                            'Noodatiy yoki chala rasmlar rad etiladi',
+                            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 7),
-                      Center(
-                        child: Text(
-                          '🔒 Hujjatlar xavfsiz serverga yuklanadi va faqat moderatorlar ko‘radi.\n1–3 kun ichida tekshiramiz',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ),
+
                     ],
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.only(top: 12, bottom: 5),
+                  alignment: Alignment.center,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        WidgetSpan(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: SvgPicture.asset('assets/icons/note_key.svg'),
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Hujjatlar xavfsiz serverga yuklanadi va faqat moderatorlar ko‘radi',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Text('1–3 kun ichida tekshiramiz', textAlign: TextAlign.center,)
               ],
             ),
           ),
@@ -147,16 +212,18 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
               child: SizedBox(
-                height: 40,
+                height: 48,
                 child: FilledButton(
-                  onPressed: () {},
+                  onPressed: _files.values.any((file) => file != null)
+                      ? _submitFiles
+                      : null,
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF2F80FF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(22),
                     ),
                   ),
-                  child: const Text('Yuborish', style: TextStyle(fontSize: 10)),
+                  child: const Text('Yuborish', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ),
@@ -170,54 +237,125 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
 class _UploadCard extends StatelessWidget {
   final String title;
   final XFile? file;
-  final VoidCallback onTap;
+  final _VerificationStatus status;
+  final String icon;
+  final VoidCallback? onTap;
 
   const _UploadCard({
     required this.title,
     required this.file,
+    required this.status,
     required this.onTap,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.only(bottom: 6),
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(13),
+    child: Opacity(
+      opacity: onTap == null ? 0.65 : 1,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(13),
 
         decoration: BoxDecoration(
           color: AppTheme.pageBackground,
-          border: Border.all(color: const Color(0xFFDCE3EC)),
+          border: Border.all(color: const Color(0xFFF8FAFC)),
           borderRadius: BorderRadius.circular(11),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/icons/document_upload.svg',
-              width: 18,
-              height: 18,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Color(0xffF1F5F9)
+              ),
+              padding: EdgeInsets.all(6),
+              child: SvgPicture.asset(
+                icon,
+                width: 18,
+                height: 18,
+              ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 6),
             Text(
               title,
-              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
+            const SizedBox(height: 6),
             Text(
               file?.name ?? 'Rasmni shu yerga yuklang',
               style: const TextStyle(
-                fontSize: 8,
+                fontSize: 14,
                 color: AppTheme.textSecondary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          ],
+            const SizedBox(height: 8),
+            _StatusLabel(status: status),
+            ],
+          ),
         ),
       ),
     ),
   );
+}
+
+class _StatusLabel extends StatelessWidget {
+  final _VerificationStatus status;
+
+  const _StatusLabel({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, color, icon) = switch (status) {
+      _VerificationStatus.notUploaded => (
+          'Yuklanmagan',
+          AppTheme.textSecondary,
+          Icons.upload_file,
+        ),
+      _VerificationStatus.ready => (
+          'Yuklashga tayyor',
+          const Color(0xFF2F80FF),
+          Icons.check_circle_outline,
+        ),
+      _VerificationStatus.underReview => (
+          'Tekshirilmoqda',
+          const Color(0xFFF59E0B),
+          Icons.hourglass_empty,
+        ),
+      _VerificationStatus.verified => (
+          'Tasdiqlangan',
+          const Color(0xFF15985B),
+          Icons.verified,
+        ),
+      _VerificationStatus.rejected => (
+          'Rad etilgan',
+          const Color(0xFFDC2626),
+          Icons.error_outline,
+        ),
+    };
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
 }
