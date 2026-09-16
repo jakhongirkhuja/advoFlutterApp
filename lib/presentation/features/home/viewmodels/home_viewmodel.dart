@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../data/models/home/lawyer.dart';
 import '../../../../data/models/home/service_category.dart';
 import '../../../../data/models/services/organization.dart';
+import '../../../../data/models/services/protokol_provider.dart';
 import '../../../../data/repositories/home_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
@@ -57,6 +58,13 @@ class HomeViewModel extends ChangeNotifier {
   String get locationName => _locationName;
   List<Organization> _organizations = const [];
   List<Organization> get organizations => _organizations;
+  List<ProtokolProvider> _protokolProviders = const [];
+  List<ProtokolProvider> get protokolProviders => _protokolProviders;
+
+  Future<void> loadProtokolProviders() async {
+    _protokolProviders = await repository.getProtokolProviders();
+    notifyListeners();
+  }
   Future<void> loadServices() async {
     _isLoading = true;
     notifyListeners();

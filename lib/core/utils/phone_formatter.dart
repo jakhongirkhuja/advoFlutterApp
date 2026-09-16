@@ -8,3 +8,12 @@ String formatPhoneNumber(String phone) {
 
   return phone;
 }
+String formatPrice(dynamic price) {
+  final priceStr = price.toString().replaceAll(RegExp(r'\D'), '');
+  if (priceStr.isEmpty) return '0';
+
+  return priceStr.replaceAllMapped(
+    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (match) => '${match[1]} ',
+  );
+}

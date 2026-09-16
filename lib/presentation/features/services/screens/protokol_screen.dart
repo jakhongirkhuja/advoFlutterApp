@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
-import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../data/models/services/organization.dart';
-import '../../../../presentation/widgets/header_screen.dart';
+import '../../../../core/utils/phone_formatter.dart';
+import '../../../../data/models/services/protokol_provider.dart';
+import '../../../widgets/header_screen.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
-class OrganizationsScreen extends StatefulWidget {
-  const OrganizationsScreen({super.key});
+class ProtokolScreen extends StatefulWidget {
+  final String title;
+
+  const ProtokolScreen({super.key, required this.title});
 
   @override
-  State<OrganizationsScreen> createState() => _OrganizationsScreenState();
+  State<ProtokolScreen> createState() => _ProtokolScreenState();
 }
 
-class _OrganizationsScreenState extends State<OrganizationsScreen> {
-  @override
+class _ProtokolScreenState extends State<ProtokolScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && context.read<HomeViewModel>().organizations.isEmpty) {
-        context.read<HomeViewModel>().loadServices();
+      if (mounted && context.read<HomeViewModel>().protokolProviders.isEmpty) {
+        context.read<HomeViewModel>().loadProtokolProviders();
       }
     });
   }
@@ -37,11 +38,11 @@ class _OrganizationsScreenState extends State<OrganizationsScreen> {
         child: Stack(
           children: [
             RefreshIndicator(
-              onRefresh: viewModel.loadServices,
+              onRefresh: viewModel.loadProtokolProviders,
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
                 children: [
-                  if (viewModel.organizations.isEmpty)
+                  if (viewModel.protokolProviders.isEmpty)
                     const SizedBox(
                       height: 300,
                       child: Center(
@@ -49,15 +50,14 @@ class _OrganizationsScreenState extends State<OrganizationsScreen> {
                       ),
                     )
                   else
-                    ...viewModel.organizations.map(
-                      (organization) =>
-                          OrganizationCard(organization: organization),
+                    ...viewModel.protokolProviders.map(
+                      (provider) => ProtokolProviderCard(provider: provider),
                     ),
                 ],
               ),
             ),
             HeaderScreen(
-              title: 'Tashkilotlar',
+              title: widget.title,
               firstActionIconPath: 'assets/icons/search.svg',
               onFirstActionTap: () =>
                   Navigator.pushNamed(context, AppRouter.search),
@@ -72,10 +72,10 @@ class _OrganizationsScreenState extends State<OrganizationsScreen> {
   }
 }
 
-class OrganizationCard extends StatelessWidget {
-  final Organization organization;
+class ProtokolProviderCard extends StatelessWidget {
+  final ProtokolProvider provider;
 
-  const OrganizationCard({required this.organization});
+  const ProtokolProviderCard({required this.provider});
 
   @override
   Widget build(BuildContext context) {
@@ -102,13 +102,13 @@ class OrganizationCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Image.network(
-                  '${AppConfig.dummyImageBaseUrl}/organization-${organization.id}/320/240',
+                  provider.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, exception, stackTrace) {
                     print(exception);
                     return Center(
                       child: Text(
-                        _initials(organization.name),
+                        _initials(provider.name),
                         style: const TextStyle(
                           color: Color(0xFF31527A),
                           fontSize: 18,
@@ -128,7 +128,7 @@ class OrganizationCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            organization.name,
+                            provider.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -137,7 +137,7 @@ class OrganizationCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (organization.isVerified) ...[
+                        if (provider.isVerified) ...[
                           const SizedBox(width: 4),
                           const Icon(
                             Icons.verified,
@@ -151,7 +151,7 @@ class OrganizationCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '${organization.type}',
+                          provider.type,
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.textChoco,
@@ -174,7 +174,7 @@ class OrganizationCard extends StatelessWidget {
                         SvgPicture.asset('assets/icons/star.svg'),
                         const SizedBox(width: 4),
                         Text(
-                          '${organization.rating}',
+                          '${provider.rating}',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
@@ -182,7 +182,7 @@ class OrganizationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          '(${organization.reviewsCount} ta sharh)',
+                          '(${provider.reviewsCount} ta sharh)',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             color: AppTheme.textChoco,
@@ -194,49 +194,26 @@ class OrganizationCard extends StatelessWidget {
                   ],
                 ),
               ),
-              InkWell(
-                onTap: () => context.read<HomeViewModel>().toggleOrganizationBookmark(organization.id),
-                borderRadius: BorderRadius.circular(40),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.pageBackground,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: SvgPicture.asset(
-                    context.watch<HomeViewModel>().isOrganizationSaved(organization.id)
-                        ? 'assets/icons/bookmarkfilled.svg'
-                        : 'assets/icons/bookmark.svg',
-                  ),
+              Container(
+                width: 42,
+                height: 42,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.pageBackground,
+                  borderRadius: BorderRadius.circular(40),
                 ),
+                child: SvgPicture.asset('assets/icons/bookmark.svg'),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: organization.tags.take(2).map(_tag).toList(),
-              ),
-              if (organization.tags.length > 2) ...[
-                const SizedBox(width: 8),
-                _tag('+${organization.tags.length - 2}'),
-              ],
-            ],
-          ),
-          const SizedBox(height: 12),
           Row(
             children: [
               SvgPicture.asset('assets/icons/location.svg'),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  organization.address,
+                  provider.address,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -253,43 +230,33 @@ class OrganizationCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.pageBackground,
-                      borderRadius: BorderRadius.circular(20)
+                  Text(
+                    formatPrice(provider.price),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff0F172A),
                     ),
-                    child: SvgPicture.asset('assets/icons/lawyer.svg'),
                   ),
-
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(organization.lawyerCount>15? '15+' : organization.lawyerCount.toString(), style: TextStyle(fontSize: 16),),
-                      Text('Advakatlar', style: TextStyle(fontSize: 14, color: AppTheme.textChoco),)
-                    ],
-                  )
+                  const Text(
+                    '/so\'mdan',
+                    style: TextStyle(fontSize: 16, color: Color(0xff64748B)),
+                  ),
                 ],
               ),
               InkWell(
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  AppRouter.organizationProfile,
-                  arguments: organization,
-                ),
+                onTap: () {},
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 9.5, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: AppTheme.buttonGold,
+                    color: Color(0xffEFF6FF),
                     borderRadius: BorderRadius.circular(42),
+                    border: Border.all(color: Color(0xffBEDBFF)),
                   ),
                   child: Text(
                     'Ko\'rish',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xff1C8AFF),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -322,4 +289,3 @@ class OrganizationCard extends StatelessWidget {
     return parts.take(2).map((part) => part[0]).join().toUpperCase();
   }
 }
-

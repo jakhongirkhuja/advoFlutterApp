@@ -9,6 +9,7 @@ import '../models/home/lawyer.dart';
 import '../models/home/service_category.dart';
 import '../models/appointments/appointment.dart';
 import '../models/services/organization.dart';
+import '../models/services/protokol_provider.dart';
 
 class HomeRepository {
   final ApiClient apiClient;
@@ -117,7 +118,7 @@ class HomeRepository {
         iconPath: 'assets/icons/jinoyat.svg',
         mainColor: Color(0xffFFBA00),
         secondaryColor: Color(0xffE17100),
-        route: AppRouter.templates,
+        route: AppRouter.protokol,
       ),
     ];
   }
@@ -182,6 +183,51 @@ class HomeRepository {
           'Shartnoma tayyorlash',
           'Sud maslahatlari',
         ],
+      ),
+    ];
+  }
+
+  Future<List<ProtokolProvider>> getProtokolProviders() async {
+    // TODO(Dio): Replace with the dedicated `protokol/providers` request.
+    return const [
+      ProtokolProvider(
+        id: 101,
+        name: 'YevroPratakol',
+        type: 'Yuridik firma',
+        rating: 4.7,
+        reviewsCount: 102,
+        imageUrl: '${AppConfig.dummyImageBaseUrl}/organization-101/160/120',
+        address: 'Toshkent shahri, Yunusobod tumani',
+        price: 150000,
+        isVerified: true,
+        latitude: 41.3382,
+        longitude: 69.3347,
+      ),
+      ProtokolProvider(
+        id: 102,
+        name: 'EuroAsia Insurance',
+        type: 'Yuridik maslahat',
+        rating: 4.5,
+        reviewsCount: 85,
+        imageUrl: '${AppConfig.dummyImageBaseUrl}/organization-102/160/120',
+        address: 'Toshkent shahri, Shayxontohur tumani',
+        price: 150000,
+        isVerified: true,
+        latitude: 41.3198,
+        longitude: 69.2425,
+      ),
+      ProtokolProvider(
+        id: 103,
+        name: 'Legal Experts Uzbekistan',
+        type: 'Yuridik maslahat',
+        rating: 4.9,
+        reviewsCount: 140,
+        imageUrl: '${AppConfig.dummyImageBaseUrl}/organization-103/160/120',
+        address: 'Toshkent shahri, Mirzo Ulug‘bek tumani',
+        price: 150000,
+        isVerified: true,
+        latitude: 41.3275,
+        longitude: 69.2812,
       ),
     ];
   }
