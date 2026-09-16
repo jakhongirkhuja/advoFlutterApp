@@ -5,7 +5,9 @@ import 'package:Vatandoshlar/presentation/widgets/section_header.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../data/models/home/service_category.dart';
 import '../../../../presentation/widgets/public_bottom_navigation_bar.dart';
+import '../../../widgets/custom_icon_design.dart';
 import '../../../widgets/header_screen.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
@@ -28,20 +30,7 @@ class ServicesScreen extends StatelessWidget {
                 // Guarantees pull-to-refresh behavior
                 padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
                 children: [
-                  _FeaturePanel(
-                    onOrganizationsTap: () => Navigator.pushNamed(
-                      context,
-                      AppRouter.organizations,
-                    ),
-                    onLawyersTap: () => Navigator.pushNamed(
-                      context,
-                      AppRouter.lawyers,
-                    ),
-                    onTemplatesTap: () => Navigator.pushNamed(
-                      context,
-                      AppRouter.templates,
-                    ),
-                  ),
+                  _ServicesGrid(categories: viewModel.serviceCategories),
                   const SizedBox(height: 12),
                   const SectionHeader(title: 'Xizmat turlari'),
                   const SizedBox(height: 12),
@@ -97,16 +86,17 @@ class ServicesScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                 ],
               ),
               HeaderScreen(
                 showBackIcon: false,
                 title: 'Xizmatlar',
                 firstActionIconPath: 'assets/icons/bookmark.svg',
-                onFirstActionTap: () => Navigator.pushNamed(context, AppRouter.savedLawyers),
+                onFirstActionTap: () =>
+                    Navigator.pushNamed(context, AppRouter.savedLawyers),
                 secondActionIconPath: 'assets/icons/notification.svg',
-                onSecondActionTap: () => Navigator.pushNamed(context, AppRouter.notifications),
+                onSecondActionTap: () =>
+                    Navigator.pushNamed(context, AppRouter.notifications),
               ),
               Positioned(
                 left: 0,
@@ -150,7 +140,11 @@ class _FeaturePanel extends StatelessWidget {
   final VoidCallback onLawyersTap;
   final VoidCallback onTemplatesTap;
 
-  const _FeaturePanel({required this.onOrganizationsTap, required this.onLawyersTap, required this.onTemplatesTap});
+  const _FeaturePanel({
+    required this.onOrganizationsTap,
+    required this.onLawyersTap,
+    required this.onTemplatesTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -232,31 +226,31 @@ class _FeatureTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppTheme.pageBackground,
-                borderRadius: BorderRadius.circular(12),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.pageBackground,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: SvgPicture.asset(icon),
               ),
-              child: SvgPicture.asset(icon),
             ),
-          ),
-          const Spacer(),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-          Text(
-            subtitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
-          ),
-        ],
+            const Spacer(),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
+            ),
+          ],
         ),
       ),
     );
@@ -313,6 +307,91 @@ class _ServiceRow extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ServicesGrid extends StatelessWidget {
+  final List<ServiceCategory> categories;
+
+  const _ServicesGrid({required this.categories});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.pageBackground,
+        borderRadius: BorderRadius.circular(22),
+      ),
+
+      padding: const EdgeInsets.only(left: 6, right: 6, bottom: 6, top: 6),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+
+        itemCount: categories.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 3,
+          mainAxisSpacing: 3,
+          childAspectRatio: 1.50,
+        ),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              onTap: () {
+                if (category.route != null) {
+                  Navigator.pushNamed(context, category.route!);
+                }
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFECECEC)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: CustomIconDesign(
+                        icon: category.iconPath,
+                        mainColor: category.mainColor,
+                        secondaryColor: category.secondaryColor,
+                        home: true,
+                        padding: 6,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 7,
+                        bottom: 7,
+                        right: 7,
+                      ),
+                      child: Text(
+                        category.title.replaceAll(' ', '\n'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

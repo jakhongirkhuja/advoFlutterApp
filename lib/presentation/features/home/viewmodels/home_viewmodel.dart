@@ -89,6 +89,7 @@ class HomeViewModel extends ChangeNotifier {
     final results = await Future.wait([
       repository.getPopularLawyers(),
       repository.getServiceCategories(),
+      repository.getOrganizations(),
     ]);
 
     _popularLawyers = results[0] as List<Lawyer>;
@@ -98,6 +99,11 @@ class HomeViewModel extends ChangeNotifier {
       ..addAll(storedLawyerIds?.map(int.parse) ??
           _popularLawyers.where((lawyer) => lawyer.isBookmarked).map((lawyer) => lawyer.id));
     _serviceCategories = results[1] as List<ServiceCategory>;
+    _organizations = results[2] as List<Organization>;
+    final storedOrganizationIds = prefs?.getStringList(_savedOrganizationsKey);
+    _savedOrganizationIds
+      ..clear()
+      ..addAll(storedOrganizationIds?.map(int.parse) ?? const <int>[]);
     _locationName = await _loadLocationName();
     _isLoading = false;
     notifyListeners();

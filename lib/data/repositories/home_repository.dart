@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import '../../core/config/app_config.dart';
+import '../../core/routes/app_router.dart';
 import '../api/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/home/lawyer.dart';
@@ -92,6 +93,7 @@ class HomeRepository {
         iconPath: 'assets/icons/maslahat.svg',
         mainColor: Color(0xff1C8AFF),
         secondaryColor: Color(0xff69AFFF),
+        route: AppRouter.organizations,
       ),
       ServiceCategory(
         id: 2,
@@ -99,6 +101,7 @@ class HomeRepository {
         iconPath: 'assets/icons/oila.svg',
         mainColor: Color(0xff15985B),
         secondaryColor: Color(0xff40DB93),
+        route: AppRouter.lawyers,
       ),
       ServiceCategory(
         id: 3,
@@ -106,6 +109,7 @@ class HomeRepository {
         iconPath: 'assets/icons/fuqoro.svg',
         mainColor: Color(0xff1E9389),
         secondaryColor: Color(0xff52CFC4),
+        route: AppRouter.templates,
       ),
       ServiceCategory(
         id: 4,
@@ -113,6 +117,7 @@ class HomeRepository {
         iconPath: 'assets/icons/jinoyat.svg',
         mainColor: Color(0xffFFBA00),
         secondaryColor: Color(0xffE17100),
+        route: AppRouter.templates,
       ),
     ];
   }

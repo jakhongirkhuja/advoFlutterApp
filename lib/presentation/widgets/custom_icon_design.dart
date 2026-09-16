@@ -21,14 +21,14 @@ class CustomIconDesign extends StatelessWidget {
         borderRadius: BorderRadius.circular(home?12:16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xff0A0D12).withValues(alpha: 0.3),
+            color: const Color(0xff0A0D12).withValues(alpha: home?0.1:0.3),
             offset: Offset(0, 4),
             blurRadius: 6,
             spreadRadius: -2,
           ),
           // 0px 12px 16px -4px #0A0D1214
           BoxShadow(
-            color: Color(0xff0A0D12).withValues(alpha: 0.2),
+            color: Color(0xff0A0D12).withValues(alpha:  home?0.1:0.2),
             offset: Offset(0, 12),
             blurRadius: 16,
             spreadRadius: -4,

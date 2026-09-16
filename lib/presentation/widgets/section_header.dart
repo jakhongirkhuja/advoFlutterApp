@@ -34,7 +34,7 @@ class SectionHeader extends StatelessWidget {
               ),
               child: Text(
                 action!,
-                style: const TextStyle(fontSize: 12, color: Color(0xFFCA9D38)),
+                style: const TextStyle(fontSize: 14, color: Color(0xFFCA9D38)),
               ),
             ),
           ],

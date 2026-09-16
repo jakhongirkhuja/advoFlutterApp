@@ -40,7 +40,7 @@ class LawyerCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Image.network(
-                  '${AppConfig.dummyImageBaseUrl}/lawyer-${lawyer.id}/320/240',
+                  '${lawyer.imageUrl}',
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     width: 74,
@@ -70,7 +70,7 @@ class LawyerCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           const Icon(
                             Icons.verified,
-                            size: 17,
+                            size: 20,
                             color: Color(0xFF3E9B6B),
                           ),
                         ],
