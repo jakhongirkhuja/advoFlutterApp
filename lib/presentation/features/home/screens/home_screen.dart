@@ -146,6 +146,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: PublicBottomNavigationBar(
+        onAddTap: () => Navigator.pushNamed(context, AppRouter.aiAssistant),
         onServicesTap: () => Navigator.pushNamed(context, AppRouter.services),
         onProfileTap: () => Navigator.pushNamed(context, AppRouter.profile),
         onAppointmentsTap: () =>

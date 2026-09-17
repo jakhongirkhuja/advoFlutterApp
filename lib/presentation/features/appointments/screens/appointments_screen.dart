@@ -72,6 +72,7 @@ class AppointmentsScreen extends StatelessWidget {
       bottomNavigationBar: showBottomNavigation
           ? PublicBottomNavigationBar(
               activeItem: 'appointments',
+              onAddTap: () => Navigator.pushNamed(context, AppRouter.aiAssistant),
               onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
                 AppRouter.home,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../presentation/features/auth/screens/login_screen.dart';
 import '../../presentation/features/auth/screens/otp_screen.dart';
 import '../../presentation/features/home/screens/home_screen.dart';
+import '../../presentation/features/home/screens/ai_chat_screen.dart';
 import '../../presentation/features/profile/screens/profile_screen.dart';
 import '../../presentation/features/profile/screens/profile_details_screen.dart';
 import '../../presentation/features/profile/screens/profile_edit_screen.dart';
@@ -47,6 +48,7 @@ class AppRouter {
   static const login = '/login';
   static const otp = '/otp';
   static const home = '/home';
+  static const aiAssistant = '/ai-assistant';
   static const profile = '/profile';
   static const profileDetails = '/profile/details';
   static const profileEdit = '/profile/edit';
@@ -80,6 +82,8 @@ class AppRouter {
     switch (settings.name) {
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case aiAssistant:
+        return MaterialPageRoute(builder: (_) => const AiChatScreen());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case profile:

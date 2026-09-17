@@ -122,6 +122,7 @@ class ServicesScreen extends StatelessWidget {
       ),
       bottomNavigationBar: PublicBottomNavigationBar(
         activeItem: 'services',
+        onAddTap: () => Navigator.pushNamed(context, AppRouter.aiAssistant),
         onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
           context,
           AppRouter.home,

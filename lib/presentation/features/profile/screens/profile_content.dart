@@ -157,6 +157,7 @@ class _ProfileShell extends StatelessWidget {
     ),
     bottomNavigationBar: showBottomNavigation
         ? PublicBottomNavigationBar(
+            onAddTap: () => Navigator.pushNamed(context, AppRouter.aiAssistant),
             activeItem: 'profile',
             onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
               context,
