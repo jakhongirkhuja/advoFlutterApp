@@ -41,51 +41,68 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _chooseLanguage(BuildContext context) async {
     final localeProvider = context.read<LocaleProvider>();
-    final button =
-    _languageKey.currentContext?.findRenderObject() as RenderBox?;
-    final overlay = Overlay
-        .of(context)
-        .context
-        .findRenderObject() as RenderBox;
-    if (button == null) return;
-    final topLeft = button.localToGlobal(Offset.zero, ancestor: overlay);
-    final bottomRight = button.localToGlobal(
-      button.size.bottomRight(Offset.zero),
-      ancestor: overlay,
-    );
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
     final selected = await showMenu<String>(
       context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromPoints(topLeft, bottomRight),
-        Offset.zero & overlay.size,
+      elevation: 0,
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      // Set position explicitly 65px from the top
+      position: RelativeRect.fromLTRB(
+        overlay.size.width,
+        105.0,
+        22.0,
+        overlay.size.height,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      menuPadding: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      popUpAnimationStyle: AnimationStyle.noAnimation,
       items: LocaleProvider.supportedLanguages.map((language) {
         final code = language['code']!;
+        final isSelected = code == localeProvider.currentLanguageCode;
+
         return PopupMenuItem<String>(
           value: code,
-          height: 34,
-          child: Row(
-            children: [
-              Text(language['flag']!, style: const TextStyle(fontSize: 15)),
-              const SizedBox(width: 6),
-              Text(
-                code == 'uz'
-                    ? 'O‘zbek tili'
-                    : code == 'ru'
-                    ? 'Rus tili'
-                    : 'Ingliz tili',
-                style: const TextStyle(fontSize: 11),
+          height: 48,
+          padding: EdgeInsets.zero, // Remove default Flutter menu item padding
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isSelected
+                    ? const Color(0xFFBEDBFF)
+                    : Colors.transparent,
+                width: 1.5,
               ),
-              if (code == localeProvider.currentLanguageCode) ...[
-                const Spacer(),
-                const Icon(Icons.check, size: 15, color: Color(0xFF2B7FFF)),
+            ),
+            child: Row(
+              children: [
+                Text(language['flag']!, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 12),
+                Text(
+                  code == 'uz'
+                      ? 'O’zbek tili'
+                      : code == 'ru'
+                      ? 'Rus tili'
+                      : 'Ingliz tili',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
               ],
-            ],
+            ),
           ),
         );
       }).toList(),
     );
+
     if (selected != null && context.mounted) {
       await localeProvider.setLocale(Locale(selected));
     }
@@ -105,16 +122,18 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(height: 100),
-                CustomIconDesign(icon: 'assets/icons/login_user.svg',
-                    mainColor: Color(0xff1C8AFF),
-                    secondaryColor: Color(0xff69AFFF)),
+                CustomIconDesign(
+                  icon: 'assets/icons/login_user.svg',
+                  mainColor: Color(0xff1C8AFF),
+                  secondaryColor: Color(0xff69AFFF),
+                ),
                 const SizedBox(height: 17),
                 Text(
                   'Ro‘yxatdan o‘tish',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xff0F172A)
+                    color: Color(0xff0F172A),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -138,7 +157,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('+998', style: TextStyle(fontSize: 16, color: Color(0xff0F172A))),
+                        child: Text(
+                          '+998',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xff0F172A),
+                          ),
+                        ),
                       ),
                       const VerticalDivider(
                         width: 1,
@@ -151,26 +176,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.phone,
 
                           inputFormatters: [_maskFormatter],
-                          onChanged: (value) =>
-                              setState(() {
-                                _completePhoneNumber =
+                          onChanged: (value) => setState(() {
+                            _completePhoneNumber =
                                 '+998${value.replaceAll(RegExp(r'\D'), '')}';
-                                _isValidPhone =
-                                    value
-                                        .replaceAll(RegExp(r'\D'), '')
-                                        .length ==
-                                        9;
-                              }),
+                            _isValidPhone =
+                                value.replaceAll(RegExp(r'\D'), '').length == 9;
+                          }),
                           decoration: const InputDecoration(
                             hintText: '99-999-99-99',
                             border: InputBorder.none,
                             isDense: true,
-                            hintStyle: TextStyle(
-                              fontSize: 16
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                            ),
+                            hintStyle: TextStyle(fontSize: 16),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
                           ),
                         ),
                       ),
@@ -189,10 +206,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         duration: const Duration(milliseconds: 150),
                         width: 22,
                         height: 22,
-                          margin: EdgeInsets.only(left: 16),
+                        margin: EdgeInsets.only(left: 16),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _termsAccepted ? const Color(0xFF2F80ED) : Colors.transparent,
+                          color: _termsAccepted
+                              ? const Color(0xFF2F80ED)
+                              : Colors.transparent,
                           border: Border.all(
                             color: _termsAccepted
                                 ? const Color(0xFF2F80ED)
@@ -202,10 +221,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: _termsAccepted
                             ? const Icon(
-                          Icons.check,
-                          size: 14,
-                          color: Colors.white,
-                        )
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              )
                             : null,
                       ),
                     ),
@@ -235,9 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
-                          style: const TextStyle(
-                            fontSize: 14,
-                          ),
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ),
                     ),
@@ -252,66 +269,63 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: _termsAccepted && _isValidPhone
                           ? () async {
-                        final otp = await viewModel.sendOtp(
-                          _completePhoneNumber,
-                        );
+                              final otp = await viewModel.sendOtp(
+                                _completePhoneNumber,
+                              );
 
-                        if (otp != null && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('OTP kod: $otp'),
-                              backgroundColor: Colors.green,
-                              duration: const Duration(seconds: 10),
-                              action: SnackBarAction(
-                                label:
-                                localizations?.translate(
-                                  'copy',
-                                ) ??
-                                    'Copy',
-                                textColor: Colors.white,
-                                onPressed: () async {
-                                  await Clipboard.setData(
-                                    ClipboardData(text: otp),
-                                  );
+                              if (otp != null && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('OTP kod: $otp'),
+                                    backgroundColor: Colors.green,
+                                    duration: const Duration(seconds: 10),
+                                    action: SnackBarAction(
+                                      label:
+                                          localizations?.translate('copy') ??
+                                          'Copy',
+                                      textColor: Colors.white,
+                                      onPressed: () async {
+                                        await Clipboard.setData(
+                                          ClipboardData(text: otp),
+                                        );
 
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        localizations?.translate(
-                                          'copied',
-                                        ) ??
-                                            'Copied',
-                                      ),
-                                      duration: const Duration(
-                                        seconds: 2,
-                                      ),
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              localizations?.translate(
+                                                    'copied',
+                                                  ) ??
+                                                  'Copied',
+                                            ),
+                                            duration: const Duration(
+                                              seconds: 2,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        }
+                                  ),
+                                );
+                              }
 
-                        if (context.mounted) {
-                          Navigator.pushNamed(
-                            context,
-                            AppRouter.otp,
-                            arguments: _completePhoneNumber,
-                          );
-                        }
-                      }
+                              if (context.mounted) {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRouter.otp,
+                                  arguments: _completePhoneNumber,
+                                );
+                              }
+                            }
                           : null,
                       child: viewModel.status == AuthStatus.loading
-                          ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                        localizations?.translate('continue') ??
-                            'Davom etish',
-                      ),
+                              localizations?.translate('continue') ??
+                                  'Davom etish',
+                              style: TextStyle(fontSize: 16),
+                            ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2B7FFF),
                         disabledBackgroundColor: const Color(0xFFA9C9FF),
@@ -328,40 +342,63 @@ class _LoginScreenState extends State<LoginScreen> {
               left: 0,
               right: 0,
               bottom: 0,
-              height: 62,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                padding: EdgeInsets.only(top: 4),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF2B7FFF),
+                      Color(0xFFFFFFFF),
+                    ],
+                    stops: [
+                      0.75,
+                      1.0,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
                 ),
-                child: ElevatedButton(
-                  onPressed: _termsAccepted && _isValidPhone
-                      ? () async {
-                    final otp = await viewModel.sendOtp(
-                      _completePhoneNumber,
-                    );
-                    if (!context.mounted) return;
-                    if (otp != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('OTP kod: $otp')),
+                child: Container(
+                  padding: EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(24), topLeft: Radius.circular(24)),
+                  ),
+                  child: GestureDetector(
+                    onTap: _termsAccepted && _isValidPhone
+                        ? () async {
+                      final otp = await viewModel.sendOtp(
+                        _completePhoneNumber,
+                      );
+                      if (!context.mounted) return;
+                      if (otp != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('OTP kod: $otp')),
+                        );
+                      }
+                      Navigator.pushNamed(
+                        context,
+                        AppRouter.otp,
+                        arguments: _completePhoneNumber,
                       );
                     }
-                    Navigator.pushNamed(
-                      context,
-                      AppRouter.otp,
-                      arguments: _completePhoneNumber,
-                    );
-                  }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2B7FFF),
-                    disabledBackgroundColor: const Color(0xFFA9C9FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                        : null,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                      height: 48,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(57),
+                        color: Colors.blue,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Davom etish',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
                     ),
                   ),
-                  child: const Text('Davom etish'),
                 ),
               ),
             ),
@@ -387,22 +424,33 @@ class _LanguageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final code = context
-        .watch<LocaleProvider>()
-        .currentLanguageCode;
+    final code = context.watch<LocaleProvider>().currentLanguageCode;
     final language = LocaleProvider.supportedLanguages.firstWhere(
-          (item) => item['code'] == code,
+      (item) => item['code'] == code,
       orElse: () => LocaleProvider.supportedLanguages.first,
     );
-    return Material(
-      color: Colors.white,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: 38,
-          height: 38,
+    return Container(
+      height: 44,
+      width: 44,
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(47),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFFFFFF), Color(0xFFD9B875)],
+          stops: [0.5, 1.0],
+        ),
+      ),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(47),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
           child: Center(
             child: Text(
               language['flag']!,
