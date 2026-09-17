@@ -1,10 +1,18 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
+import 'package:yandex_maps_mapkit_lite/mapkit.dart'
+    hide Icon, Image, TextStyle, Uri;
+import 'package:yandex_maps_mapkit_lite/ui_view.dart';
+import 'package:yandex_maps_mapkit_lite/yandex_map.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../data/models/services/organization.dart';
 import '../../../widgets/header_navigation.dart';
 import '../../../widgets/lawyer_card.dart';
@@ -49,6 +57,7 @@ class _OrganizationProfileScreenState extends State<OrganizationProfileScreen> {
                 ),
               ],
             ),
+
             Positioned(
               left: 16,
               right: 16,
@@ -58,7 +67,7 @@ class _OrganizationProfileScreenState extends State<OrganizationProfileScreen> {
                 children: [
                   HeaderNavigation(
                     firstIconPath: 'assets/icons/back.svg',
-                    firstIconOnTap: () {},
+                    firstIconOnTap: () => Navigator.of(context).maybePop(),
                     moveBack: true,
                   ),
                   HeaderNavigation(
@@ -433,22 +442,13 @@ class _OrganizationMap extends StatefulWidget {
 }
 
 class _OrganizationMapState extends State<_OrganizationMap> {
-  GoogleMapController? _controller;
-
-  static const _tashkent = LatLng(41.3111, 69.2797);
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    _controller = null;
-    super.dispose();
-  }
+  static const _tashkent = Point(latitude: 41.3111, longitude: 69.2797);
 
   @override
   Widget build(BuildContext context) {
-    final position = LatLng(
-      widget.organization.latitude ?? _tashkent.latitude,
-      widget.organization.longitude ?? _tashkent.longitude,
+    final position = Point(
+      latitude: widget.organization.latitude ?? _tashkent.latitude,
+      longitude: widget.organization.longitude ?? _tashkent.longitude,
     );
 
     return GestureDetector(
@@ -458,34 +458,93 @@ class _OrganizationMapState extends State<_OrganizationMap> {
         child: SizedBox(
           height: 104,
           width: double.infinity,
-          child: AbsorbPointer(
-            child: GoogleMap(
-          initialCameraPosition: CameraPosition(target: position, zoom: 13.5),
-          markers: {
-            Marker(
-              markerId: MarkerId('organization-${widget.organization.id}'),
-              position: position,
-              infoWindow: InfoWindow(title: widget.organization.name),
-            ),
-          },
-          onMapCreated: (controller) => _controller = controller,
-          zoomControlsEnabled: false,
-          mapToolbarEnabled: false,
-          myLocationButtonEnabled: false,
-          compassEnabled: false,
-          rotateGesturesEnabled: false,
-          tiltGesturesEnabled: false,
-          scrollGesturesEnabled: false,
-          zoomGesturesEnabled: false,
+          child: _mapIsConfigured
+              ? AbsorbPointer(
+                  child: YandexMap(
+                    onMapCreated: (window) => _configureMap(window, position),
+                  ),
+                )
+              : const ColoredBox(
+                  color: Color(0xFFE8EEF5),
+                  child: Center(
+                    child: Icon(
+                      Icons.map_outlined,
+                      color: AppTheme.primaryBlue,
+                    ),
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  static const _mapIsConfigured = AppConfig.yandexMapKitApiKey != '';
+
+  void _configureMap(MapWindow window, Point position) {
+    window.map.move(CameraPosition(position, zoom: 13.5, azimuth: 0, tilt: 0));
+    final placemark = window.map.mapObjects.addPlacemark()..geometry = position;
+    placemark.setViewWithStyle(
+      ViewProvider(
+        builder: () async {
+          final bytes = (await rootBundle.load('assets/images/logo_icon.png'))
+              .buffer
+              .asUint8List();
+          final codec = await ui.instantiateImageCodec(
+            bytes,
+            targetWidth: 28,
+            targetHeight: 28,
+          );
+          final frame = await codec.getNextFrame();
+          return _OrganizationMarker(image: frame.image);
+        },
+        cacheable: true,
+      ),
+      const IconStyle(anchor: math.Point(0.5, 1.0)),
+    );
+  }
+}
+
+class _OrganizationMarker extends StatelessWidget {
+  final ui.Image image;
+
+  const _OrganizationMarker({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 46,
+      height: 56,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          const Positioned(
+            bottom: 0,
+            child: Icon(
+              Icons.location_on,
+              size: 48,
+              color: AppTheme.primaryBlue,
             ),
           ),
-        ),
+          Positioned(
+            top: 3,
+            child: Container(
+              width: 28,
+              height: 28,
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(child: RawImage(image: image, fit: BoxFit.cover)),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-Future<void> _showMapOpenSheet(BuildContext context, LatLng position) async {
+Future<void> _showMapOpenSheet(BuildContext context, Point position) async {
   await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -504,10 +563,15 @@ Future<void> _showMapOpenSheet(BuildContext context, LatLng position) async {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Ochish', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const Text(
+                  'Ochish',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
                 IconButton(
                   onPressed: () => Navigator.pop(sheetContext),
-                  style: IconButton.styleFrom(backgroundColor: AppTheme.tagBackground),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppTheme.tagBackground,
+                  ),
                   icon: const Icon(Icons.close, size: 16),
                 ),
               ],
@@ -517,10 +581,12 @@ Future<void> _showMapOpenSheet(BuildContext context, LatLng position) async {
               children: [
                 _MapOpenOption(
                   icon: Icons.map_outlined,
-                  label: 'Google Maps',
+                  label: 'Yandex Maps',
                   onTap: () => _launchMap(
                     sheetContext,
-                    Uri.parse('https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}'),
+                    Uri.parse(
+                      'https://yandex.com/maps/?pt=${position.longitude},${position.latitude}&z=15',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -529,7 +595,9 @@ Future<void> _showMapOpenSheet(BuildContext context, LatLng position) async {
                   label: 'Brauzer',
                   onTap: () => _launchMap(
                     sheetContext,
-                    Uri.parse('https://maps.google.com/?q=${position.latitude},${position.longitude}'),
+                    Uri.parse(
+                      'https://yandex.com/maps/?ll=${position.longitude},${position.latitude}&z=15',
+                    ),
                   ),
                 ),
               ],
@@ -545,9 +613,9 @@ Future<void> _launchMap(BuildContext context, Uri uri) async {
   Navigator.pop(context);
   final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
   if (!launched && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Xaritani ochib bo‘lmadi')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Xaritani ochib bo‘lmadi')));
   }
 }
 
@@ -556,7 +624,11 @@ class _MapOpenOption extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _MapOpenOption({required this.icon, required this.label, required this.onTap});
+  const _MapOpenOption({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -566,8 +638,24 @@ class _MapOpenOption extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Container(
           height: 78,
-          decoration: BoxDecoration(color: AppTheme.tagBackground, borderRadius: BorderRadius.circular(18)),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 30, color: AppTheme.primaryBlue), const SizedBox(height: 6), Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600))]),
+          decoration: BoxDecoration(
+            color: AppTheme.tagBackground,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 30, color: AppTheme.primaryBlue),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

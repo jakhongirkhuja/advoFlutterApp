@@ -25,6 +25,7 @@ import '../../presentation/features/services/screens/templates_screen.dart';
 import '../../presentation/features/services/screens/organizations_screen.dart';
 import '../../presentation/features/services/screens/organization_profile_screen.dart';
 import '../../presentation/features/services/screens/protokol_screen.dart';
+import '../../presentation/features/services/screens/protokol_map_screen.dart';
 import '../../presentation/features/common/screens/utility_screens.dart';
 import '../../data/models/home/lawyer.dart';
 import '../../data/models/auth/user_model.dart';
@@ -68,6 +69,7 @@ class AppRouter {
   static const organizations = '/services/organizations';
   static const organizationProfile = '/organization-profile';
   static const protokol = '/services/protokol';
+  static const protokolProviders = '/services/protokol/providers';
   static const savedLawyers = '/saved-lawyers';
   static const lawyers = '/lawyers';
   static const notifications = '/notifications';
@@ -151,11 +153,10 @@ class AppRouter {
               : const OrganizationsScreen(),
         );
       case protokol:
-        final title = settings.arguments;
+        return MaterialPageRoute(builder: (_) => const ProtokolMapScreen());
+      case protokolProviders:
         return MaterialPageRoute(
-          builder: (_) => ProtokolScreen(
-            title: title is String ? title : 'Yevro pratakol',
-          ),
+          builder: (_) => const ProtokolScreen(title: 'Yevro pratakol'),
         );
       case savedLawyers:
         return MaterialPageRoute(builder: (_) => const SavedLawyersScreen());

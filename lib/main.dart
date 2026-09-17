@@ -5,9 +5,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
+import 'package:yandex_maps_mapkit_lite/init.dart' as mapkit_init;
+import 'package:yandex_maps_mapkit_lite/mapkit_factory.dart';
 
 import 'core/localization/app_localizations.dart';
 import 'core/localization/locale_provider.dart';
+import 'core/config/app_config.dart';
 import 'core/routes/app_router.dart';
 import 'core/services/location_sync_service.dart';
 import 'core/services/notification_service.dart';
@@ -29,6 +32,19 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: binding);
+
+  const mapkitApiKey = AppConfig.yandexMapKitApiKey;
+  if (mapkitApiKey.isNotEmpty) {
+    try {
+      print(mapkitApiKey);
+      await mapkit_init.initMapkit(apiKey: mapkitApiKey);
+      // mapkit.onStart();
+    } catch (error, stackTrace) {
+      debugPrint('Yandex MapKit initialization failed: $error\n$stackTrace');
+    }
+  } else {
+    debugPrint('Yandex MapKit disabled: MAPKIT_API_KEY was not provided');
+  }
 
   try {
     await Firebase.initializeApp();
@@ -99,6 +115,13 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     LocationSyncService.instance.handleAppLifecycleChange(state);
+    if (AppConfig.yandexMapKitApiKey.isNotEmpty) {
+      if (state == AppLifecycleState.resumed) {
+        mapkit.onStart();
+      } else if (state == AppLifecycleState.paused) {
+        mapkit.onStop();
+      }
+    }
   }
 
   @override
@@ -126,11 +149,7 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       locale: localeProvider.locale,
-      supportedLocales: const [
-        Locale('uz'),
-        Locale('en'),
-        Locale('ru'),
-      ],
+      supportedLocales: const [Locale('uz'), Locale('en'), Locale('ru')],
       localizationsDelegates: const [
         AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
