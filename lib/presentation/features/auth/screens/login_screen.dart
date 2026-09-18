@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<AuthViewModel>();
     final localizations = AppLocalizations.of(context);
-
+    final double progress = 0.9;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F6FA),
       body: SafeArea(
@@ -338,60 +338,72 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
+
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
               child: Container(
-                padding: EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.only(top: 4),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      Color(0xFF2B7FFF),
-                      Color(0xFFFFFFFF),
+                      const Color(0xFF2B7FFF),
+                      const Color(0xFF2B7FFF),
+                      Colors.white,
                     ],
                     stops: [
-                      0.75,
-                      1.0,
+                      0.0,
+                      progress.clamp(0.0, 1.0),
+                      ((progress+0.1) + 0.05).clamp(0.0, 1.0),
                     ],
                   ),
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20),
+                  ),
                 ),
                 child: Container(
-                  padding: EdgeInsets.only(bottom: 14),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(24), topLeft: Radius.circular(24)),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(24),
+                      topLeft: Radius.circular(24),
+                    ),
                   ),
                   child: GestureDetector(
                     onTap: _termsAccepted && _isValidPhone
                         ? () async {
-                      final otp = await viewModel.sendOtp(
-                        _completePhoneNumber,
-                      );
-                      if (!context.mounted) return;
-                      if (otp != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('OTP kod: $otp')),
-                        );
-                      }
-                      Navigator.pushNamed(
-                        context,
-                        AppRouter.otp,
-                        arguments: _completePhoneNumber,
-                      );
-                    }
+                            final otp = await viewModel.sendOtp(
+                              _completePhoneNumber,
+                            );
+                            if (!context.mounted) return;
+                            if (otp != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('OTP kod: $otp')),
+                              );
+                            }
+                            Navigator.pushNamed(
+                              context,
+                              AppRouter.otp,
+                              arguments: _completePhoneNumber,
+                            );
+                          }
                         : null,
                     child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
                       height: 48,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(57),
                         color: Colors.blue,
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           'Davom etish',
                           style: TextStyle(fontSize: 16, color: Colors.white),

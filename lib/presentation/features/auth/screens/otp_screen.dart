@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../widgets/custom_icon_design.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/localization/locale_provider.dart';
 import 'package:flutter/services.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
+
   const OtpScreen({super.key, required this.phoneNumber});
 
   @override
@@ -73,204 +76,222 @@ class _OtpScreenState extends State<OtpScreen> {
     final viewModel = context.watch<AuthViewModel>();
     final localizations = AppLocalizations.of(context);
 
+    final phone = widget.phoneNumber
+        .replaceFirst('+998', '')
+        .replaceAll(RegExp(r'\D'), '');
+    final formattedPhone = phone.length == 9
+        ? '+998 ${phone.substring(0, 2)} ${phone.substring(2, 5)} ${phone.substring(5, 7)} ${phone.substring(7)}'
+        : widget.phoneNumber;
+    final canVerify = _controllers.every((c) => c.text.isNotEmpty);
+
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              // Logo
-              Image.asset(
-                'assets/images/logo.png',
-                height: 92,
-                width: 92,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 92,
-                  width: 92,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFFE7F1FF),
-                  ),
-                  child: const Icon(
-                    Icons.lock_outline,
-                    size: 40,
-                    color: Color(0xFF0056B3),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                localizations?.translate('otp_title') ?? 'Tasdiqlash kodi',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              Text(
-                localizations?.translate('otp_subtitle') ??
-                    'SMS orqali yuborilgan 6 xonali kodni kiriting.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 92),
+              child: Column(
                 children: [
-                  ...List.generate(3, (index) => _buildPinField(index)),
-
-                  Transform.translate(
-                    offset: const Offset(0, -6),
-                    child: Container(
-                      width: 20,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                  const SizedBox(height: 40),
+                  CustomIconDesign(
+                    icon: 'assets/icons/otp.svg',
+                    mainColor: const Color(0xff1C8AFF),
+                    secondaryColor: const Color(0xff69AFFF),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    localizations?.translate('otp_title') ?? 'Kodni kiriting',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff0F172A),
                     ),
                   ),
-
-                  ...List.generate(3, (index) => _buildPinField(index + 3)),
-                ],
-              ),
-              const SizedBox(height: 22),
-              if (!_canResend)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-
-                  children: [
-                    InkWell(
-                      onTap: () => {},
-                      child: Text(
-                        localizations?.translate('resend_code') ??
-                            'Qayta yuborish',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _formatTime(_timerSeconds),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                )
-              else
-                TextButton(
-                  onPressed: () async {
-                    final otp = await viewModel.sendOtp(widget.phoneNumber);
-                    _startTimer();
-                    if (otp != null && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('OTP kod: $otp'),
-                          backgroundColor: Colors.green,
-                          duration: const Duration(seconds: 10),
-                          action: SnackBarAction(
-                            label: localizations?.translate('copy') ?? 'Copy',
-                            textColor: Colors.white,
-                            onPressed: () async {
-                              await Clipboard.setData(ClipboardData(text: otp));
-
-                              // Optional: Show feedback to the user
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    localizations?.translate('copied') ??
-                                        'Copied',
-                                  ),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            },
+                  const SizedBox(height: 4),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$formattedPhone ',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
                           ),
                         ),
-                      );
-                    }
-                  },
-                  child: Text(
-                    localizations?.translate('resend_code') ?? 'Qayta yuborish',
-                    style: const TextStyle(
-                      color: Color(0xFF0056B3),
-                      fontWeight: FontWeight.bold,
+                        TextSpan(
+                          text: 'raqamiga yuborilgan 4 xonali kodni kiriting.',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF475569),
+                          ),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: List.generate(
+                      4,
+                      (index) => _buildPinField(index),
                     ),
                   ),
-                ),
-              const Spacer(),
-              ElevatedButton(
-                onPressed:
-                    _controllers.every((c) => c.text.isNotEmpty) &&
-                        viewModel.status != AuthStatus.loading
-                    ? () async {
-                        String otp = _controllers.map((c) => c.text).join();
-                        await viewModel.verifyOtp(otp);
-                        if (context.mounted &&
-                            viewModel.status == AuthStatus.authenticated) {
-                          Navigator.of(
-                            context,
-                          ).popUntil((route) => route.isFirst);
-                        }
-                      }
-                    : null,
-                child: viewModel.status == AuthStatus.loading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        localizations?.translate('verify_code') ??
-                            'Kodni tasdiqlash',
-                      ),
+                  const SizedBox(height: 16),
+                  if (!_canResend)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Qayta yuborish ',style: TextStyle(
+                          color: Color(0xff475569),
+                          fontSize: 16
+                        ),),
+                        Text(
+                          '${_formatTime(_timerSeconds)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Kodni olmadingizmi?', style: TextStyle(
+                          color: Color(0xff475569),
+                          fontSize: 16
+                        ),),
+                        TextButton(
+
+                          onPressed: () async {
+                            await viewModel.sendOtp(widget.phoneNumber);
+                            _startTimer();
+                          },
+                          child: const Text('Qayta yuborish'),
+                        ),
+                      ],
+                    ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 62,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: ElevatedButton(
+                  onPressed: canVerify && viewModel.status != AuthStatus.loading
+                      ? () async {
+                          await viewModel.verifyOtp(
+                            _controllers.map((c) => c.text).join(),
+                          );
+                          if (context.mounted &&
+                              viewModel.status == AuthStatus.authenticated) {
+                            Navigator.of(
+                              context,
+                            ).popUntil((route) => route.isFirst);
+                          }
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2B7FFF),
+                    disabledBackgroundColor: const Color(0xFFA9C9FF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: viewModel.status == AuthStatus.loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Kodni tasdiqlash'),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: _OtpLanguageButton(onTap: () => _chooseLanguage(context)),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildPinField(int index) {
-    // Check if this specific field is currently focused to change border state
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
+  Future<void> _chooseLanguage(BuildContext context) async {
+    final provider = context.read<LocaleProvider>();
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Tilni tanlang'),
+        children: LocaleProvider.supportedLanguages
+            .map(
+              (item) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, item['code']),
+                child: Text('${item['flag']}  ${item['name']}'),
+              ),
+            )
+            .toList(),
       ),
+    );
+    if (selected != null && context.mounted)
+      await provider.setLocale(Locale(selected));
+  }
+
+  Widget _buildPinField(int index) {
+    final bool isFocused = _focusNodes[index].hasFocus;
+    final bool hasValue = _controllers[index].text.isNotEmpty;
+
+    return SizedBox(
       width: 50,
-      height: 64,
+      height: 58,
       child: TextField(
         controller: _controllers[index],
         focusNode: _focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
+        cursorColor: const Color(0xFF2B7FFF),
+        textAlignVertical: TextAlignVertical.center,
+
         style: const TextStyle(
-          fontSize: 24,
+          fontSize: 22,
           fontWeight: FontWeight.bold,
-          color: Colors.grey, // Matching the dull grey text color in your image
+          color: Color(0xFF0F172A),
         ),
         decoration: InputDecoration(
           counterText: '',
           filled: true,
-          // Active/Focused field has white background, matching your image's active state
           fillColor: Colors.white,
-          contentPadding: EdgeInsets.zero, // Centers text perfectly vertically
-          // Active border configuration (Blue outline)
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(
-              4,
-            ), // Slightly sharp corners like the image
-            borderSide: const BorderSide(color: Colors.blue, width: 2),
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+          hintText: (isFocused || hasValue) ? '' : '•',
+          hintStyle: const TextStyle(
+            color: Color(0xFFCBD5E1),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: hasValue ? const Color(0xFF2B7FFF) : const Color(0xFFE2E8F0),
+              width: 1,
+            ),
           ),
 
-          // Default unselected border configuration (No outline, soft round look)
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(
-              12,
-            ), // Smoother rounding for inactive fields
-            borderSide: BorderSide.none,
+          // Active blue border matches exact full height
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF2B7FFF), width: 1.5),
           ),
         ),
         onChanged: (value) {
@@ -279,10 +300,53 @@ class _OtpScreenState extends State<OtpScreen> {
           } else if (value.isEmpty && index > 0) {
             _focusNodes[index - 1].requestFocus();
           }
-          setState(
-            () {},
-          ); // Refreshes state to toggle active border colors instantly
+          setState(() {});
         },
+      ),
+    );
+  }
+}
+
+class _OtpLanguageButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _OtpLanguageButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final code = context.watch<LocaleProvider>().currentLanguageCode;
+    final language = LocaleProvider.supportedLanguages.firstWhere(
+      (item) => item['code'] == code,
+      orElse: () => LocaleProvider.supportedLanguages.first,
+    );
+    return Container(
+      width: 44,
+      height: 44,
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(47),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.white, Color(0xFFD9B875)],
+          stops: [0.5, 1.0],
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(47),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Center(
+            child: Text(
+              language['flag']!,
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
+        ),
       ),
     );
   }
