@@ -113,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final viewModel = context.watch<AuthViewModel>();
     final localizations = AppLocalizations.of(context);
     final double progress = 0.9;
+    final canContinue = _termsAccepted && _isValidPhone;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F6FA),
       body: SafeArea(
@@ -328,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2B7FFF),
-                        disabledBackgroundColor: const Color(0xFFA9C9FF),
+                        disabledBackgroundColor: const Color(0xFF2B7FFF).withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
@@ -375,7 +376,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   child: GestureDetector(
-                    onTap: _termsAccepted && _isValidPhone
+                    onTap: canContinue
                         ? () async {
                             final otp = await viewModel.sendOtp(
                               _completePhoneNumber,
@@ -401,7 +402,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 48,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(57),
-                        color: Colors.blue,
+                        color: canContinue
+                            ? const Color(0xFF2B7FFF)
+                            : const Color(0xFF2B7FFF).withValues(alpha: 0.4),
                       ),
                       child: const Center(
                         child: Text(

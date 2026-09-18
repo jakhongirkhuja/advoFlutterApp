@@ -100,8 +100,19 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> verifyOtp(String otp) async {
-    if (_phoneNumber == null) return;
+  Future<void> verifyOtp(String otp, {String? phoneNumber}) async {
+    // Keep verification working even when the OTP screen was opened directly
+    // or after the view model was recreated.
+    if ((_phoneNumber == null || _phoneNumber!.isEmpty) &&
+        phoneNumber != null &&
+        phoneNumber.isNotEmpty) {
+      _phoneNumber = phoneNumber;
+    }
+    if (_phoneNumber == null || _phoneNumber!.isEmpty) {
+      _status = AuthStatus.error;
+      notifyListeners();
+      return;
+    }
 
     _status = AuthStatus.loading;
     notifyListeners();

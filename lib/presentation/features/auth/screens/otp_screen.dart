@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/locale_provider.dart';
-import 'package:flutter/services.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -17,26 +18,29 @@ class OtpScreen extends StatefulWidget {
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
   final List<TextEditingController> _controllers = List.generate(
-    6,
+    4,
     (_) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   int _timerSeconds = 30;
   Timer? _timer;
   bool _canResend = false;
+  bool _incorrectCode = false;
 
   @override
   void initState() {
     super.initState();
     _startTimer();
+    _startSmsAutofill();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    cancel();
     for (var controller in _controllers) {
       controller.dispose();
     }
@@ -44,6 +48,45 @@ class _OtpScreenState extends State<OtpScreen> {
       node.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _startSmsAutofill() async {
+    try {
+      listenForCode(smsCodeRegexPattern: r'\b\d{4}\b');
+    } catch (error) {
+      debugPrint('[SMS autofill] listener unavailable: $error');
+    }
+
+    try {
+      final signature = await SmsAutoFill().getAppSignature;
+      debugPrint('[SMS autofill] app signature: $signature');
+    } catch (error) {
+      debugPrint('[SMS autofill] app signature unavailable: $error');
+    }
+  }
+
+  @override
+  void codeUpdated() {
+    final match = RegExp(r'\b\d{4}\b').firstMatch(code ?? '');
+    final receivedCode = match?.group(0);
+    if (receivedCode == null || !mounted) return;
+
+    for (var index = 0; index < _controllers.length; index++) {
+      _controllers[index].value = TextEditingValue(
+        text: receivedCode[index],
+        selection: const TextSelection.collapsed(offset: 1),
+      );
+    }
+
+    setState(() {
+      _incorrectCode = false;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _submitOtp(context.read<AuthViewModel>());
+      }
+    });
   }
 
   void _startTimer() {
@@ -83,7 +126,8 @@ class _OtpScreenState extends State<OtpScreen> {
     final formattedPhone = phone.length == 9
         ? '+998 ${phone.substring(0, 2)} ${phone.substring(2, 5)} ${phone.substring(5, 7)} ${phone.substring(7)}'
         : widget.phoneNumber;
-    final canVerify = _controllers.every((c) => c.text.isNotEmpty);
+    final canVerify = _controllers.every((controller) => controller.text.isNotEmpty);
+    final canSubmit = canVerify && viewModel.status != AuthStatus.loading;
     final double progress = 0.9;
     return Scaffold(
 
@@ -149,7 +193,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       Text(
-                        '${_formatTime(_timerSeconds)}',
+                        _formatTime(_timerSeconds),
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF0F172A),
@@ -215,18 +259,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ),
                   child: GestureDetector(
-                    onTap: canVerify && viewModel.status != AuthStatus.loading
-                        ? () async {
-                            await viewModel.verifyOtp(
-                              _controllers.map((c) => c.text).join(),
-                            );
-                            if (context.mounted &&
-                                viewModel.status == AuthStatus.authenticated) {
-                              Navigator.of(
-                                context,
-                              ).popUntil((route) => route.isFirst);
-                            }
-                          }
+                    onTap: canSubmit
+                        ? () => _submitOtp(viewModel)
                         : null,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -236,7 +270,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       height: 48,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(57),
-                        color: Colors.blue,
+                        color:canSubmit? const Color(0x332B7FFF) : const Color(0x332B7FFF).withValues(alpha: 0.4),
                       ),
                       child: Center(
                         child: viewModel.status == AuthStatus.loading
@@ -287,6 +321,13 @@ class _OtpScreenState extends State<OtpScreen> {
               right: 16,
               child: _OtpLanguageButton(onTap: () => _chooseLanguage(context)),
             ),
+            if (_incorrectCode)
+              const Positioned(
+                top: 40,
+                left: 36,
+                right: 36,
+                child: _IncorrectCodeBanner(),
+              ),
           ],
         ),
       ),
@@ -362,63 +403,166 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
+  Future<void> _submitOtp(AuthViewModel viewModel) async {
+    final firstEmpty = _controllers.indexWhere((controller) => controller.text.isEmpty);
+    if (firstEmpty != -1) {
+      _focusNodes[firstEmpty].requestFocus();
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    await viewModel.verifyOtp(
+      _controllers.map((controller) => controller.text).join(),
+      phoneNumber: widget.phoneNumber,
+    );
+
+    if (!mounted) return;
+    if (viewModel.status == AuthStatus.authenticated) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+
+    setState(() => _incorrectCode = true);
+  }
+
   Widget _buildPinField(int index) {
     final bool isFocused = _focusNodes[index].hasFocus;
     final bool hasValue = _controllers[index].text.isNotEmpty;
+    final bool hasError = _incorrectCode;
 
     return SizedBox(
       width: 50,
       height: 58,
-      child: TextField(
-        controller: _controllers[index],
-        focusNode: _focusNodes[index],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        maxLength: 1,
-        cursorColor: const Color(0xFF2B7FFF),
-        textAlignVertical: TextAlignVertical.center,
+      child: Focus(
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.backspace &&
+              _controllers[index].text.isEmpty &&
+              index > 0) {
+            _focusNodes[index - 1].requestFocus();
+            _controllers[index - 1].selection = TextSelection.collapsed(
+              offset: _controllers[index - 1].text.length,
+            );
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: TextField(
+          controller: _controllers[index],
+          focusNode: _focusNodes[index],
+          keyboardType: TextInputType.number,
+          autofillHints: const [AutofillHints.oneTimeCode],
+          textAlign: TextAlign.center,
+          maxLength: 1,
+          cursorColor: const Color(0xFF2B7FFF),
+          textAlignVertical: TextAlignVertical.center,
 
-        style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF0F172A),
-        ),
-        decoration: InputDecoration(
-          counterText: '',
-          filled: true,
-          fillColor: Colors.white,
-          isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14),
-          hintText: (isFocused || hasValue) ? '' : '•',
-          hintStyle: const TextStyle(
-            color: Color(0xFFCBD5E1),
-            fontSize: 24,
+          style: const TextStyle(
+            fontSize: 22,
             fontWeight: FontWeight.bold,
+            color: Color(0xFF0F172A),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: hasValue
-                  ? const Color(0xFF2B7FFF)
-                  : const Color(0xFFE2E8F0),
-              width: 1,
+          decoration: InputDecoration(
+            counterText: '',
+            filled: true,
+            fillColor: Colors.white,
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            hintText: (isFocused || hasValue) ? '' : '•',
+            hintStyle: const TextStyle(
+              color: Color(0xFFCBD5E1),
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: hasError
+                    ? const Color(0xFFFF0000)
+                    : hasValue
+                    ? const Color(0xFF2B7FFF)
+                    : const Color(0xFFE2E8F0),
+                width: hasError ? 1.5 : 1,
+              ),
+            ),
+
+            // Active blue border matches exact full height
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: hasError
+                    ? const Color(0xFFFF0000)
+                    : const Color(0xFF2B7FFF),
+                width: 1.5,
+              ),
             ),
           ),
+          onChanged: (value) {
+            if (hasError) {
+              _incorrectCode = false;
+            }
+            if (value.isNotEmpty && index < _controllers.length - 1) {
+              _focusNodes[index + 1].requestFocus();
+            } else if (value.isEmpty && index > 0) {
+              _focusNodes[index - 1].requestFocus();
+              _controllers[index - 1].selection = TextSelection.collapsed(
+                offset: _controllers[index - 1].text.length,
+              );
+            }
+            setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+}
 
-          // Active blue border matches exact full height
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF2B7FFF), width: 1.5),
+class _IncorrectCodeBanner extends StatelessWidget {
+  const _IncorrectCodeBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      elevation: 8,
+      shadowColor: Colors.black38,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 10, 16, 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF00012),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white, size: 22),
+                  SizedBox(width: 8),
+                  Text(
+                    'Kod noto‘g‘ri',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Kiritilgan tasdiqlash kodi noto‘g‘ri. Iltimos, qaytadan urinib ko‘ring.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  height: 1.25,
+                ),
+              ),
+            ],
           ),
         ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < 5) {
-            _focusNodes[index + 1].requestFocus();
-          } else if (value.isEmpty && index > 0) {
-            _focusNodes[index - 1].requestFocus();
-          }
-          setState(() {});
-        },
       ),
     );
   }
