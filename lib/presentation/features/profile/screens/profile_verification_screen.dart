@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 import '../../../widgets/header_screen.dart';
 
 enum _VerificationStatus { notUploaded, ready, underReview, verified, rejected }
@@ -18,6 +22,7 @@ class ProfileVerificationScreen extends StatefulWidget {
 }
 
 class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
+  bool _isSubmitting = false;
   final Map<String, XFile?> _files = {
     'passport_front': null,
     'passport_back': null,
@@ -37,7 +42,10 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
 
     final file = await openFile(
       acceptedTypeGroups: [
-        XTypeGroup(label: context.tr('upload_files'), extensions: ['jpg', 'jpeg', 'png']),
+        XTypeGroup(
+          label: context.tr('upload_files'),
+          extensions: ['jpg', 'jpeg', 'png'],
+        ),
       ],
     );
     if (!mounted || file == null) return;
@@ -47,14 +55,34 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
     });
   }
 
-  void _submitFiles() {
-    setState(() {
-      for (final title in _files.keys) {
-        if (_files[title] != null && !_isVerified(title)) {
+  Future<void> _submitFiles() async {
+    final front = _files['passport_front'];
+    final back = _files['passport_back'];
+    final selfie = _files['selfie_with_document'];
+    if (front == null || back == null || selfie == null || _isSubmitting)
+      return;
+
+    setState(() => _isSubmitting = true);
+    try {
+      await context.read<AdvokatRepository>().submitVerification(
+        passportFront: File(front.path),
+        passportBack: File(back.path),
+        selfie: File(selfie.path),
+      );
+      if (!mounted) return;
+      setState(() {
+        for (final title in _files.keys) {
           _statuses[title] = _VerificationStatus.underReview;
         }
-      }
-    });
+      });
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('suggestion_failed'))));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -72,7 +100,11 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
               children: [
                 Column(
                   children: [
-                    CustomIconDesign(icon: 'assets/icons/verify.svg', mainColor: AppTheme.color_FF15985B, secondaryColor: AppTheme.color_FF40DB93),
+                    CustomIconDesign(
+                      icon: 'assets/icons/verify.svg',
+                      mainColor: AppTheme.color_FF15985B,
+                      secondaryColor: AppTheme.color_FF40DB93,
+                    ),
                     const SizedBox(height: 12),
                     const Text(
                       'Profilingizni tasdiqlang',
@@ -122,7 +154,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                     color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(22),
                   ),
-                  child:  Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
@@ -145,7 +177,10 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                           SvgPicture.asset('assets/icons/note_ok.svg'),
                           Text(
                             context.tr('verification_tip_clear'),
-                            style: TextStyle(fontSize: 14, color: AppTheme.color_FF334155),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.color_FF334155,
+                            ),
                           ),
                         ],
                       ),
@@ -156,7 +191,10 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                           SvgPicture.asset('assets/icons/note_ok.svg'),
                           Text(
                             context.tr('verification_tip_selfie'),
-                            style: TextStyle(fontSize: 14, color: AppTheme.color_FF334155),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.color_FF334155,
+                            ),
                           ),
                         ],
                       ),
@@ -167,12 +205,14 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                           SvgPicture.asset('assets/icons/note_fail.svg'),
                           Text(
                             context.tr('verification_tip_rejected'),
-                            style: TextStyle(fontSize: 14, color: AppTheme.color_FF334155),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.color_FF334155,
+                            ),
                           ),
                         ],
                       ),
                       SizedBox(height: 7),
-
                     ],
                   ),
                 ),
@@ -185,7 +225,9 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                         WidgetSpan(
                           child: Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: SvgPicture.asset('assets/icons/note_key.svg'),
+                            child: SvgPicture.asset(
+                              'assets/icons/note_key.svg',
+                            ),
                           ),
                         ),
                         TextSpan(
@@ -200,7 +242,10 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                Text(context.tr('verification_time'), textAlign: TextAlign.center,)
+                Text(
+                  context.tr('verification_time'),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
@@ -215,7 +260,9 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
               child: SizedBox(
                 height: 48,
                 child: FilledButton(
-                  onPressed: _files.values.any((file) => file != null)
+                  onPressed:
+                      !_isSubmitting &&
+                          _files.values.every((file) => file != null)
                       ? _submitFiles
                       : null,
                   style: FilledButton.styleFrom(
@@ -224,7 +271,19 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                       borderRadius: BorderRadius.circular(22),
                     ),
                   ),
-                  child: Text(context.tr('submit_button'), style: const TextStyle(fontSize: 16)),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppTheme.surface,
+                          ),
+                        )
+                      : Text(
+                          context.tr('submit_button'),
+                          style: const TextStyle(fontSize: 16),
+                        ),
                 ),
               ),
             ),
@@ -262,44 +321,41 @@ class _UploadCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(13),
 
-        decoration: BoxDecoration(
-          color: AppTheme.pageBackground,
-          border: Border.all(color: AppTheme.color_FFF8FAFC),
-          borderRadius: BorderRadius.circular(11),
-        ),
+          decoration: BoxDecoration(
+            color: AppTheme.pageBackground,
+            border: Border.all(color: AppTheme.color_FFF8FAFC),
+            borderRadius: BorderRadius.circular(11),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: AppTheme.color_FFF1F5F9
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(color: AppTheme.color_FFF1F5F9),
+                padding: EdgeInsets.all(6),
+                child: SvgPicture.asset(icon, width: 18, height: 18),
               ),
-              padding: EdgeInsets.all(6),
-              child: SvgPicture.asset(
-                icon,
-                width: 18,
-                height: 18,
+              const SizedBox(height: 6),
+              Text(
+                context.tr(title),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              context.tr(title),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              file?.name ?? 'Rasmni shu yerga yuklang',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.textSecondary,
+              const SizedBox(height: 6),
+              Text(
+                file?.name ?? 'Rasmni shu yerga yuklang',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            _StatusLabel(status: status),
+              const SizedBox(height: 8),
+              _StatusLabel(status: status),
             ],
           ),
         ),
@@ -317,30 +373,30 @@ class _StatusLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, color, icon) = switch (status) {
       _VerificationStatus.notUploaded => (
-          'Yuklanmagan',
-          AppTheme.textSecondary,
-          Icons.upload_file,
-        ),
+        'Yuklanmagan',
+        AppTheme.textSecondary,
+        Icons.upload_file,
+      ),
       _VerificationStatus.ready => (
-          'Yuklashga tayyor',
-          AppTheme.color_FF2F80FF,
-          Icons.check_circle_outline,
-        ),
+        'Yuklashga tayyor',
+        AppTheme.color_FF2F80FF,
+        Icons.check_circle_outline,
+      ),
       _VerificationStatus.underReview => (
-          'Tekshirilmoqda',
-          AppTheme.color_FFF59E0B,
-          Icons.hourglass_empty,
-        ),
+        'Tekshirilmoqda',
+        AppTheme.color_FFF59E0B,
+        Icons.hourglass_empty,
+      ),
       _VerificationStatus.verified => (
-          'Tasdiqlangan',
-          AppTheme.color_FF15985B,
-          Icons.verified,
-        ),
+        'Tasdiqlangan',
+        AppTheme.color_FF15985B,
+        Icons.verified,
+      ),
       _VerificationStatus.rejected => (
-          'Rad etilgan',
-          AppTheme.color_FFDC2626,
-          Icons.error_outline,
-        ),
+        'Rad etilgan',
+        AppTheme.color_FFDC2626,
+        Icons.error_outline,
+      ),
     };
 
     return Row(

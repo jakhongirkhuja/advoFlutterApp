@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../presentation/features/auth/screens/login_screen.dart';
 import '../../presentation/features/auth/screens/otp_screen.dart';
 import '../../presentation/features/auth/screens/user_info_fill.dart';
+import '../../presentation/features/auth/viewmodels/auth_viewmodel.dart';
 import '../../presentation/features/home/screens/home_screen.dart';
 import '../../presentation/features/home/screens/ai_chat_screen.dart';
 import '../../presentation/features/profile/screens/profile_screen.dart';
@@ -32,6 +34,7 @@ import '../../presentation/features/common/screens/utility_screens.dart';
 import '../../data/models/home/lawyer.dart';
 import '../../data/models/auth/user_model.dart';
 import '../../data/models/services/organization.dart';
+
 class CourtRepresentationArgs {
   final String title;
   final String about;
@@ -43,6 +46,7 @@ class CourtRepresentationArgs {
     required this.description,
   });
 }
+
 class AppRouter {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -89,7 +93,9 @@ class AppRouter {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case profile:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        return MaterialPageRoute(
+          builder: (_) => const _AuthenticatedPage(child: ProfileScreen()),
+        );
       case profileDetails:
         final user = settings.arguments;
         return MaterialPageRoute(
@@ -119,7 +125,9 @@ class AppRouter {
       case suggestions:
         return MaterialPageRoute(builder: (_) => const SuggestionsScreen());
       case appointments:
-        return MaterialPageRoute(builder: (_) => const AppointmentsScreen());
+        return MaterialPageRoute(
+          builder: (_) => const _AuthenticatedPage(child: AppointmentsScreen()),
+        );
       case services:
         return MaterialPageRoute(builder: (_) => const ServicesScreen());
       case AppRouter.courtRepresentation:
@@ -134,21 +142,31 @@ class AppRouter {
       case lawyerProfile:
         final lawyer = settings.arguments;
         return MaterialPageRoute(
-          builder: (_) => lawyer is Lawyer ? LawyerProfileScreen(lawyer: lawyer) : const ServicesScreen(),
+          builder: (_) => lawyer is Lawyer
+              ? LawyerProfileScreen(lawyer: lawyer)
+              : const ServicesScreen(),
         );
       case appointmentCreate:
         final lawyer = settings.arguments;
         return MaterialPageRoute(
-          builder: (_) => lawyer is Lawyer ? AppointmentCreateScreen(lawyer: lawyer) : const ServicesScreen(),
+          builder: (_) => lawyer is Lawyer
+              ? AppointmentCreateScreen(lawyer: lawyer)
+              : const ServicesScreen(),
         );
       case templates:
         return MaterialPageRoute(builder: (_) => const TemplatesScreen());
       case profileTemplates:
-        return MaterialPageRoute(builder: (_) => const ProfileTemplatesScreen());
+        return MaterialPageRoute(
+          builder: (_) => const ProfileTemplatesScreen(),
+        );
       case profileVerification:
-        return MaterialPageRoute(builder: (_) => const ProfileVerificationScreen());
+        return MaterialPageRoute(
+          builder: (_) => const ProfileVerificationScreen(),
+        );
       case profileContribution:
-        return MaterialPageRoute(builder: (_) => const ProfileContributionScreen());
+        return MaterialPageRoute(
+          builder: (_) => const ProfileContributionScreen(),
+        );
       case organizations:
         return MaterialPageRoute(builder: (_) => const OrganizationsScreen());
       case organizationProfile:
@@ -191,5 +209,23 @@ class AppRouter {
       default:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
     }
+  }
+}
+
+class _AuthenticatedPage extends StatelessWidget {
+  final Widget child;
+
+  const _AuthenticatedPage({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final status = context.watch<AuthViewModel>().status;
+    if (status == AuthStatus.initial || status == AuthStatus.loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (status != AuthStatus.authenticated) {
+      return const LoginScreen();
+    }
+    return child;
   }
 }

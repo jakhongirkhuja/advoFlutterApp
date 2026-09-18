@@ -9,6 +9,7 @@ import '../../../widgets/custom_icon_design.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/locale_provider.dart';
+import '../../../../core/routes/app_router.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -132,11 +133,12 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
     final formattedPhone = phone.length == 9
         ? '+998 ${phone.substring(0, 2)} ${phone.substring(2, 5)} ${phone.substring(5, 7)} ${phone.substring(7)}'
         : widget.phoneNumber;
-    final canVerify = _controllers.every((controller) => controller.text.isNotEmpty);
+    final canVerify = _controllers.every(
+      (controller) => controller.text.isNotEmpty,
+    );
     final canSubmit = canVerify && viewModel.status != AuthStatus.loading;
     final progress = _progress;
     return Scaffold(
-
       body: SafeArea(
         child: Stack(
           children: [
@@ -226,9 +228,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                           await viewModel.sendOtp(widget.phoneNumber);
                           _startTimer();
                         },
-                        child: Text(
-                          context.tr('otp_resend'),
-                        ),
+                        child: Text(context.tr('otp_resend')),
                       ),
                     ],
                   ),
@@ -270,9 +270,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                     ),
                   ),
                   child: GestureDetector(
-                    onTap: canSubmit
-                        ? () => _submitOtp(viewModel)
-                        : null,
+                    onTap: canSubmit ? () => _submitOtp(viewModel) : null,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 12,
@@ -287,13 +285,16 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                       ),
                       child: Center(
                         child: viewModel.status == AuthStatus.loading
-                            ? const CircularProgressIndicator(color: AppTheme.surface) : Text(
-                          context.tr('verify_button'),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: AppTheme.surface,
-                          ),
-                        ),
+                            ? const CircularProgressIndicator(
+                                color: AppTheme.surface,
+                              )
+                            : Text(
+                                context.tr('verify_button'),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: AppTheme.surface,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -382,7 +383,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
             margin: const EdgeInsets.symmetric(vertical: 2),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? AppTheme.color_FFEFF6FF : AppTheme.transparent,
+              color: isSelected
+                  ? AppTheme.color_FFEFF6FF
+                  : AppTheme.transparent,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isSelected
@@ -416,7 +419,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
   }
 
   Future<void> _submitOtp(AuthViewModel viewModel) async {
-    final firstEmpty = _controllers.indexWhere((controller) => controller.text.isEmpty);
+    final firstEmpty = _controllers.indexWhere(
+      (controller) => controller.text.isEmpty,
+    );
     if (firstEmpty != -1) {
       _focusNodes[firstEmpty].requestFocus();
       return;
@@ -432,11 +437,24 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
       setState(() => _progress = 1.0);
       await Future<void>.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
-      Navigator.pushReplacementNamed(
-        context,
-        '/user-info',
-        arguments: widget.phoneNumber,
-      );
+      final user = viewModel.currentUser;
+      final needsProfileInfo =
+          user == null ||
+          user.firstName.trim().isEmpty ||
+          user.lastName.trim().isEmpty;
+      if (needsProfileInfo) {
+        Navigator.pushReplacementNamed(
+          context,
+          AppRouter.userInfo,
+          arguments: widget.phoneNumber,
+        );
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRouter.home,
+          (route) => false,
+        );
+      }
       return;
     }
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -79,6 +81,31 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       payload: message.data.toString(),
+    );
+  }
+
+  static Future<void> showDataNotification(Map<String, dynamic> message) async {
+    final nested = message['data'];
+    final data = nested is Map ? Map<String, dynamic>.from(nested) : message;
+    final title = data['title']?.toString();
+    final body = data['body']?.toString();
+    if (title == null && body == null) return;
+    await _plugin.show(
+      id: DateTime.now().millisecondsSinceEpoch.remainder(2147483647),
+      title: title ?? 'ADVO',
+      body: body ?? '',
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _channelId,
+          _channelName,
+          channelDescription: 'Notifications from the application',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/launcher_icon',
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      payload: jsonEncode(data),
     );
   }
 

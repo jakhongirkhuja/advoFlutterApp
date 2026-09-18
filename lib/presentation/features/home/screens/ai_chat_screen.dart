@@ -1,14 +1,15 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 import '../../../widgets/header_screen.dart';
 
 class AiChatScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   final _scroll = ScrollController();
   final _messages = <_ChatMessage>[];
   bool _typing = false;
-  Timer? _replyTimer;
+  int? _conversationId;
   String? _pendingPath;
   String? _pendingName;
 
@@ -37,11 +38,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
   void dispose() {
     _input.dispose();
     _scroll.dispose();
-    _replyTimer?.cancel();
     super.dispose();
   }
 
-  void _send([String? suggestion]) {
+  Future<void> _send([String? suggestion]) async {
     final text = (suggestion ?? _input.text).trim();
     if ((text.isEmpty && _pendingPath == null) || _typing) return;
     final pendingPath = _pendingPath;
@@ -61,16 +61,41 @@ class _AiChatScreenState extends State<AiChatScreen> {
       _typing = true;
     });
     _toBottom();
-    _replyTimer = Timer(const Duration(milliseconds: 700), () {
+    try {
+      final response = await context.read<AdvokatRepository>().askChatbot(
+        message: text,
+        conversationId: _conversationId,
+        file: pendingPath == null ? null : File(pendingPath),
+      );
       if (!mounted) return;
+      final data = response['data'] is Map
+          ? Map<String, dynamic>.from(response['data'] as Map)
+          : response;
+      final conversation = data['conversation'];
+      if (conversation is Map) {
+        _conversationId = int.tryParse('${conversation['id'] ?? ''}');
+      }
+      final answer = '${data['answer'] ?? ''}'.trim();
+      final lawyers = data['lawyers'];
       setState(() {
         _typing = false;
         _messages.add(
-          _ChatMessage(context.tr('ai_lawyer_found'), false, lawyers: true),
+          _ChatMessage(
+            answer.isEmpty ? context.tr('suggestion_failed') : answer,
+            false,
+            lawyers: lawyers is List && lawyers.isNotEmpty,
+          ),
         );
       });
       _toBottom();
-    });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _typing = false;
+        _messages.add(_ChatMessage(context.tr('suggestion_failed'), false));
+      });
+      _toBottom();
+    }
   }
 
   Future<void> _attach() async {
@@ -81,7 +106,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
         alignment: Alignment.bottomLeft,
         child: Container(
           width: 272,
-          padding: const EdgeInsets.only(bottom: 72,left: 16),
+          padding: const EdgeInsets.only(bottom: 72, left: 16),
           child: Material(
             color: AppTheme.surface,
             borderRadius: BorderRadius.circular(16),
@@ -151,16 +176,29 @@ class _AiChatScreenState extends State<AiChatScreen> {
   });
 
   void _newChat() {
-    _replyTimer?.cancel();
     setState(() {
       _messages.clear();
       _typing = false;
+      _conversationId = null;
       _pendingPath = null;
       _pendingName = null;
     });
   }
 
   Future<void> _showHistory() async {
+    List<Map<String, dynamic>> conversations;
+    try {
+      conversations = await context
+          .read<AdvokatRepository>()
+          .getChatbotConversations();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('suggestion_failed'))));
+      return;
+    }
+    if (!mounted) return;
     final selected = await showDialog<_HistoryItem>(
       context: context,
       builder: (context) => AlertDialog(
@@ -170,36 +208,74 @@ class _AiChatScreenState extends State<AiChatScreen> {
           width: double.maxFinite,
           child: ListView(
             shrinkWrap: true,
-            children: [
-              _HistoryTile(
-                item: _HistoryItem(
-                  context.tr('ai_history_labor'),
-                  '12.09.2026',
-                ),
-              ),
-              _HistoryTile(
-                item: _HistoryItem(context.tr('ai_history_search'), '08.09.2026'),
-              ),
-              _HistoryTile(
-                item: _HistoryItem(context.tr('ai_history_contract'), '01.09.2026'),
-              ),
-            ],
+            children: conversations.isEmpty
+                ? [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        context.tr('no_data'),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ]
+                : conversations.map((conversation) {
+                    final id = int.tryParse('${conversation['id'] ?? ''}') ?? 0;
+                    final date =
+                        '${conversation['updated_at'] ?? conversation['created_at'] ?? ''}';
+                    return _HistoryTile(
+                      item: _HistoryItem(
+                        id,
+                        '${conversation['title'] ?? context.tr('old_chats')}',
+                        date.length >= 10 ? date.substring(0, 10) : date,
+                      ),
+                    );
+                  }).toList(),
           ),
         ),
       ),
     );
     if (selected == null || !mounted) return;
-    setState(() {
-      _messages
-        ..clear()
-        ..add(_ChatMessage(selected.title, true))
-        ..add(
-          _ChatMessage(
-            context.tr('chat_resumed'),
-            false,
-          ),
-        );
-    });
+    try {
+      final history = await context.read<AdvokatRepository>().getChatbotHistory(
+        selected.id,
+      );
+      if (!mounted) return;
+      dynamic raw = history['messages'] ?? history['items'] ?? history['data'];
+      if (raw is Map) raw = raw['messages'] ?? raw['items'];
+      final restored = raw is List
+          ? raw
+                .whereType<Map>()
+                .map((item) {
+                  final map = Map<String, dynamic>.from(item);
+                  final role = '${map['role'] ?? map['sender'] ?? ''}'
+                      .toLowerCase();
+                  return _ChatMessage(
+                    '${map['content'] ?? map['message'] ?? map['text'] ?? ''}',
+                    role == 'user' || role == 'client',
+                  );
+                })
+                .where((message) => message.text.isNotEmpty)
+                .toList()
+          : <_ChatMessage>[];
+      setState(() {
+        _conversationId = selected.id;
+        _messages
+          ..clear()
+          ..addAll(
+            restored.isEmpty
+                ? [
+                    _ChatMessage(selected.title, true),
+                    _ChatMessage(context.tr('chat_resumed'), false),
+                  ]
+                : restored,
+          );
+      });
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('suggestion_failed'))));
+    }
     _toBottom();
   }
 
@@ -314,10 +390,11 @@ class _HeaderButton extends StatelessWidget {
 }
 
 class _HistoryItem {
+  final int id;
   final String title;
   final String date;
 
-  const _HistoryItem(this.title, this.date);
+  const _HistoryItem(this.id, this.title, this.date);
 }
 
 class _HistoryTile extends StatelessWidget {
@@ -381,7 +458,10 @@ class _Welcome extends StatelessWidget {
             children: _AiChatScreenState.suggestions
                 .map(
                   (text) => ActionChip(
-                    label: Text(context.tr(text), style: const TextStyle(fontSize: 11)),
+                    label: Text(
+                      context.tr(text),
+                      style: const TextStyle(fontSize: 11),
+                    ),
                     avatar: const Icon(Icons.gavel, size: 14),
                     backgroundColor: AppTheme.surface,
                     side: BorderSide.none,
@@ -530,7 +610,7 @@ class _LawyerCard extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
-                  color: AppTheme.color_FF0F172A,
+                      color: AppTheme.color_FF0F172A,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -538,7 +618,7 @@ class _LawyerCard extends StatelessWidget {
                     '(89 ${context.tr('reviews_suffix')})',
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                  color: AppTheme.color_FF475569,
+                      color: AppTheme.color_FF475569,
                       fontSize: 14,
                     ),
                   ),
@@ -609,7 +689,10 @@ class _FileAttachment extends StatelessWidget {
               ),
             )
           else
-            const Icon(Icons.insert_drive_file_outlined, color: AppTheme.surface),
+            const Icon(
+              Icons.insert_drive_file_outlined,
+              color: AppTheme.surface,
+            ),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -784,7 +867,13 @@ class _AttachmentOption extends StatelessWidget {
             child: SvgPicture.asset(icon),
           ),
           const SizedBox(width: 12),
-          Text(label, style: const TextStyle(fontSize: 16, color: AppTheme.color_FF0F172A)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              color: AppTheme.color_FF0F172A,
+            ),
+          ),
         ],
       ),
     ),

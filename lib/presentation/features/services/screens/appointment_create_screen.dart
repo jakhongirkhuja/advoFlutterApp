@@ -1,13 +1,17 @@
 import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
+import 'dart:io';
+
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/home/lawyer.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 import '../../../widgets/header_navigation.dart';
 
 class AppointmentCreateScreen extends StatefulWidget {
@@ -29,6 +33,13 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
   String _payment = 'Payme';
   final _problemController = TextEditingController();
   final List<_AppointmentDocument> _documents = [];
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.lawyer.tags.isNotEmpty) _service = widget.lawyer.tags.first;
+  }
 
   @override
   void dispose() {
@@ -91,7 +102,9 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
           child: SizedBox(
             height: 44,
             child: FilledButton(
-              onPressed: _step == 2
+              onPressed: _isSubmitting
+                  ? null
+                  : _step == 2
                   ? _confirmAppointment
                   : () => setState(() => _step++),
               style: FilledButton.styleFrom(
@@ -101,9 +114,20 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
                   borderRadius: BorderRadius.circular(22),
                 ),
               ),
-              child: Text(
-                _step == 2 ? context.tr('confirm') : context.tr('continue'),
-              ),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.surface,
+                      ),
+                    )
+                  : Text(
+                      _step == 2
+                          ? context.tr('confirm')
+                          : context.tr('continue'),
+                    ),
             ),
           ),
         ),
@@ -123,7 +147,11 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
     final selected = <_AppointmentDocument>[];
     for (final file in files) {
       selected.add(
-        _AppointmentDocument(name: file.name, size: await file.length()),
+        _AppointmentDocument(
+          name: file.name,
+          path: file.path,
+          size: await file.length(),
+        ),
       );
     }
     setState(() {
@@ -168,74 +196,109 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
     Localizations.localeOf(context).languageCode,
   ).format(_selectedDate);
 
-  void _confirmAppointment() {
-    showDialog<void>(
-      context: context,
-      barrierColor: AppTheme.black.withValues(alpha: 0.26),
-      builder: (dialogContext) => Dialog(
-        backgroundColor: AppTheme.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(26),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.color_FFF3F1F1,
-                    borderRadius: BorderRadius.circular(18),
+  Future<void> _confirmAppointment() async {
+    final serviceIndex = widget.lawyer.tags.indexOf(_service);
+    final serviceTypeId =
+        serviceIndex >= 0 && serviceIndex < widget.lawyer.serviceTypeIds.length
+        ? widget.lawyer.serviceTypeIds[serviceIndex]
+        : null;
+    if (serviceTypeId == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('no_data'))));
+      return;
+    }
+    setState(() => _isSubmitting = true);
+    try {
+      await context.read<AdvokatRepository>().createAppointment(
+        lawyerId: widget.lawyer.id,
+        serviceTypeId: serviceTypeId,
+        date: DateFormat('yyyy-MM-dd').format(_selectedDate),
+        startTime: _time,
+        receptionType: _consultationType == 'video_call'
+            ? 'video'
+            : 'in_person',
+        paymentMethod: _payment.toLowerCase().replaceAll(' ', ''),
+        problemDescription: _problemController.text.trim(),
+        documents: _documents.map((document) => File(document.path)).toList(),
+      );
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        barrierColor: AppTheme.black.withValues(alpha: 0.26),
+        builder: (dialogContext) => Dialog(
+          backgroundColor: AppTheme.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(26),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.color_FFF3F1F1,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Icon(Icons.close, size: 18),
                   ),
-                  child: Icon(Icons.close, size: 18),
                 ),
-              ),
-              CustomIconDesign(icon: 'assets/icons/note_ok.svg', mainColor: AppTheme.color_FF15985B, secondaryColor: AppTheme.color_FF40DB93),
-              const SizedBox(height: 12),
-              Text(
-                context.tr('payment_confirmed'),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                context.tr('payment_success'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 1.35,
-                  color: AppTheme.textChoco,
+                CustomIconDesign(
+                  icon: 'assets/icons/note_ok.svg',
+                  mainColor: AppTheme.color_FF15985B,
+                  secondaryColor: AppTheme.color_FF40DB93,
                 ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () => Navigator.popUntil(
-                    dialogContext,
-                    (route) => route.isFirst,
+                const SizedBox(height: 12),
+                Text(
+                  context.tr('payment_confirmed'),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.tr('payment_success'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.35,
+                    color: AppTheme.textChoco,
                   ),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.tagBackground,
-                    foregroundColor: AppTheme.black87,
-                  ),
-                  child: Text(
-                    context.tr('go_to_appointments'),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.popUntil(
+                      dialogContext,
+                      (route) => route.isFirst,
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.tagBackground,
+                      foregroundColor: AppTheme.black87,
+                    ),
+                    child: Text(
+                      context.tr('go_to_appointments'),
+                      style: const TextStyle(color: Colors.black, fontSize: 16),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('application_failed'))));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 }
 
@@ -460,22 +523,24 @@ class _ScheduleStep extends StatelessWidget {
         _SectionCard(
           title: context.tr('service_type'),
           child: Column(
-            children: [
-              _SelectionRow(
-                title: context.tr('court_representation'),
-                selected: state._service == 'court_representation',
-                onTap: () => state.setState(
-                  () => state._service = 'court_representation',
-                ),
-              ),
-              const SizedBox(height: 6),
-              _SelectionRow(
-                title: context.tr('claim_application'),
-                selected: state._service == 'claim_application',
-                onTap: () =>
-                    state.setState(() => state._service = 'claim_application'),
-              ),
-            ],
+            children:
+                (state.widget.lawyer.tags.isEmpty
+                        ? const ['court_representation']
+                        : state.widget.lawyer.tags)
+                    .map(
+                      (service) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: _SelectionRow(
+                          title: state.widget.lawyer.tags.isEmpty
+                              ? context.tr(service)
+                              : service,
+                          selected: state._service == service,
+                          onTap: () =>
+                              state.setState(() => state._service = service),
+                        ),
+                      ),
+                    )
+                    .toList(),
           ),
         ),
       ],
@@ -964,9 +1029,14 @@ class _DocumentRow extends StatelessWidget {
 
 class _AppointmentDocument {
   final String name;
+  final String path;
   final int size;
 
-  const _AppointmentDocument({required this.name, required this.size});
+  const _AppointmentDocument({
+    required this.name,
+    required this.path,
+    required this.size,
+  });
 }
 
 class _DetailRow extends StatelessWidget {

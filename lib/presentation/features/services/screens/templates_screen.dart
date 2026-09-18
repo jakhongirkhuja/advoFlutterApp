@@ -1,13 +1,46 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routes/app_router.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 import '../../../widgets/header_screen.dart';
 
-class TemplatesScreen extends StatelessWidget {
+class TemplatesScreen extends StatefulWidget {
   const TemplatesScreen({super.key});
+
+  @override
+  State<TemplatesScreen> createState() => _TemplatesScreenState();
+}
+
+class _TemplatesScreenState extends State<TemplatesScreen> {
+  late Future<Map<String, dynamic>> _templates;
+
+  @override
+  void initState() {
+    super.initState();
+    _templates = context.read<AdvokatRepository>().getDocumentTemplates();
+  }
+
+  Future<void> _refresh() async {
+    final request = context.read<AdvokatRepository>().getDocumentTemplates();
+    setState(() => _templates = request);
+    await request;
+  }
+
+  List<Map<String, dynamic>> _items(Map<String, dynamic> response) {
+    final raw =
+        response['items'] ??
+        (response['data'] is Map ? (response['data'] as Map)['items'] : null) ??
+        response['data'];
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,36 +48,58 @@ class TemplatesScreen extends StatelessWidget {
       backgroundColor: AppTheme.pageBackground,
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async => {},
+          onRefresh: _refresh,
           child: Stack(
             children: [
-              ListView(
-                padding: const EdgeInsets.fromLTRB(12, 70, 12, 24),
-                children: [
-                  _TemplateCard(
-                    first: true,
-                    price: 12000,
-                    title: 'resignation_application',
-                    description: 'template_description',
-                  ),
-                  _TemplateCard(
-                    price: 18000,
-                    title: 'resignation_application',
-                    description: 'template_description',
-                  ),
-                  _TemplateCard(
-                    price: 24000,
-                    title: 'resignation_application',
-                    description: 'template_description',
-                  ),
-                ],
+              FutureBuilder<Map<String, dynamic>>(
+                future: _templates,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final items = snapshot.hasData
+                      ? _items(snapshot.data!)
+                      : const <Map<String, dynamic>>[];
+                  if (snapshot.hasError || items.isEmpty) {
+                    return ListView(
+                      padding: const EdgeInsets.fromLTRB(24, 110, 24, 24),
+                      children: [
+                        Text(
+                          snapshot.hasError
+                              ? context.tr('suggestion_failed')
+                              : context.tr('no_data'),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    );
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 70, 12, 24),
+                    itemCount: items.length,
+                    itemBuilder: (_, index) {
+                      final item = items[index];
+                      return _TemplateCard(
+                        templateId: int.tryParse(
+                          '${item['id'] ?? item['template_id'] ?? ''}',
+                        ),
+                        first: item['is_purchased'] != true,
+                        price: (item['price'] as num?)?.round() ?? 0,
+                        title: '${item['name'] ?? item['title'] ?? ''}',
+                        description: '${item['description'] ?? ''}',
+                        onPurchased: _refresh,
+                      );
+                    },
+                  );
+                },
               ),
               HeaderScreen(
                 title: context.tr('templates'),
                 firstActionIconPath: 'assets/icons/search.svg',
-                onFirstActionTap: () => Navigator.pushNamed(context, AppRouter.search),
+                onFirstActionTap: () =>
+                    Navigator.pushNamed(context, AppRouter.search),
                 secondActionIconPath: 'assets/icons/filter.svg',
-                onSecondActionTap: () => Navigator.pushNamed(context, AppRouter.filters),
+                onSecondActionTap: () =>
+                    Navigator.pushNamed(context, AppRouter.filters),
               ),
             ],
           ),
@@ -55,22 +110,26 @@ class TemplatesScreen extends StatelessWidget {
 }
 
 class _TemplateCard extends StatelessWidget {
+  final int? templateId;
   final bool first;
   final int price;
   final String title;
   final String description;
+  final Future<void> Function() onPurchased;
 
   const _TemplateCard({
+    required this.templateId,
     this.first = false,
     required this.price,
     required this.title,
     required this.description,
+    required this.onPurchased,
   });
 
   String _formatPrice(int amount) {
     return amount.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]} ',
+      (Match m) => '${m[1]} ',
     );
   }
 
@@ -79,8 +138,25 @@ class _TemplateCard extends StatelessWidget {
       context: context,
       builder: (_) => _PurchaseSheet(
         price: price,
-        onPayPressed: (paymentType) {
-          // Process payment callback logic here
+        onPayPressed: (paymentType) async {
+          final id = templateId;
+          if (id == null) return;
+          try {
+            await context.read<AdvokatRepository>().purchaseDocumentTemplate(
+              id,
+              paymentMethod: paymentType.toLowerCase().replaceAll(' ', ''),
+            );
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(context.tr('purchased'))));
+            await onPurchased();
+          } catch (_) {
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(context.tr('payment_failed'))),
+            );
+          }
         },
       ),
     );
@@ -115,7 +191,7 @@ class _TemplateCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      context.tr(title),
+                      title,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -125,7 +201,10 @@ class _TemplateCard extends StatelessWidget {
                       children: [
                         const Text(
                           'DOCX',
-                          style: TextStyle(fontSize: 14, color: AppTheme.textChoco),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppTheme.textChoco,
+                          ),
                         ),
                         Container(
                           width: 6,
@@ -138,7 +217,10 @@ class _TemplateCard extends StatelessWidget {
                         ),
                         const Text(
                           'PDF',
-                          style: TextStyle(fontSize: 14, color: AppTheme.textChoco),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppTheme.textChoco,
+                          ),
                         ),
                       ],
                     ),
@@ -153,11 +235,13 @@ class _TemplateCard extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppTheme.pageBackground,
-              border: Border.all(color: AppTheme.textChoco.withValues(alpha: 0.2)),
+              border: Border.all(
+                color: AppTheme.textChoco.withValues(alpha: 0.2),
+              ),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              context.tr(description),
+              description,
               style: const TextStyle(fontSize: 14, color: AppTheme.textChoco),
             ),
           ),
@@ -227,11 +311,8 @@ class _PurchaseSheet extends StatefulWidget {
   final int price;
   final ValueChanged<String> onPayPressed;
 
-  const _PurchaseSheet({
-    super.key,
-    int? price,
-    required this.onPayPressed,
-  }) : price = price ?? 0; // Ensures price is never null
+  const _PurchaseSheet({super.key, int? price, required this.onPayPressed})
+    : price = price ?? 0; // Ensures price is never null
 
   @override
   State<_PurchaseSheet> createState() => _PurchaseSheetState();
@@ -260,7 +341,10 @@ class _PurchaseSheetState extends State<_PurchaseSheet> {
                   Expanded(
                     child: Text(
                       context.tr('purchase'),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -286,7 +370,10 @@ class _PurchaseSheetState extends State<_PurchaseSheet> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         context.tr('payment_type'),
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -367,7 +454,7 @@ class _PriceLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final formattedPrice = price.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]} ',
+      (Match m) => '${m[1]} ',
     );
 
     return Container(
@@ -392,12 +479,12 @@ class _PriceLine extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(width: 4,),
+          const SizedBox(width: 4),
           Text(
             'so\'m',
             style: const TextStyle(
               fontSize: 20,
-      color: AppTheme.black,
+              color: AppTheme.black,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -419,7 +506,7 @@ class _Payment extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.onTap,
-    required this.iconPath
+    required this.iconPath,
   });
 
   @override
@@ -445,8 +532,9 @@ class _Payment extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                  height: 50,
-                  child: Image.asset(iconPath, fit: BoxFit.contain,)),
+                height: 50,
+                child: Image.asset(iconPath, fit: BoxFit.contain),
+              ),
               Container(
                 height: 1,
                 margin: EdgeInsets.symmetric(vertical: 10),
@@ -455,10 +543,7 @@ class _Payment extends StatelessWidget {
               ),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight:FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ],
           ),

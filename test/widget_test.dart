@@ -25,6 +25,6 @@ void main() {
     await tester.pump();
 
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.text('Xush kelibsiz!'), findsOneWidget);
+    expect(find.text('signup_title'), findsOneWidget);
   });
 }

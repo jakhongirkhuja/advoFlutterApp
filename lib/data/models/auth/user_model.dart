@@ -34,21 +34,28 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final fullName = (json['full_name'] ?? json['fio'] ?? '').toString();
+    final nameParts = fullName.trim().split(RegExp(r'\s+'));
     return UserModel(
-      id: json['id'] ?? 0,
-      phoneNumber: json['phone_number'] ?? '',
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
-      middleName: json['middle_name'] ?? '',
-      fio: json['fio'] ?? '',
-      username: json['username'] ?? '',
-      countryId: json['country_id'] ?? 0,
-      regionId: json['region_id'] ?? 0,
-      avatarPath: json['avatar_path'],
-      shareLocation: json['share_location'] ?? false,
-      points: json['points'] ?? 0,
-      trustRating: json['trust_rating'] ?? 0,
-      verify: json['verify'] ?? false,
+      id: _asInt(json['id']),
+      phoneNumber: (json['phone'] ?? json['phone_number'] ?? '').toString(),
+      firstName:
+          (json['first_name'] ?? (nameParts.isNotEmpty ? nameParts.first : ''))
+              .toString(),
+      lastName:
+          (json['last_name'] ??
+                  (nameParts.length > 1 ? nameParts.skip(1).join(' ') : ''))
+              .toString(),
+      middleName: (json['parent_name'] ?? json['middle_name'] ?? '').toString(),
+      fio: fullName,
+      username: (json['username'] ?? '').toString(),
+      countryId: _asInt(json['country_id']),
+      regionId: _asInt(json['city_id'] ?? json['region_id']),
+      avatarPath: (json['avatar_url'] ?? json['avatar_path'])?.toString(),
+      shareLocation: json['share_location'] == true,
+      points: _asInt(json['points']),
+      trustRating: _asInt(json['trust_rating']),
+      verify: json['verify'] == true || json['is_verified'] == true,
     );
   }
 
@@ -79,5 +86,11 @@ class UserModel {
       return avatarPath!;
     }
     return '${AppConfig.mediaBaseUrl}$avatarPath';
+  }
+
+  static int _asInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse('$value') ?? 0;
   }
 }

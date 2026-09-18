@@ -23,32 +23,84 @@ class HomeViewModel extends ChangeNotifier {
 
   final Set<int> _savedLawyerIds = <int>{};
   final Set<int> _savedOrganizationIds = <int>{};
+  final Set<int> _savedEuroProtocolIds = <int>{};
 
-  List<Lawyer> get savedLawyers =>
-      _popularLawyers.where((lawyer) => _savedLawyerIds.contains(lawyer.id)).toList();
+  List<Lawyer> get savedLawyers => _popularLawyers
+      .where((lawyer) => _savedLawyerIds.contains(lawyer.id))
+      .toList();
 
-  List<Organization> get savedOrganizations =>
-      _organizations.where((organization) => _savedOrganizationIds.contains(organization.id)).toList();
+  List<Organization> get savedOrganizations => _organizations
+      .where((organization) => _savedOrganizationIds.contains(organization.id))
+      .toList();
 
   bool isLawyerSaved(int lawyerId) => _savedLawyerIds.contains(lawyerId);
 
   Future<void> toggleLawyerBookmark(int lawyerId) async {
-    if (!_savedLawyerIds.add(lawyerId)) {
+    final saved = !_savedLawyerIds.contains(lawyerId);
+    if (saved) {
+      _savedLawyerIds.add(lawyerId);
+    } else {
       _savedLawyerIds.remove(lawyerId);
     }
     await _persistBookmarks();
     notifyListeners();
+    try {
+      final serverSaved = await repository.setLawyerSaved(
+        lawyerId,
+        saved: saved,
+      );
+      serverSaved
+          ? _savedLawyerIds.add(lawyerId)
+          : _savedLawyerIds.remove(lawyerId);
+      await _persistBookmarks();
+      notifyListeners();
+    } catch (_) {
+      // Retain the local state while offline.
+    }
   }
 
   bool isOrganizationSaved(int organizationId) =>
       _savedOrganizationIds.contains(organizationId);
 
   Future<void> toggleOrganizationBookmark(int organizationId) async {
-    if (!_savedOrganizationIds.add(organizationId)) {
+    final saved = !_savedOrganizationIds.contains(organizationId);
+    if (saved) {
+      _savedOrganizationIds.add(organizationId);
+    } else {
       _savedOrganizationIds.remove(organizationId);
     }
     await _persistBookmarks();
     notifyListeners();
+    try {
+      final serverSaved = await repository.setOrganizationSaved(
+        organizationId,
+        saved: saved,
+      );
+      serverSaved
+          ? _savedOrganizationIds.add(organizationId)
+          : _savedOrganizationIds.remove(organizationId);
+      await _persistBookmarks();
+      notifyListeners();
+    } catch (_) {
+      // Retain the local state while offline.
+    }
+  }
+
+  bool isEuroProtocolSaved(int protocolId) =>
+      _savedEuroProtocolIds.contains(protocolId);
+
+  Future<void> toggleEuroProtocolBookmark(int protocolId) async {
+    final saved = !_savedEuroProtocolIds.contains(protocolId);
+    saved
+        ? _savedEuroProtocolIds.add(protocolId)
+        : _savedEuroProtocolIds.remove(protocolId);
+    await _persistBookmarks();
+    notifyListeners();
+    try {
+      await repository.setEuroProtocolSaved(protocolId, saved: saved);
+    } catch (_) {
+      // Retain the local state while offline.
+    }
   }
 
   List<ServiceCategory> _serviceCategories = const [];
@@ -63,8 +115,14 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<void> loadProtokolProviders() async {
     _protokolProviders = await repository.getProtokolProviders();
+    _savedEuroProtocolIds.addAll(
+      _protokolProviders
+          .where((provider) => provider.isSaved)
+          .map((provider) => provider.id),
+    );
     notifyListeners();
   }
+
   Future<void> loadServices() async {
     _isLoading = true;
     notifyListeners();
@@ -78,10 +136,16 @@ class HomeViewModel extends ChangeNotifier {
     }
     _savedOrganizationIds
       ..clear()
-      ..addAll(prefs?.getStringList(_savedOrganizationsKey)?.map(int.parse) ?? const <int>[]);
+      ..addAll(
+        prefs?.getStringList(_savedOrganizationsKey)?.map(int.parse) ??
+            _organizations
+                .where((organization) => organization.isSaved)
+                .map((organization) => organization.id),
+      );
     _isLoading = false;
     notifyListeners();
   }
+
   Future<void> loadHome() async {
     _isLoading = true;
     notifyListeners();
@@ -104,14 +168,29 @@ class HomeViewModel extends ChangeNotifier {
     final storedLawyerIds = prefs?.getStringList(_savedLawyersKey);
     _savedLawyerIds
       ..clear()
-      ..addAll(storedLawyerIds?.map(int.parse) ??
-          _popularLawyers.where((lawyer) => lawyer.isBookmarked).map((lawyer) => lawyer.id));
+      ..addAll(
+        storedLawyerIds?.map(int.parse) ??
+            _popularLawyers
+                .where((lawyer) => lawyer.isBookmarked)
+                .map((lawyer) => lawyer.id),
+      );
     _serviceCategories = results[1] as List<ServiceCategory>;
     _organizations = results[2] as List<Organization>;
     final storedOrganizationIds = prefs?.getStringList(_savedOrganizationsKey);
     _savedOrganizationIds
       ..clear()
-      ..addAll(storedOrganizationIds?.map(int.parse) ?? const <int>[]);
+      ..addAll(
+        storedOrganizationIds?.map(int.parse) ??
+            _organizations
+                .where((organization) => organization.isSaved)
+                .map((organization) => organization.id),
+      );
+    _savedEuroProtocolIds
+      ..clear()
+      ..addAll(
+        prefs?.getStringList(_savedEuroProtocolsKey)?.map(int.parse) ??
+            const <int>[],
+      );
     _locationName = await _loadLocationName();
     _isLoading = false;
     notifyListeners();
@@ -119,6 +198,7 @@ class HomeViewModel extends ChangeNotifier {
 
   static const _savedLawyersKey = 'saved_lawyer_ids';
   static const _savedOrganizationsKey = 'saved_organization_ids';
+  static const _savedEuroProtocolsKey = 'saved_euro_protocol_ids';
 
   Future<void> loadSavedItems() async {
     final futures = <Future<void>>[];
@@ -138,6 +218,10 @@ class HomeViewModel extends ChangeNotifier {
         _savedOrganizationsKey,
         _savedOrganizationIds.map((id) => id.toString()).toList(),
       );
+      await prefs.setStringList(
+        _savedEuroProtocolsKey,
+        _savedEuroProtocolIds.map((id) => id.toString()).toList(),
+      );
     } catch (_) {
       // The in-memory state is still updated even if persistence fails.
     }
@@ -154,7 +238,8 @@ class HomeViewModel extends ChangeNotifier {
         return _locationName;
       }
 
-      final position = await Geolocator.getLastKnownPosition() ??
+      final position =
+          await Geolocator.getLastKnownPosition() ??
           await Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
               accuracy: LocationAccuracy.medium,
@@ -168,7 +253,9 @@ class HomeViewModel extends ChangeNotifier {
         position.latitude.toString(),
         position.longitude.toString(),
       );
-      return address?.trim().isNotEmpty == true ? address!.trim() : _locationName;
+      return address?.trim().isNotEmpty == true
+          ? address!.trim()
+          : _locationName;
     } catch (_) {
       return _locationName;
     }

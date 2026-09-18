@@ -244,7 +244,8 @@ class _Menu extends StatelessWidget {
       _Tile(
         icon: 'assets/icons/verified_user_outlined.svg',
         title: context.tr('verification'),
-        onTap: () => Navigator.pushNamed(context, AppRouter.profileVerification),
+        onTap: () =>
+            Navigator.pushNamed(context, AppRouter.profileVerification),
       ),
       _Tile(
         icon: 'assets/icons/description_outlined.svg',
@@ -259,7 +260,8 @@ class _Menu extends StatelessWidget {
       _Tile(
         icon: 'assets/icons/card_giftcard_outlined.svg',
         title: context.tr('contribution'),
-        onTap: () => Navigator.pushNamed(context, AppRouter.profileContribution),
+        onTap: () =>
+            Navigator.pushNamed(context, AppRouter.profileContribution),
       ),
       // _Tile(
       //   icon: 'assets/icons/notification.svg',
@@ -340,7 +342,10 @@ class _Menu extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
           decoration: BoxDecoration(
             color: AppTheme.color_FFF5F6F8,
-            borderRadius: BorderRadius.only(topRight: Radius.circular(28), topLeft: Radius.circular(28)),
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(28),
+              topLeft: Radius.circular(28),
+            ),
           ),
           child: SafeArea(
             top: false,
@@ -447,9 +452,17 @@ class _Menu extends StatelessWidget {
                     ),
                     onPressed: () async {
                       await localeProvider.setLocale(Locale(selectedCode));
+                      if (context.mounted) {
+                        await context.read<AuthViewModel>().updateLanguage(
+                          selectedCode,
+                        );
+                      }
                       if (sheetContext.mounted) Navigator.pop(sheetContext);
                     },
-                    child: Text(context.tr('save_button'), style: const TextStyle(fontSize: 16)),
+                    child: Text(
+                      context.tr('save_button'),
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ],
@@ -473,10 +486,7 @@ class _Banner extends StatelessWidget {
       gradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [
-          AppTheme.color_FF69AFFF,
-          AppTheme.color_FF1C8AFF,
-        ],
+        colors: [AppTheme.color_FF69AFFF, AppTheme.color_FF1C8AFF],
         stops: [0.0, 1.0],
       ),
       borderRadius: BorderRadius.circular(28),
@@ -703,7 +713,11 @@ class _Details extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 10,
                         backgroundColor: AppTheme.buttonGold,
-                        child: Icon(Icons.add, size: 14, color: AppTheme.surface),
+                        child: Icon(
+                          Icons.add,
+                          size: 14,
+                          color: AppTheme.surface,
+                        ),
                       ),
                     ),
                 ],
@@ -868,7 +882,6 @@ class _Field extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               borderSide: const BorderSide(color: AppTheme.color_FFECE8E4),
             ),
-
           ),
         ),
       ],
@@ -953,7 +966,7 @@ class _Select extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             filled: true,
-                  fillColor: AppTheme.color_FFFAF9F8,
+            fillColor: AppTheme.color_FFFAF9F8,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 10,

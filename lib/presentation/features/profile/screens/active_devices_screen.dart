@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../../../widgets/header_screen.dart';
 
-class ActiveDevicesScreen extends StatelessWidget {
+class ActiveDevicesScreen extends StatefulWidget {
   const ActiveDevicesScreen({super.key});
+
+  @override
+  State<ActiveDevicesScreen> createState() => _ActiveDevicesScreenState();
+}
+
+class _ActiveDevicesScreenState extends State<ActiveDevicesScreen> {
+  late Future<List<Map<String, dynamic>>> _devices;
+
+  @override
+  void initState() {
+    super.initState();
+    _devices = context.read<AdvokatRepository>().getClientDevices();
+  }
+
+  Future<void> _reload() async {
+    final request = context.read<AdvokatRepository>().getClientDevices();
+    setState(() => _devices = request);
+    await request;
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -15,33 +36,74 @@ class ActiveDevicesScreen extends StatelessWidget {
     body: SafeArea(
       child: Stack(
         children: [
-          ListView(
-            padding: const EdgeInsets.fromLTRB(16, 70, 16, 24),
-            children: [
-              _DeviceTile(
-                icon: 'assets/icons/ios.svg',
-                title: 'iPhone 15 Pro',
-                subtitle: context.tr('currently_active'),
-                ip: 'IP: 185.74.22.123',
-                active: true,
-
-                onTap: () => _showDeviceDetails(context, 'iPhone 15 Pro','185.74.22.123',null),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                context.tr('other_devices'),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 12),
-              _DeviceTile(
-                time: context.tr('five_minutes_ago'),
-                icon: 'assets/icons/android.svg',
-                title: 'Samsung A12',
-                subtitle: context.tr('inactive'),
-                ip: 'IP: 185.74.22.123',
-                onTap: () => _showDeviceDetails(context, 'Samsung A12','185.74.22.123',context.tr('five_minutes_ago')),
-              ),
-            ],
+          FutureBuilder<List<Map<String, dynamic>>>(
+            future: _devices,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final devices = snapshot.data ?? const [];
+              if (snapshot.hasError || devices.isEmpty) {
+                return RefreshIndicator(
+                  onRefresh: _reload,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(24, 110, 24, 24),
+                    children: [
+                      Text(
+                        snapshot.hasError
+                            ? context.tr('suggestion_failed')
+                            : context.tr('no_data'),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: _reload,
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 70, 16, 24),
+                  itemCount: devices.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (_, index) {
+                    final device = devices[index];
+                    final platform =
+                        '${device['platform'] ?? device['device_type'] ?? ''}'
+                            .toLowerCase();
+                    final name =
+                        '${device['device_name'] ?? device['model'] ?? device['name'] ?? platform}';
+                    final ip = '${device['ip_address'] ?? device['ip'] ?? ''}';
+                    final active =
+                        device['is_current'] == true ||
+                        device['active'] == true;
+                    final id = int.tryParse('${device['id'] ?? ''}');
+                    return _DeviceTile(
+                      time: active
+                          ? null
+                          : '${device['last_active_at'] ?? device['updated_at'] ?? ''}',
+                      icon:
+                          platform.contains('ios') ||
+                              platform.contains('iphone')
+                          ? 'assets/icons/ios.svg'
+                          : 'assets/icons/android.svg',
+                      title: name,
+                      subtitle: context.tr(
+                        active ? 'currently_active' : 'inactive',
+                      ),
+                      ip: ip.isEmpty ? '' : 'IP: $ip',
+                      active: active,
+                      onTap: () => _showDeviceDetails(
+                        context,
+                        id,
+                        name,
+                        ip,
+                        active ? null : '${device['last_active_at'] ?? ''}',
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
           HeaderScreen(title: context.tr('active_devices')),
         ],
@@ -50,11 +112,12 @@ class ActiveDevicesScreen extends StatelessWidget {
   );
 
   Future<void> _showDeviceDetails(
-      BuildContext context,
-      String name,
-      String ip,
-      String? time,
-      ) async {
+    BuildContext context,
+    int? id,
+    String name,
+    String ip,
+    String? time,
+  ) async {
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppTheme.transparent,
@@ -66,7 +129,10 @@ class ActiveDevicesScreen extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(6, 0, 6, 0),
         decoration: BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
         ),
         child: SafeArea(
           child: Padding(
@@ -77,16 +143,16 @@ class ActiveDevicesScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.topRight,
                   child: InkWell(
-
                     onTap: () => Navigator.pop(context),
                     child: Container(
                       width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: AppTheme.pageBackground,
-                          borderRadius: BorderRadius.circular(32)
-                        ),
-                        child: const Icon(Icons.close, size: 24,)),
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppTheme.pageBackground,
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                      child: const Icon(Icons.close, size: 24),
+                    ),
                   ),
                 ),
                 CustomIconDesign(
@@ -108,12 +174,12 @@ class ActiveDevicesScreen extends StatelessWidget {
                     ),
                     time != null
                         ? Text(
-                      time,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.textSecondary,
-                      ),
-                    )
+                            time,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.textSecondary,
+                            ),
+                          )
                         : const SizedBox(),
                   ],
                 ),
@@ -122,7 +188,8 @@ class ActiveDevicesScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: AppTheme.backgroundWhite, // Restored original inner container color
+                    color: AppTheme
+                        .backgroundWhite, // Restored original inner container color
                     borderRadius: BorderRadius.circular(46),
                   ),
                   child: Row(
@@ -133,10 +200,7 @@ class ActiveDevicesScreen extends StatelessWidget {
                         child: SvgPicture.asset('assets/icons/ip.svg'),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        ip,
-                        style: const TextStyle(fontSize: 16),
-                      ),
+                      Text(ip, style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                 ),
@@ -150,7 +214,27 @@ class ActiveDevicesScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: id == null
+                        ? null
+                        : () async {
+                            try {
+                              await context
+                                  .read<AdvokatRepository>()
+                                  .revokeClientDevice(id);
+                              if (!context.mounted) return;
+                              Navigator.pop(context);
+                              await _reload();
+                            } catch (_) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    context.tr('suggestion_failed'),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                     child: Text(
                       context.tr('remove_device'),
                       style: TextStyle(
@@ -168,8 +252,6 @@ class ActiveDevicesScreen extends StatelessWidget {
     );
   }
 }
-
-
 
 class _DeviceTile extends StatelessWidget {
   final String icon;

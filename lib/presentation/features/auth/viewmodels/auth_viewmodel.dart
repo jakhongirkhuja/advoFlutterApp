@@ -148,6 +148,11 @@ class AuthViewModel extends ChangeNotifier {
     String? username,
     int? countryId,
     int? regionId,
+    String? birthday,
+    String? phone,
+    String? email,
+    double? latitude,
+    double? longitude,
     File? avatar,
   }) async {
     _status = AuthStatus.loading;
@@ -162,6 +167,11 @@ class AuthViewModel extends ChangeNotifier {
         username: username,
         countryId: countryId,
         regionId: regionId,
+        birthday: birthday,
+        phone: phone,
+        email: email,
+        latitude: latitude,
+        longitude: longitude,
         avatar: avatar,
       );
       if (updatedUser != null) {
@@ -187,6 +197,15 @@ class AuthViewModel extends ChangeNotifier {
       isAuthenticated: false,
     );
     notifyListeners();
+  }
+
+  Future<void> updateLanguage(String languageCode) async {
+    if (_status != AuthStatus.authenticated) return;
+    try {
+      await authRepository.updateLanguage(languageCode);
+    } catch (_) {
+      // The selected locale remains available locally while offline.
+    }
   }
 
   Future<void> _ensureLocationShareEnabled() async {

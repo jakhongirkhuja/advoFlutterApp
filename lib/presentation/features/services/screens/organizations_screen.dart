@@ -135,6 +135,7 @@ class OrganizationCard extends StatelessWidget {
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 16,
+                              color: AppTheme.textSecondary
                             ),
                           ),
                         ),
@@ -233,13 +234,16 @@ class OrganizationCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              SvgPicture.asset('assets/icons/location.svg'),
+              SvgPicture.asset('assets/icons/location.svg', colorFilter: ColorFilter.mode(AppTheme.color_FFCA9D38, BlendMode.srcATop),),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   organization.address,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppTheme.textSecondary
+                  ),
                 ),
               ),
             ],

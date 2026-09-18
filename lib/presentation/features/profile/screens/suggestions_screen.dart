@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../../../widgets/header_screen.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 
 class SuggestionsScreen extends StatefulWidget {
   const SuggestionsScreen({super.key});
@@ -17,6 +21,7 @@ class SuggestionsScreen extends StatefulWidget {
 class _SuggestionsScreenState extends State<SuggestionsScreen> {
   final _suggestionController = TextEditingController();
   XFile? _selectedFile;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -76,7 +81,10 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(context.tr('comment'), style: const TextStyle(fontSize: 14)),
+                    Text(
+                      context.tr('comment'),
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _suggestionController,
@@ -118,10 +126,12 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                 decoration: const BoxDecoration(
                   color: AppTheme.surface,
-                  border: Border(top: BorderSide(color: AppTheme.color_FFE4E8EE)),
+                  border: Border(
+                    top: BorderSide(color: AppTheme.color_FFE4E8EE),
+                  ),
                 ),
                 child: GestureDetector(
-                  onTap: _submit,
+                  onTap: _isSubmitting ? null : _submit,
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12),
                     alignment: Alignment.center,
@@ -144,15 +154,25 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
   );
 
   Future<void> _submit() async {
-    final success = _suggestionController.text.trim().isNotEmpty;
+    final comment = _suggestionController.text.trim();
+    if (comment.isEmpty) return;
+    setState(() => _isSubmitting = true);
+    var success = false;
+    try {
+      await context.read<AdvokatRepository>().sendSuggestion(
+        comment: comment,
+        image: _selectedFile == null ? null : File(_selectedFile!.path),
+      );
+      success = true;
+      _suggestionController.clear();
+      _selectedFile = null;
+    } catch (_) {
+      success = false;
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
 
-    // TODO: Send the selected file and comment through the API.
-    // final request = FormData.fromMap({
-    //   'comment': _suggestionController.text.trim(),
-    //   'file': await MultipartFile.fromFile(_selectedFile!.path),
-    // });
-    // await apiClient.post('/suggestions', data: request);
-
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       barrierColor: AppTheme.black54,
@@ -174,9 +194,9 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
       setState(() => _selectedFile = file);
     } on Exception catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr('file_select_failed'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('file_select_failed'))));
     }
   }
 }
@@ -210,7 +230,11 @@ class _SuggestionResultDialog extends StatelessWidget {
                   color: AppTheme.color_FFF1F5F9,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(Icons.close, size: 15, color: AppTheme.color_FF334155),
+                child: const Icon(
+                  Icons.close,
+                  size: 15,
+                  color: AppTheme.color_FF334155,
+                ),
               ),
             ),
           ),
@@ -220,8 +244,12 @@ class _SuggestionResultDialog extends StatelessWidget {
             icon: success
                 ? 'assets/icons/marked_success.svg'
                 : 'assets/icons/failed.svg',
-            mainColor: success ? AppTheme.color_FF15985B : AppTheme.color_FFCE040E,
-            secondaryColor: success ? AppTheme.color_FF40DB93 : AppTheme.color_FFFF666D,
+            mainColor: success
+                ? AppTheme.color_FF15985B
+                : AppTheme.color_FFCE040E,
+            secondaryColor: success
+                ? AppTheme.color_FF40DB93
+                : AppTheme.color_FFFF666D,
             padding: 18,
           ),
           const SizedBox(height: 16),

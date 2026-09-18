@@ -14,12 +14,15 @@ import 'core/config/app_config.dart';
 import 'core/routes/app_router.dart';
 import 'core/services/location_sync_service.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/notification_socket_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_provider.dart';
 import 'data/api/api_client.dart';
 import 'data/repositories/auth_repository.dart';
+import 'data/repositories/advokat_repository.dart';
 import 'data/repositories/home_repository.dart';
 import 'presentation/features/auth/viewmodels/auth_viewmodel.dart';
+import 'presentation/features/auth/screens/login_screen.dart';
 import 'presentation/features/home/screens/home_screen.dart';
 import 'presentation/features/home/viewmodels/home_viewmodel.dart';
 import 'presentation/features/appointments/viewmodels/appointments_viewmodel.dart';
@@ -70,9 +73,14 @@ Future<void> main() async {
   }
 
   final apiClient = ApiClient();
+  final notificationSocketService = NotificationSocketService();
   runApp(
     MultiProvider(
       providers: [
+        Provider<NotificationSocketService>.value(
+          value: notificationSocketService,
+        ),
+        Provider<AdvokatRepository>.value(value: AdvokatRepository(apiClient)),
         ChangeNotifierProvider(
           create: (_) => AuthViewModel(AuthRepository(apiClient)),
         ),
@@ -142,6 +150,9 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
         if (isAuthenticated) {
           NotificationService.requestPermissions();
           authViewModel.syncDeviceToken();
+          context.read<NotificationSocketService>().connect();
+        } else {
+          context.read<NotificationSocketService>().disconnect();
         }
       });
     }
@@ -167,6 +178,9 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
   }
 
   Widget _buildInitialScreen(AuthViewModel authViewModel) {
-    return const HomeScreen();
+    if (authViewModel.status == AuthStatus.authenticated) {
+      return const HomeScreen();
+    }
+    return const LoginScreen();
   }
 }

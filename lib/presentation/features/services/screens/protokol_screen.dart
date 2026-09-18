@@ -83,10 +83,11 @@ class ProtokolProviderCard extends StatefulWidget {
 }
 
 class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
-  bool _isBookmarked = false;
-
   @override
   Widget build(BuildContext context) {
+    final isBookmarked = context.watch<HomeViewModel>().isEuroProtocolSaved(
+      widget.provider.id,
+    );
     return Container(
       padding: const EdgeInsets.all(12),
       margin: EdgeInsets.only(bottom: 12),
@@ -203,7 +204,9 @@ class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
                 ),
               ),
               InkWell(
-                onTap: () => setState(() => _isBookmarked = !_isBookmarked),
+                onTap: () => context
+                    .read<HomeViewModel>()
+                    .toggleEuroProtocolBookmark(widget.provider.id),
                 borderRadius: BorderRadius.circular(40),
                 child: Container(
                   width: 42,
@@ -214,7 +217,7 @@ class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   child: SvgPicture.asset(
-                    _isBookmarked
+                    isBookmarked
                         ? 'assets/icons/bookmarkfilled.svg'
                         : 'assets/icons/bookmark.svg',
                   ),
@@ -225,7 +228,13 @@ class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
           const SizedBox(height: 10),
           Row(
             children: [
-              SvgPicture.asset('assets/icons/location.svg', colorFilter: ColorFilter.mode(AppTheme.color_FFCA9D38, BlendMode.srcATop),),
+              SvgPicture.asset(
+                'assets/icons/location.svg',
+                colorFilter: ColorFilter.mode(
+                  AppTheme.color_FFCA9D38,
+                  BlendMode.srcATop,
+                ),
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -256,7 +265,10 @@ class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
                   ),
                   Text(
                     context.tr('per_from'),
-                    style: TextStyle(fontSize: 16, color: AppTheme.color_FF64748B),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppTheme.color_FF64748B,
+                    ),
                   ),
                 ],
               ),
@@ -267,7 +279,6 @@ class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
                   decoration: BoxDecoration(
                     color: AppTheme.buttonGold,
                     borderRadius: BorderRadius.circular(42),
-
                   ),
                   child: Text(
                     context.tr('view'),

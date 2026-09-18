@@ -13,12 +13,12 @@ class AuthRepository {
   Future<String?> sendOtp(String phone) async {
     try {
       final response = await apiClient.post(
-        'auth/sign-in',
-        data: {'phone_number': phone.replaceAll(RegExp(r'\D'), '')},
+        'clients/login',
+        data: {'phone': _normalizePhone(phone)},
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        return response.data['otp_code']?.toString();
+        return response.data['otp']?.toString();
       }
 
       if (response.statusCode != 200) {
@@ -28,7 +28,7 @@ class AuthRepository {
       }
       return null;
     } catch (e) {
-      print('--- API Error: auth/sign-in ---');
+      print('--- API Error: clients/login ---');
       print(e);
       rethrow;
     }
@@ -43,21 +43,12 @@ class AuthRepository {
   }) async {
     try {
       final response = await apiClient.post(
-        'auth/verify-otp',
-        data: {
-          'phone_number': phone.replaceAll(RegExp(r'\D'), ''),
-          'code': code,
-          if (deviceModel != null && deviceModel.trim().isNotEmpty)
-            'device_model': deviceModel.trim(),
-          if (platform != null && platform.trim().isNotEmpty)
-            'platform': platform.trim(),
-          if (appVersion != null && appVersion.trim().isNotEmpty)
-            'app_version': appVersion.trim(),
-        },
+        'clients/login/confirm',
+        data: {'phone': _normalizePhone(phone), 'otp': code},
       );
 
-      final accessToken = response.data['access_token'];
-      final userData = response.data['user'];
+      final accessToken = response.data['token'];
+      final userData = response.data['client'];
 
       if (accessToken != null) {
         final prefs = await SharedPreferences.getInstance();
@@ -91,7 +82,7 @@ class AuthRepository {
 
   Future<UserModel?> getCurrentUser() async {
     try {
-      final response = await apiClient.get('users/me');
+      final response = await apiClient.get('clients/me');
       if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
         final user = UserModel.fromJson(response.data);
         await saveUser(user);
@@ -116,17 +107,22 @@ class AuthRepository {
     String? username,
     int? countryId,
     int? regionId,
+    String? birthday,
+    String? phone,
+    String? email,
+    double? latitude,
+    double? longitude,
     File? avatar,
   }) async {
     try {
       Map<String, dynamic> data = {
         if (firstName != null) 'first_name': firstName,
         if (lastName != null) 'last_name': lastName,
-        if (middleName != null) 'middle_name': middleName,
-        if (fio != null) 'fio': fio,
-        if (username != null) 'username': username,
-        if (countryId != null) 'country_id': countryId,
-        if (regionId != null) 'region_id': regionId,
+        if (birthday != null) 'birthday': birthday,
+        if (phone != null) 'phone': _normalizePhone(phone),
+        if (email != null) 'email': email,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
       };
 
       if (avatar != null) {
@@ -137,7 +133,7 @@ class AuthRepository {
       }
 
       final response = await apiClient.put(
-        'users/me',
+        'clients/me',
         data: FormData.fromMap(data),
       );
 
@@ -165,15 +161,58 @@ class AuthRepository {
   }
 
   Future<void> updateDeviceToken(String token, String platform) async {
-    try {
-      await apiClient.post(
-        'users/device-token',
-        data: {'token': token, 'platform': platform},
+    // The supplied Advokat API does not expose a device-token endpoint yet.
+  }
+
+  Future<String?> sendRegistrationOtp({
+    required String firstName,
+    required String lastName,
+    required String phone,
+  }) async {
+    final response = await apiClient.post(
+      'clients/register',
+      data: {
+        'first_name': firstName,
+        'last_name': lastName,
+        'phone': _normalizePhone(phone),
+      },
+    );
+    return response.data is Map ? response.data['otp']?.toString() : null;
+  }
+
+  Future<String?> confirmRegistration({
+    required String phone,
+    required String otp,
+  }) async {
+    final response = await apiClient.post(
+      'clients/register/confirm',
+      data: {'phone': _normalizePhone(phone), 'otp': otp},
+    );
+    return _saveAuthResponse(response.data);
+  }
+
+  Future<void> updateLanguage(String languageCode) async {
+    await apiClient.put('clients/me/lang', data: {'lang': languageCode});
+  }
+
+  Future<String?> _saveAuthResponse(dynamic data) async {
+    if (data is! Map) return null;
+    final token = data['token']?.toString();
+    if (token == null || token.isEmpty) return null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+    final client = data['client'];
+    if (client is Map) {
+      await prefs.setString(
+        'user_data',
+        json.encode(Map<String, dynamic>.from(client)),
       );
-    } catch (e) {
-      // We don't necessarily want to crash if token update fails,
-      // but logging it is good.
-      print('Failed to update device token: $e');
     }
+    return token;
+  }
+
+  String _normalizePhone(String phone) {
+    final digits = phone.replaceAll(RegExp(r'\D'), '');
+    return digits.startsWith('998') ? '+$digits' : '+998$digits';
   }
 }

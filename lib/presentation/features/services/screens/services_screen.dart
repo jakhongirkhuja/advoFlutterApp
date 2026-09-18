@@ -30,10 +30,21 @@ class ServicesScreen extends StatelessWidget {
             children: [
               ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                // Guarantees pull-to-refresh behavior
+
                 padding: const EdgeInsets.fromLTRB(12, 70, 12, 18),
                 children: [
-                  _ServicesGrid(categories: viewModel.serviceCategories),
+                  Container(
+                    padding: EdgeInsets.all(6),
+
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      color: AppTheme.surface,
+                    ),
+                    child: _ServicesGrid(
+                      categories: viewModel.serviceCategories,
+                    ),
+                  ),
+
                   const SizedBox(height: 12),
                   SectionHeader(title: tr('service_categories')),
                   const SizedBox(height: 12),

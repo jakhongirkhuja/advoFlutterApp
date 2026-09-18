@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -12,9 +14,10 @@ class ApiClient {
       BaseOptions(
         baseUrl: AppConfig.apiBaseUrl,
         connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        contentType: Headers
-            .formUrlEncodedContentType, // Always use form data by default
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
+        contentType: Headers.formUrlEncodedContentType,
+        responseType: ResponseType.json,
       ),
     );
 
@@ -24,9 +27,17 @@ class ApiClient {
         onRequest: (options, handler) async {
           final prefs = await SharedPreferences.getInstance();
           final token = prefs.getString('auth_token');
+          final languageCode = prefs.getString('language_code') ?? 'uz';
           final isTrackedLocationRequest = _isTrackedLocationPath(options.path);
           final startedAt = DateTime.now().millisecondsSinceEpoch;
           options.extra['request_started_at'] = startedAt;
+          options.headers['Accept-Language'] = languageCode;
+          options.headers['Accept'] = Headers.jsonContentType;
+          if (Platform.isAndroid) {
+            options.headers['X-App-Type'] = 'android';
+          } else if (Platform.isIOS) {
+            options.headers['X-App-Type'] = 'ios';
+          }
 
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
@@ -120,24 +131,62 @@ class ApiClient {
   Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
+    Options? options,
   }) async {
-    return await dio.get(path, queryParameters: queryParameters);
+    return await dio.get(
+      _normalizePath(path),
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   // Helper for POST requests
-  Future<Response> post(String path, {dynamic data}) async {
-    return await dio.post(path, data: data);
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return await dio.post(
+      _normalizePath(path),
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   // Helper for PUT requests
-  Future<Response> put(String path, {dynamic data}) async {
-    return await dio.put(path, data: data);
+  Future<Response> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return await dio.put(
+      _normalizePath(path),
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   // Helper for DELETE requests
-  Future<Response> delete(String path, {dynamic data}) async {
-    return await dio.delete(path, data: data);
+  Future<Response> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return await dio.delete(
+      _normalizePath(path),
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
+
+  String _normalizePath(String path) =>
+      path.startsWith('/') ? path.substring(1) : path;
 
   bool _isTrackedLocationPath(String path) {
     return path == 'users/location' ||

@@ -2,10 +2,12 @@ import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../data/repositories/advokat_repository.dart';
 import '../../../widgets/header_screen.dart';
 
 class ProfileContributionFormScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _ProfileContributionFormScreenState
   final _amount = TextEditingController();
   String _payment = 'Payme';
   bool _anonymous = false;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -59,7 +62,10 @@ class _ProfileContributionFormScreenState
                         ),
                       ),
                       const Divider(height: 24, color: AppTheme.color_FFE4EAF1),
-                      Text(context.tr('amount'), style: const TextStyle(fontSize: 14)),
+                      Text(
+                        context.tr('amount'),
+                        style: const TextStyle(fontSize: 14),
+                      ),
                       const SizedBox(height: 6),
                       TextField(
                         style: const TextStyle(fontSize: 14),
@@ -76,19 +82,25 @@ class _ProfileContributionFormScreenState
                             .map(
                               (value) => InkWell(
                                 borderRadius: BorderRadius.circular(21),
-                                    onTap: () {
-                                      _amount.text = value.replaceAll(' ', '');
-                                      setState(() {});
-                                    },
+                                onTap: () {
+                                  _amount.text = value.replaceAll(' ', '');
+                                  setState(() {});
+                                },
                                 child: Container(
                                   height: 30,
-                                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 6,
+                                    horizontal: 10,
+                                  ),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     color: AppTheme.color_FFF1F5F9,
                                     borderRadius: BorderRadius.circular(21),
                                   ),
-                                  child: Text(value, style: const TextStyle(fontSize: 14)),
+                                  child: Text(
+                                    value,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
                                 ),
                               ),
                             )
@@ -101,7 +113,10 @@ class _ProfileContributionFormScreenState
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(context.tr('payment_type'), style: const TextStyle(fontSize: 15)),
+                      Text(
+                        context.tr('payment_type'),
+                        style: const TextStyle(fontSize: 15),
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -172,9 +187,10 @@ class _ProfileContributionFormScreenState
                         child: CupertinoSwitch(
                           activeTrackColor: AppTheme.color_FF2B7FFF,
                           value: _anonymous,
-                          onChanged: (value) => setState(() => _anonymous = value),
+                          onChanged: (value) =>
+                              setState(() => _anonymous = value),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -192,7 +208,7 @@ class _ProfileContributionFormScreenState
               child: SizedBox(
                 height: 48,
                 child: FilledButton(
-                  onPressed: _canSubmit ? _submit : null,
+                  onPressed: _canSubmit && !_isSubmitting ? _submit : null,
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.color_FF2F80FF,
                     disabledBackgroundColor: AppTheme.color_FFCBD5E1,
@@ -200,10 +216,19 @@ class _ProfileContributionFormScreenState
                       borderRadius: BorderRadius.circular(44),
                     ),
                   ),
-                  child: Text(
-                    context.tr('add_contribution'),
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppTheme.surface,
+                          ),
+                        )
+                      : Text(
+                          context.tr('add_contribution'),
+                          style: const TextStyle(fontSize: 16),
+                        ),
                 ),
               ),
             ),
@@ -247,11 +272,31 @@ class _ProfileContributionFormScreenState
   bool get _canSubmit =>
       (int.tryParse(_amount.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0) > 0;
 
-  Future<void> _submit() => showDialog<void>(
-    context: context,
-    barrierColor: AppTheme.black.withValues(alpha: .22),
-    builder: (_) => const _ContributionSuccessDialog(),
-  );
+  Future<void> _submit() async {
+    final amount = int.tryParse(_amount.text.replaceAll(RegExp(r'[^0-9]'), ''));
+    if (amount == null || amount <= 0 || _isSubmitting) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await context.read<AdvokatRepository>().addContribution(
+        amount: amount,
+        paymentMethod: _payment.toLowerCase().replaceAll(' ', ''),
+        isAnonymous: _anonymous,
+      );
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        barrierColor: AppTheme.black.withValues(alpha: .22),
+        builder: (_) => const _ContributionSuccessDialog(),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.tr('contribution_error'))));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
 }
 
 class _ContributionSuccessDialog extends StatelessWidget {
@@ -307,7 +352,7 @@ class _ContributionSuccessDialog extends StatelessWidget {
                   onPressed: () => Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRouter.profile,
-                        (route) => false
+                    (route) => false,
                   ),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.color_FFF1F5F9,
@@ -327,7 +372,8 @@ class _ContributionSuccessDialog extends StatelessWidget {
           ),
           Positioned(
             right: 0,
-            top: 0, // Set to 0 so it aligns with the top of the Stack within bounds
+            top:
+                0, // Set to 0 so it aligns with the top of the Stack within bounds
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
@@ -337,7 +383,11 @@ class _ContributionSuccessDialog extends StatelessWidget {
                   color: AppTheme.color_FFF1F5F9,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close, size: 15, color: AppTheme.color_FF475569),
+                child: const Icon(
+                  Icons.close,
+                  size: 15,
+                  color: AppTheme.color_FF475569,
+                ),
               ),
             ),
           ),
@@ -346,6 +396,7 @@ class _ContributionSuccessDialog extends StatelessWidget {
     ),
   );
 }
+
 class _PaymentOption extends StatelessWidget {
   final String title;
   final String iconPath;
@@ -373,7 +424,7 @@ class _PaymentOption extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           border: Border.all(
-              color: selected ? AppTheme.color_FF2F80FF : AppTheme.color_FFDCE3EC,
+            color: selected ? AppTheme.color_FF2F80FF : AppTheme.color_FFDCE3EC,
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -396,16 +447,16 @@ class _PaymentOption extends StatelessWidget {
             Container(
               height: 1,
               color: AppTheme.color_FFE4EAF1,
-              margin: const EdgeInsets.only(top: 8, bottom: 10), // Tightened margin to clear 3px overflow
+              margin: const EdgeInsets.only(
+                top: 8,
+                bottom: 10,
+              ), // Tightened margin to clear 3px overflow
             ),
             Text(
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ],
         ),
