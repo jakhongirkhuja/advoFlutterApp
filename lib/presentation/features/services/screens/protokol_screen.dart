@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/phone_formatter.dart';
 import '../../../../data/models/services/protokol_provider.dart';
@@ -72,10 +73,17 @@ class _ProtokolScreenState extends State<ProtokolScreen> {
   }
 }
 
-class ProtokolProviderCard extends StatelessWidget {
+class ProtokolProviderCard extends StatefulWidget {
   final ProtokolProvider provider;
 
   const ProtokolProviderCard({required this.provider});
+
+  @override
+  State<ProtokolProviderCard> createState() => _ProtokolProviderCardState();
+}
+
+class _ProtokolProviderCardState extends State<ProtokolProviderCard> {
+  bool _isBookmarked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +91,9 @@ class ProtokolProviderCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFECECEC)),
+        border: Border.all(color: AppTheme.color_FFECECEC),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,15 +110,15 @@ class ProtokolProviderCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Image.network(
-                  provider.imageUrl,
+                  widget.provider.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, exception, stackTrace) {
                     print(exception);
                     return Center(
                       child: Text(
-                        _initials(provider.name),
+                        _initials(widget.provider.name),
                         style: const TextStyle(
-                          color: Color(0xFF31527A),
+                          color: AppTheme.color_FF31527A,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
@@ -128,7 +136,7 @@ class ProtokolProviderCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            provider.name,
+                            widget.provider.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -137,12 +145,12 @@ class ProtokolProviderCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (provider.isVerified) ...[
+                        if (widget.provider.isVerified) ...[
                           const SizedBox(width: 4),
                           const Icon(
                             Icons.verified,
                             size: 17,
-                            color: Color(0xFF3E9B6B),
+                            color: AppTheme.color_FF3E9B6B,
                           ),
                         ],
                       ],
@@ -151,7 +159,7 @@ class ProtokolProviderCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          provider.type,
+                          widget.provider.type,
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.textChoco,
@@ -174,7 +182,7 @@ class ProtokolProviderCard extends StatelessWidget {
                         SvgPicture.asset('assets/icons/star.svg'),
                         const SizedBox(width: 4),
                         Text(
-                          '${provider.rating}',
+                          '${widget.provider.rating}',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
@@ -182,7 +190,7 @@ class ProtokolProviderCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          '(${provider.reviewsCount} ta sharh)',
+                          '(${widget.provider.reviewsCount} ta sharh)',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             color: AppTheme.textChoco,
@@ -194,26 +202,34 @@ class ProtokolProviderCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: 42,
-                height: 42,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.pageBackground,
-                  borderRadius: BorderRadius.circular(40),
+              InkWell(
+                onTap: () => setState(() => _isBookmarked = !_isBookmarked),
+                borderRadius: BorderRadius.circular(40),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.pageBackground,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: SvgPicture.asset(
+                    _isBookmarked
+                        ? 'assets/icons/bookmarkfilled.svg'
+                        : 'assets/icons/bookmark.svg',
+                  ),
                 ),
-                child: SvgPicture.asset('assets/icons/bookmark.svg'),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              SvgPicture.asset('assets/icons/location.svg'),
+              SvgPicture.asset('assets/icons/location.svg', colorFilter: ColorFilter.mode(AppTheme.color_FFCA9D38, BlendMode.srcATop),),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  provider.address,
+                  widget.provider.address,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -231,16 +247,16 @@ class ProtokolProviderCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    formatPrice(provider.price),
+                    formatPrice(widget.provider.price),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xff0F172A),
+                      color: AppTheme.color_FF0F172A,
                     ),
                   ),
-                  const Text(
-                    '/so\'mdan',
-                    style: TextStyle(fontSize: 16, color: Color(0xff64748B)),
+                  Text(
+                    context.tr('per_from'),
+                    style: TextStyle(fontSize: 16, color: AppTheme.color_FF64748B),
                   ),
                 ],
               ),
@@ -249,14 +265,14 @@ class ProtokolProviderCard extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 9.5, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Color(0xffEFF6FF),
+                    color: AppTheme.buttonGold,
                     borderRadius: BorderRadius.circular(42),
-                    border: Border.all(color: Color(0xffBEDBFF)),
+
                   ),
                   child: Text(
-                    'Ko\'rish',
+                    context.tr('view'),
                     style: TextStyle(
-                      color: Color(0xff1C8AFF),
+                      color: AppTheme.color_FFFFFFFF,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),

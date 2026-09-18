@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../presentation/widgets/public_bottom_navigation_bar.dart';
 import '../../../widgets/header_screen.dart';
 import '../viewmodels/appointments_viewmodel.dart';
@@ -17,7 +18,7 @@ class AppointmentsScreen extends StatelessWidget {
 
   const AppointmentsScreen({
     super.key,
-    this.title = 'Qabullar',
+    this.title = 'appointments',
     this.showBottomNavigation = true,
     this.showSearchAction = true,
   });
@@ -34,7 +35,7 @@ class AppointmentsScreen extends StatelessWidget {
               onRefresh: viewModel.loadAppointments,
               edgeOffset: 120,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 105, 16, 24),
+                padding: const EdgeInsets.fromLTRB(16, 70, 16, 24),
                 children: [
                   const SizedBox(height: 18),
                   if (viewModel.isLoading)
@@ -48,111 +49,40 @@ class AppointmentsScreen extends StatelessWidget {
                         child: _AppointmentCard(appointment: appointment),
                       ),
                     ),
-
                 ],
               ),
             ),
             HeaderScreen(
-              title: title,
-              firstActionIconPath: showSearchAction ? 'assets/icons/search.svg' : null,
+              title: title == 'appointments'
+                  ? context.tr('appointments')
+                  : title,
+              firstActionIconPath: showSearchAction
+                  ? 'assets/icons/search.svg'
+                  : null,
               onFirstActionTap: showSearchAction
                   ? () => Navigator.pushNamed(context, AppRouter.search)
                   : null,
               showBackIcon: false,
             ),
-
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 65,
-              child: _FilterBar(viewModel: viewModel),)
           ],
         ),
       ),
       bottomNavigationBar: showBottomNavigation
           ? PublicBottomNavigationBar(
               activeItem: 'appointments',
-              onAddTap: () => Navigator.pushNamed(context, AppRouter.aiAssistant),
+              onAddTap: () =>
+                  Navigator.pushNamed(context, AppRouter.aiAssistant),
+              onServicesTap: () =>
+                  Navigator.pushNamed(context, AppRouter.services),
               onHomeTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
                 AppRouter.home,
                 (route) => false,
               ),
-              onProfileTap: () => Navigator.pushNamed(context, AppRouter.profile),
+              onProfileTap: () =>
+                  Navigator.pushNamed(context, AppRouter.profile),
             )
           : null,
-    );
-  }
-}
-class _FilterBar extends StatefulWidget {
-  final AppointmentsViewModel viewModel;
-
-  const _FilterBar({required this.viewModel});
-
-  @override
-  State<_FilterBar> createState() => _FilterBarState();
-}
-
-class _FilterBarState extends State<_FilterBar> {
-  final ScrollController _scrollController = ScrollController();
-
-  void _scrollToIndex(int index) {
-    double position = index * 100.0;
-    _scrollController.animateTo(
-      position,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(41),
-      ),
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(AppointmentsViewModel.filters.length, (index) {
-            final filter = AppointmentsViewModel.filters[index];
-            final selected = widget.viewModel.selectedFilter == filter;
-
-            return InkWell(
-              onTap: () {
-                widget.viewModel.selectFilter(filter);
-                _scrollToIndex(index);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: selected ? AppTheme.buttonGold : Colors.white,
-                  borderRadius: BorderRadius.circular(45),
-                ),
-                child: Text(
-                  filter,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: selected ? Colors.white : const Color(0xff334155),
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
     );
   }
 }
@@ -164,39 +94,39 @@ class _AppointmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPassed = _formatDateLabel(appointment.dateLabel)!='today'? true : false;
-    final isUpcoming = appointment.countdownTime != null &&  !isPassed;
+    final isPassed = _formatDateLabel(appointment.dateLabel) != 'today'
+        ? true
+        : false;
+    final isUpcoming = appointment.countdownTime != null && !isPassed;
 
     return Container(
       decoration: BoxDecoration(
-        gradient:  _formatDateLabel(appointment.dateLabel)=='today'? const RadialGradient(
-          center: Alignment(0.0, 0.086),
-          radius: 0.80,
-          colors: [
-            Color.fromRGBO(217, 184, 117, 0.6),
-            Color.fromRGBO(243, 237, 226, 1.0),
-          ],
-          stops: [0.0, 1.0],
-        ) : const RadialGradient(
-          center: Alignment(0.0, 0.086),
-          radius: 0.80,
-          colors: [
-            Color.fromRGBO(232, 228, 227, 1),
-            Color.fromRGBO(232, 228, 2276, 1.0),
-          ],
-          stops: [0.0, 1.0],
-        ),
+        gradient: _formatDateLabel(appointment.dateLabel) == 'today'
+            ? const RadialGradient(
+                center: Alignment(0.0, 0.086),
+                radius: 0.80,
+                colors: [
+                  AppTheme.appointmentGoldFade,
+                  AppTheme.appointmentGoldFade,
+                ],
+                stops: [0.0, 1.0],
+              )
+            : const RadialGradient(
+                center: Alignment(0.0, 0.086),
+                radius: 0.80,
+                colors: [AppTheme.appointmentPast, AppTheme.appointmentPast],
+                stops: [0.0, 1.0],
+              ),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         children: [
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset('assets/icons/calendar.svg'),
+                SvgPicture.asset('assets/icons/calendar.svg', colorFilter: ColorFilter.mode(AppTheme.textSecondary, BlendMode.srcATop),),
                 const SizedBox(width: 6),
                 Row(
                   children: [
@@ -205,18 +135,19 @@ class _AppointmentCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF333333),
+                        color: AppTheme.black,
                       ),
                     ),
-                    _formatDateLabel(appointment.dateLabel)=='today'?
-                    Text(
-                      ', ${appointment.timeLabel}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF333333),
-                      ),
-                    ) : SizedBox(),
+                    _formatDateLabel(appointment.dateLabel) == 'today'
+                        ? Text(
+                            ', ${appointment.timeLabel}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.black,
+                            ),
+                          )
+                        : SizedBox(),
                   ],
                 ),
                 if (isPassed) ...[
@@ -228,15 +159,19 @@ class _AppointmentCard extends StatelessWidget {
                         height: 6,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: appointment.status=='Bekor qilingan' ? Colors.red : Colors.grey[600],
+                          color: appointment.status == 'filter_cancelled'
+                              ? AppTheme.danger
+                              : AppTheme.textMuted,
                         ),
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        appointment.status,
+                        context.tr(appointment.status),
                         style: TextStyle(
-                          fontSize: 12,
-                          color: appointment.status=='Bekor qilingan' ?  Colors.red : Colors.grey[700],
+                          fontSize: 14,
+                          color: appointment.status == 'Bekor qilingan'
+                              ? AppTheme.danger
+                              : AppTheme.textMuted,
                         ),
                       ),
                     ],
@@ -246,11 +181,10 @@ class _AppointmentCard extends StatelessWidget {
             ),
           ),
 
-
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
@@ -258,30 +192,22 @@ class _AppointmentCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: appointment.avatarUrl != null
                           ? Image.network(
-                        appointment.avatarUrl!,
-                        width: 74,
-                        height: 74,
-                        fit: BoxFit.cover,
-                      )
+                              appointment.avatarUrl!,
+                              width: 74,
+                              height: 74,
+                              fit: BoxFit.cover,
+                            )
                           : Container(
-                        width: 74,
-                        height: 74,
-                        color: const Color(0xFFE5EDF5),
-                        alignment: Alignment.center,
-                        child: Text(
-                          _initials(appointment.lawyerName),
-                          style: const TextStyle(
-                            color: Color(0xFF31527A),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
+                              width: 74,
+                              height: 74,
+                              color: AppTheme.avatarBackground,
+                              alignment: Alignment.center,
+                              child: Image.asset('assets/images/default_user.jpg'),
+                            ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -305,7 +231,7 @@ class _AppointmentCard extends StatelessWidget {
                               const Icon(
                                 Icons.verified,
                                 size: 17,
-                                color: Color(0xFF00B27A),
+                                color: AppTheme.color_FF00B27A,
                               ),
                             ],
                           ),
@@ -313,7 +239,7 @@ class _AppointmentCard extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                '${appointment.lawyerTitle}',
+                                context.tr(appointment.lawyerTitle),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppTheme.textChoco,
@@ -331,7 +257,7 @@ class _AppointmentCard extends StatelessWidget {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  '${appointment.experienceYears} yil tajriba',
+                                  '${appointment.experienceYears} ${context.tr('years_experience')}',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: AppTheme.textChoco,
@@ -355,7 +281,7 @@ class _AppointmentCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '(${appointment.reviewsCount} ta sharh)',
+                                '(${appointment.reviewsCount} ${context.tr('reviews_suffix')})',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppTheme.textChoco,
@@ -375,45 +301,49 @@ class _AppointmentCard extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _Tag(label: appointment.topic),
+                    _Tag(label: context.tr(appointment.topic)),
                     _Tag(
-                      label: appointment.consultationType,
+                      label: context.tr(appointment.consultationType),
                       icon: Icons.videocam_outlined,
                     ),
                   ],
                 ),
 
-                Container(margin: EdgeInsets.symmetric(vertical: 14),height: 1, color: AppTheme.textChoco.withValues(alpha:0.2)),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 14),
+                  height: 1,
+                  color: AppTheme.textChoco.withValues(alpha: 0.2),
+                ),
 
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _CardButton(
-                          label: 'Tafsilot',
-                          color: const Color(0xFFF4F4F4),
-                          textColor: Colors.black87,
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AppointmentDetailScreen(
-                                appointment: appointment,
-                              ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _CardButton(
+                        label: context.tr('details'),
+                        color: AppTheme.color_FFF4F4F4,
+                        textColor: AppTheme.black87,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AppointmentDetailScreen(
+                              appointment: appointment,
                             ),
                           ),
                         ),
                       ),
-                      if(appointment.countdownTime!=null)const SizedBox(width: 10),
-                      if(appointment.countdownTime!=null) Expanded(
+                    ),
+                    if (appointment.countdownTime != null)
+                      const SizedBox(width: 10),
+                    if (appointment.countdownTime != null)
+                      Expanded(
                         child: AppointmentActionButton(
                           appointment: appointment,
-                          backgroundColor: const Color(0xFFD8B26E),
+                          backgroundColor: AppTheme.color_FFD8B26E,
                           fontSize: 13,
                         ),
                       ),
-                    ],
-                  ),
-
+                  ],
+                ),
               ],
             ),
           ),
@@ -432,7 +362,9 @@ class _AppointmentCard extends StatelessWidget {
   }
 
   String _formatDateLabel(String rawDate) {
-    if (rawDate.isEmpty || rawDate.toLowerCase() == 'bugun' || rawDate.toLowerCase() == 'today') {
+    if (rawDate.isEmpty ||
+        rawDate.toLowerCase() == 'bugun' ||
+        rawDate.toLowerCase() == 'today') {
       return 'today';
     }
 
@@ -442,8 +374,8 @@ class _AppointmentCard extends StatelessWidget {
       if (rawDate.contains('.')) {
         final parts = rawDate.split('.');
         final month = int.parse(parts[0]); // 09 -> September
-        final day = int.parse(parts[1]);   // 10 -> 10th
-        final year = int.parse(parts[2]);  // 2026
+        final day = int.parse(parts[1]); // 10 -> 10th
+        final year = int.parse(parts[2]); // 2026
 
         apptDate = DateTime(year, month, day);
       } else {
@@ -451,7 +383,8 @@ class _AppointmentCard extends StatelessWidget {
       }
 
       final now = DateTime.now();
-      final isToday = apptDate.year == now.year &&
+      final isToday =
+          apptDate.year == now.year &&
           apptDate.month == now.month &&
           apptDate.day == now.day;
 
@@ -461,6 +394,7 @@ class _AppointmentCard extends StatelessWidget {
     }
   }
 }
+
 class _Tag extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -472,21 +406,27 @@ class _Tag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: AppTheme.pageBackground,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            SvgPicture.asset('assets/icons/camera.svg'),
+            SvgPicture.asset(
+              'assets/icons/camera.svg',
+              colorFilter: ColorFilter.mode(
+                AppTheme.color_FFCA9D38,
+                BlendMode.srcATop,
+              ),
+            ),
             const SizedBox(width: 4),
           ],
           Text(
             label,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF444444),
+              color: AppTheme.color_FF444444,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -518,14 +458,22 @@ class _CardButton extends StatelessWidget {
       style: TextButton.styleFrom(
         backgroundColor: color,
         padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
-      child: child ?? Text(label, style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 13)),
+      child:
+          child ??
+          Text(
+            label,
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
     );
   }
 }
+
 class _LoadingCard extends StatelessWidget {
   const _LoadingCard();
 
@@ -543,9 +491,26 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(top: 80),
-      child: Center(child: Text('Bu bo‘limda qabullar mavjud emas')),
+    return Padding(
+      padding: EdgeInsets.only(top: 120),
+      child: Expanded(
+        child: Column(
+          children: [
+            Image.asset('assets/images/appointments_empty.png'),
+            Text(
+              context.tr('appointments_empty'),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, color: AppTheme.color_FF0F172A),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              context.tr('appointments_empty_body'),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: AppTheme.color_FF475569),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

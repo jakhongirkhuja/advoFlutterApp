@@ -18,6 +18,7 @@ import 'package:yandex_maps_mapkit_lite/yandex_map.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/services/protokol_provider.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 
@@ -137,8 +138,8 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
     }
     if (_state == _RequestState.searching) {
       _searchArea = objects.addCircle(Circle(_selectedPoint, radius: 3000))
-        ..fillColor = const Color(0x26287FF0)
-        ..strokeColor = const Color(0xFF287FF0)
+        ..fillColor = AppTheme.color_26287FF0
+        ..strokeColor = AppTheme.color_FF287FF0
         ..strokeWidth = 1.5;
     }
   }
@@ -201,7 +202,7 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
         children: [
           Positioned.fill(
             child: AppConfig.yandexMapKitApiKey.isEmpty
-                ? const ColoredBox(color: Color(0xFFE6EAEE))
+                ? const ColoredBox(color: AppTheme.color_FFE6EAEE)
                 : YandexMap(
                     key: const ValueKey('protokol-map'),
                     onMapCreated: _created,
@@ -239,14 +240,14 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
                     arguments: 'Yevro pratakol',
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppTheme.surface,
                     foregroundColor: AppTheme.primaryBlue,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  child: const Text('Barcha tashkilotlar'),
+                  child: Text(context.tr('all_organizations')),
                 ),
               ],
             ),
@@ -271,14 +272,14 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
   Future<void> _confirmCancel(BuildContext context) async {
     await showDialog<void>(
       context: context,
-      barrierColor: Colors.black54,
+      barrierColor: AppTheme.black54,
       builder: (dialogContext) => Dialog(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppTheme.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 30),
         child: Container(
           padding: const EdgeInsets.fromLTRB(10, 11, 10, 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(32),
           ),
           child: Column(
@@ -293,56 +294,56 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
                     width: 32,
                     height: 32,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFF3F3F5),
+                      color: AppTheme.color_FFF3F3F5,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, color: Color(0xFF475569)),
+                    child: const Icon(Icons.close, color: AppTheme.color_FF475569),
                   ),
                 ),
               ),
               const SizedBox(height: 2),
               CustomIconDesign(
                 icon: 'assets/icons/failed.svg',
-                mainColor: Color(0xffCE040E),
-                secondaryColor: Color(0xffFF666D),
+                mainColor: AppTheme.color_FFCE040E,
+                secondaryColor: AppTheme.color_FFFF666D,
                 padding: 15,
               ),
               const SizedBox(height: 14),
-              const Text(
-                'Bekor qilinishni tasdiqlaysizmi?',
+              Text(
+                context.tr('cancel_confirmation'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1D1816),
+                  color: AppTheme.color_FF1D1816,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Chaqiruvni bekor qilishni istaysizmi?',
+              Text(
+                context.tr('cancel_call_question'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Color(0xff5B4F4B)),
+                style: TextStyle(fontSize: 16, color: AppTheme.color_FF5B4F4B),
               ),
               const SizedBox(height: 28),
               Row(
                 children: [
                   Expanded(
                     child: Material(
-                      color: Colors.transparent,
+                      color: AppTheme.transparent,
                       child: Ink(
                         height: 48,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F1F3),
+                          color: AppTheme.color_FFF1F1F3,
                           borderRadius: BorderRadius.circular(44),
                         ),
                         child: InkWell(
                           onTap: () => Navigator.pop(dialogContext),
                           borderRadius: BorderRadius.circular(44),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              'Orqaga',
+                              context.tr('back'),
                               style: TextStyle(
-                                color: Color(0xFF111827),
+                                color: AppTheme.color_FF111827,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -355,11 +356,11 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Material(
-                      color: Colors.transparent,
+                      color: AppTheme.transparent,
                       child: Ink(
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Color(0xffFB2C36),
+                          color: AppTheme.color_FFFB2C36,
                           borderRadius: BorderRadius.circular(44),
                         ),
                         child: InkWell(
@@ -368,11 +369,11 @@ class _ProtokolMapScreenState extends State<ProtokolMapScreen> {
                             _cancel();
                           },
                           borderRadius: BorderRadius.circular(44),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              'Bekor qilish',
+                              context.tr('cancel'),
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppTheme.surface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -418,15 +419,15 @@ class _CenterPicker extends StatelessWidget {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: const Color(0xFF287FF0),
+            color: AppTheme.color_FF287FF0,
             borderRadius: BorderRadius.circular(13),
             boxShadow: const [
-              BoxShadow(color: Color(0x33000000), blurRadius: 8),
+              BoxShadow(color: AppTheme.color_33000000, blurRadius: 8),
             ],
           ),
           child: const Icon(
             Icons.location_on_outlined,
-            color: Colors.white,
+            color: AppTheme.surface,
             size: 32,
           ),
         ),
@@ -434,7 +435,7 @@ class _CenterPicker extends StatelessWidget {
           width: 4,
           height: 26,
           decoration: BoxDecoration(
-            color: const Color(0xFF287FF0),
+            color: AppTheme.color_FF287FF0,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -485,7 +486,7 @@ class _RequestCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
@@ -498,7 +499,7 @@ class _RequestCard extends StatelessWidget {
               const Expanded(
                 child: Text(
                   'Tashkent, sh',
-                  style: TextStyle(color: Color(0xff334155), fontSize: 16),
+                  style: TextStyle(color: AppTheme.color_FF334155, fontSize: 16),
                 ),
               ),
               if (!active) ...[
@@ -523,10 +524,10 @@ class _RequestCard extends StatelessWidget {
                           child: SvgPicture.asset('assets/icons/edit.svg'),
                         ),
                         const SizedBox(width: 6),
-                        const Text(
-                          'O\'zgartirish',
+                        Text(
+                          context.tr('change'),
                           style: TextStyle(
-                            color: Color(0xff334155),
+                            color: AppTheme.color_FF334155,
                             fontSize: 16,
                           ),
                         ),
@@ -548,18 +549,18 @@ class _RequestCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Javob kutilmoqda',
+                  context.tr('waiting_for_response'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF0F172A),
+                    color: AppTheme.color_FF0F172A,
                   ),
                 ),
                 Text(
                   time,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Color(0xff334155),
+                    color: AppTheme.color_FF334155,
                   ),
                 ),
               ],
@@ -570,7 +571,7 @@ class _RequestCard extends StatelessWidget {
                 value: progress,
                 minHeight: 8,
                 borderRadius: BorderRadius.circular(16),
-                backgroundColor: const Color(0xFFE2E8F0),
+                backgroundColor: AppTheme.color_FFE2E8F0,
                 valueColor: const AlwaysStoppedAnimation<Color>(
                   AppTheme.primaryBlue,
                 ),
@@ -582,15 +583,15 @@ class _RequestCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF8FAFC),
+                color: AppTheme.color_FFF8FAFC,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Color(0xffE2E8F0)),
+                border: Border.all(color: AppTheme.color_FFE2E8F0),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 21,
-                    backgroundColor: Color(0xffF1F5F9),
+                    backgroundColor: AppTheme.color_FFF1F5F9,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: SvgPicture.asset('assets/icons/car.svg'),
@@ -602,7 +603,7 @@ class _RequestCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Taxminan 5 daqiqada yetib keladi',
+                          context.tr('arrival_estimate'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -616,14 +617,14 @@ class _RequestCard extends StatelessWidget {
                               '1.2 km',
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Color(0xff1E293B),
+                                color: AppTheme.color_FF1E293B,
                               ),
                             ),
                             Text(
-                              'masofa',
+                              context.tr('distance'),
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Color(0xff475569),
+                                color: AppTheme.color_FF475569,
                               ),
                             ),
                           ],
@@ -644,10 +645,10 @@ class _RequestCard extends StatelessWidget {
             width: double.infinity,
             height: 48,
             child: Material(
-              color: Colors.transparent,
+              color: AppTheme.transparent,
               child: Ink(
                 decoration: BoxDecoration(
-                  color: active ? Color(0xffFEF2F2) : const Color(0xFF287FF0),
+                  color: active ? AppTheme.color_FFFEF2F2 : AppTheme.color_FF287FF0,
                   borderRadius: BorderRadius.circular(44),
                 ),
                 child: InkWell(
@@ -655,9 +656,9 @@ class _RequestCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(44),
                   child: Center(
                     child: Text(
-                      active ? 'Bekor qilish' : 'Chaqirish',
+                      active ? context.tr('cancel') : context.tr('call'),
                       style: TextStyle(
-                        color: active ? AppTheme.danger : Colors.white,
+                        color: active ? AppTheme.danger : AppTheme.surface,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -683,15 +684,15 @@ class _Summary extends StatelessWidget {
     padding: const EdgeInsets.all(8),
 
     decoration: BoxDecoration(
-      color: Color(0xffF8FAFC),
+      color: AppTheme.color_FFF8FAFC,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Color(0xffE2E8F0)),
+      border: Border.all(color: AppTheme.color_FFE2E8F0),
     ),
     child: Row(
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: Color(0xffF1F5F9),
+          backgroundColor: AppTheme.color_FFF1F5F9,
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: SvgPicture.asset('assets/icons/lawyer.svg'),
@@ -702,11 +703,11 @@ class _Summary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$count ta topildi',
+              '$count ${context.tr('found_nearby')}',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            const Text(
-              'Sizning joylashuvingizga yaqin',
+            Text(
+              context.tr('near_your_location'),
               style: TextStyle(fontSize: 14, color: AppTheme.textMuted),
             ),
           ],
@@ -727,9 +728,9 @@ class _ProviderPreview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFFFF8FAFC),
+        color: AppTheme.color_FFF8FAFC,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Color(0xffE2E8F0)),
+        border: Border.all(color: AppTheme.color_FFE2E8F0),
       ),
       child: Row(
         children: [
@@ -778,7 +779,7 @@ class _ProviderPreview extends StatelessWidget {
                       '${provider!.rating}',
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Color(0xff334155),
+                        color: AppTheme.color_FF334155,
                       ),
                     ),
                   ],
@@ -800,7 +801,7 @@ class _MapButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    color: AppTheme.surface,
     shape: const CircleBorder(),
     child: InkWell(
       onTap: onTap,

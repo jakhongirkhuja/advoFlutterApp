@@ -36,14 +36,14 @@ class PublicBottomNavigationBar extends StatelessWidget {
           children: [
             _BottomItem(
               icon: Icons.home_filled,
-              label: AppLocalizations.of(context)?.translate('home') ?? 'Asosiy',
+              label: context.tr('home'),
               active: activeItem == 'home',
               onTap: onHomeTap,
               iconPath: 'assets/icons/nav_home.svg',
             ),
             _BottomItem(
               icon: Icons.grid_view_rounded,
-              label: AppLocalizations.of(context)?.translate('services') ?? 'Xizmatlar',
+              label: context.tr('services'),
               active: activeItem == 'services',
               onTap: onServicesTap,
               iconPath: 'assets/icons/nav_services.svg',
@@ -56,14 +56,14 @@ class PublicBottomNavigationBar extends StatelessWidget {
             ),
             _BottomItem(
               icon: Icons.calendar_month_outlined,
-              label: AppLocalizations.of(context)?.translate('appointments') ?? 'Qabullar',
+              label: context.tr('appointments'),
               active: activeItem == 'appointments',
               onTap: onAppointmentsTap,
               iconPath: 'assets/icons/nav_appointments.svg',
             ),
             _BottomItem(
               icon: Icons.person_outline,
-              label: AppLocalizations.of(context)?.translate('profile') ?? 'Profil',
+              label: context.tr('profile'),
               active: activeItem == 'profile',
               onTap: onProfileTap,
               iconPath: 'assets/icons/nav_profile.svg',

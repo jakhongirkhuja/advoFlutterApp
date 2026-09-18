@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_theme.dart';
 import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -47,8 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final selected = await showMenu<String>(
       context: context,
       elevation: 0,
-      color: Colors.white,
-      surfaceTintColor: Colors.transparent,
+      color: AppTheme.surface,
+      surfaceTintColor: AppTheme.transparent,
       // Set position explicitly 65px from the top
       position: RelativeRect.fromLTRB(
         overlay.size.width,
@@ -72,12 +73,12 @@ class _LoginScreenState extends State<LoginScreen> {
             margin: const EdgeInsets.symmetric(vertical: 2),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
+              color: isSelected ? AppTheme.color_FFEFF6FF : AppTheme.transparent,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isSelected
-                    ? const Color(0xFFBEDBFF)
-                    : Colors.transparent,
+                    ? AppTheme.color_FFBEDBFF
+                    : AppTheme.transparent,
                 width: 1.5,
               ),
             ),
@@ -86,15 +87,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(language['flag']!, style: const TextStyle(fontSize: 20)),
                 const SizedBox(width: 12),
                 Text(
-                  code == 'uz'
-                      ? 'O’zbek tili'
-                      : code == 'ru'
-                      ? 'Rus tili'
-                      : 'Ingliz tili',
+                  context.tr('language_$code'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF0F172A),
+                    color: AppTheme.color_FF0F172A,
                   ),
                 ),
               ],
@@ -116,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final progress = _progress;
     final canContinue = _termsAccepted && _isValidPhone;
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F6FA),
+      backgroundColor: AppTheme.color_FFF2F6FA,
       body: SafeArea(
         child: Stack(
           children: [
@@ -126,25 +123,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 100),
                 CustomIconDesign(
                   icon: 'assets/icons/login_user.svg',
-                  mainColor: Color(0xff1C8AFF),
-                  secondaryColor: Color(0xff69AFFF),
+                  mainColor: AppTheme.color_FF1C8AFF,
+                  secondaryColor: AppTheme.color_FF69AFFF,
                 ),
                 const SizedBox(height: 17),
                 Text(
-                  'Ro‘yxatdan o‘tish',
+                  context.tr('signup_title'),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xff0F172A),
+                    color: AppTheme.color_FF0F172A,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Tasdiqlash kodini yuborish uchun telefon raqamingizni kiriting.',
+                  context.tr('phone_number_prompt'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF475569),
+                    color: AppTheme.color_FF475569,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -152,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 50,
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -163,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           '+998',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Color(0xff0F172A),
+                            color: AppTheme.color_FF0F172A,
                           ),
                         ),
                       ),
@@ -212,12 +209,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: _termsAccepted
-                              ? const Color(0xFF2F80ED)
-                              : Colors.transparent,
+                              ? AppTheme.color_FF2F80ED
+                              : AppTheme.transparent,
                           border: Border.all(
                             color: _termsAccepted
-                                ? const Color(0xFF2F80ED)
-                                : const Color(0xFFD1D5DB),
+                                ? AppTheme.color_FF2F80ED
+                                : AppTheme.color_FFD1D5DB,
                             width: 2,
                           ),
                         ),
@@ -225,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const Icon(
                                 Icons.check,
                                 size: 14,
-                                color: Colors.white,
+                                color: AppTheme.surface,
                               )
                             : null,
                       ),
@@ -240,18 +237,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: 'Maxfiylik siyosati',
+                                text: context.tr('privacy_policy'),
                                 style: const TextStyle(
                                   decoration: TextDecoration.underline,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF374151),
+                                  color: AppTheme.color_FF374151,
                                 ),
                               ),
-                              const TextSpan(
-                                text: ' tanishib chiqdim',
+                                TextSpan(
+                                text: context.tr('privacy_agreement_suffix'),
                                 style: TextStyle(
                                   fontWeight: FontWeight.normal,
-                                  color: Color(0xFF4B5563),
+                                  color: AppTheme.color_FF4B5563,
                                 ),
                               ),
                             ],
@@ -278,14 +275,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (otp != null && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('OTP kod: $otp'),
-                                    backgroundColor: Colors.green,
+                                    content: Text('${context.tr('otp_code')}: $otp'),
+                                    backgroundColor: AppTheme.success,
                                     duration: const Duration(seconds: 10),
                                     action: SnackBarAction(
                                       label:
-                                          localizations?.translate('copy') ??
-                                          'Copy',
-                                      textColor: Colors.white,
+                                          context.tr('copy'),
+                                      textColor: AppTheme.surface,
                                       onPressed: () async {
                                         await Clipboard.setData(
                                           ClipboardData(text: otp),
@@ -296,10 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                              localizations?.translate(
-                                                    'copied',
-                                                  ) ??
-                                                  'Copied',
+                                              context.tr('copied'),
                                             ),
                                             duration: const Duration(
                                               seconds: 2,
@@ -322,15 +315,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                           : null,
                       child: viewModel.status == AuthStatus.loading
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const CircularProgressIndicator(color: AppTheme.surface)
                           : Text(
-                              localizations?.translate('continue') ??
-                                  'Davom etish',
+                              context.tr('continue_button'),
                               style: TextStyle(fontSize: 16),
                             ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2B7FFF),
-                        disabledBackgroundColor: const Color(0xFF2B7FFF).withValues(alpha: 0.1),
+                        backgroundColor: AppTheme.color_FF2B7FFF,
+                        disabledBackgroundColor: AppTheme.color_FF2B7FFF.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
@@ -352,9 +344,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      const Color(0xFF2B7FFF),
-                      const Color(0xFF2B7FFF),
-                      Colors.white,
+                      AppTheme.color_FF2B7FFF,
+                      AppTheme.color_FF2B7FFF,
+                      AppTheme.surface,
                     ],
                     stops: [
                       0.0,
@@ -370,7 +362,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(bottom: 14),
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(24),
                       topLeft: Radius.circular(24),
@@ -389,7 +381,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (!context.mounted) return;
                             if (otp != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('OTP kod: $otp')),
+                                SnackBar(content: Text('${context.tr('otp_code')}: $otp')),
                               );
                             }
                             Navigator.pushNamed(
@@ -408,13 +400,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(57),
                         color: canContinue
-                            ? const Color(0xFF2B7FFF)
-                            : const Color(0xFF2B7FFF).withValues(alpha: 0.2),
+                            ? AppTheme.color_FF2B7FFF
+                            : AppTheme.color_FF2B7FFF.withValues(alpha: 0.2),
                       ),
                       child: const Center(
                         child: Text(
                           'Davom etish',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          style: TextStyle(fontSize: 16, color: AppTheme.surface),
                         ),
                       ),
                     ),
@@ -459,14 +451,14 @@ class _LanguageButton extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFFFFF), Color(0xFFD9B875)],
+          colors: [AppTheme.color_FFFFFFFF, AppTheme.color_FFD9B875],
           stops: [0.5, 1.0],
         ),
       ),
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(47),
         ),
         child: InkWell(

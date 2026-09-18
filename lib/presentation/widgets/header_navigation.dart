@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import '../../core/theme/app_theme.dart';
 
 class HeaderNavigation extends StatelessWidget {
   final String firstIconPath;
@@ -27,11 +28,11 @@ class HeaderNavigation extends StatelessWidget {
       padding: EdgeInsets.all(1),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(47),
-        color: Colors.white,
+        color: AppTheme.surface,
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFFFFF), Color(0xFFD9B875)],
+          colors: [AppTheme.color_FFFFFFFF, AppTheme.color_FFD9B875],
           stops: [0.5, 1.0],
         ),
       ),
@@ -40,7 +41,7 @@ class HeaderNavigation extends StatelessWidget {
 
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(47),
         ),
         child: Row(

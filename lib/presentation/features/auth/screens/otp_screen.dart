@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_theme.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -144,40 +145,43 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                 const SizedBox(height: 100),
                 CustomIconDesign(
                   icon: 'assets/icons/otp.svg',
-                  mainColor: const Color(0xff1C8AFF),
-                  secondaryColor: const Color(0xff69AFFF),
+                  mainColor: AppTheme.color_FF1C8AFF,
+                  secondaryColor: AppTheme.color_FF69AFFF,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  localizations?.translate('otp_title') ?? 'Kodni kiriting',
+                  context.tr('otp_title'),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff0F172A),
+                    color: AppTheme.color_FF0F172A,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '$formattedPhone ',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$formattedPhone ',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.color_FF0F172A,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: 'raqamiga yuborilgan\n4 xonali kodni kiriting.',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF475569),
+                        TextSpan(
+                          text: context.tr('otp_sent_to'),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: AppTheme.color_FF475569,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -191,9 +195,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Qayta yuborish ',
+                        '${context.tr('otp_resend')} ',
                         style: TextStyle(
-                          color: Color(0xff475569),
+                          color: AppTheme.color_FF475569,
                           fontSize: 16,
                         ),
                       ),
@@ -201,7 +205,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                         _formatTime(_timerSeconds),
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF0F172A),
+                          color: AppTheme.color_FF0F172A,
                         ),
                       ),
                     ],
@@ -211,9 +215,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Kodni olmadingizmi?',
+                        context.tr('otp_resend_prompt'),
                         style: TextStyle(
-                          color: Color(0xff475569),
+                          color: AppTheme.color_FF475569,
                           fontSize: 16,
                         ),
                       ),
@@ -222,7 +226,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                           await viewModel.sendOtp(widget.phoneNumber);
                           _startTimer();
                         },
-                        child: const Text('Qayta yuborish'),
+                        child: Text(
+                          context.tr('otp_resend'),
+                        ),
                       ),
                     ],
                   ),
@@ -239,9 +245,9 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      const Color(0xFF2B7FFF),
-                      const Color(0xFF2B7FFF),
-                      Colors.white,
+                      AppTheme.color_FF2B7FFF,
+                      AppTheme.color_FF2B7FFF,
+                      AppTheme.surface,
                     ],
                     stops: [
                       0.0,
@@ -257,7 +263,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                 child: Container(
                   padding: const EdgeInsets.only(bottom: 14),
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(24),
                       topLeft: Radius.circular(24),
@@ -276,14 +282,17 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(57),
                         color: canSubmit
-                            ? const Color(0xFF2B7FFF)
-                            : const Color(0xFF2B7FFF).withValues(alpha: 0.2),
+                            ? AppTheme.color_FF2B7FFF
+                            : AppTheme.color_FF2B7FFF.withValues(alpha: 0.2),
                       ),
                       child: Center(
                         child: viewModel.status == AuthStatus.loading
-                            ? const CircularProgressIndicator(color: Colors.white) : const Text(
-                          'Kodni tasdiqlash',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                            ? const CircularProgressIndicator(color: AppTheme.surface) : Text(
+                          context.tr('verify_button'),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: AppTheme.surface,
+                          ),
                         ),
                       ),
                     ),
@@ -304,13 +313,13 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                   gradient: const LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.white, Color(0xFFD9B875)],
+                    colors: [AppTheme.surface, AppTheme.color_FFD9B875],
                     stops: [0.5, 1.0],
                   ),
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(47),
                   ),
                   child: InkWell(
@@ -348,8 +357,8 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
     final selected = await showMenu<String>(
       context: context,
       elevation: 0,
-      color: Colors.white,
-      surfaceTintColor: Colors.transparent,
+      color: AppTheme.surface,
+      surfaceTintColor: AppTheme.transparent,
       // Set position explicitly 65px from the top
       position: RelativeRect.fromLTRB(
         overlay.size.width,
@@ -373,12 +382,12 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
             margin: const EdgeInsets.symmetric(vertical: 2),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
+              color: isSelected ? AppTheme.color_FFEFF6FF : AppTheme.transparent,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isSelected
-                    ? const Color(0xFFBEDBFF)
-                    : Colors.transparent,
+                    ? AppTheme.color_FFBEDBFF
+                    : AppTheme.transparent,
                 width: 1.5,
               ),
             ),
@@ -387,15 +396,11 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                 Text(language['flag']!, style: const TextStyle(fontSize: 20)),
                 const SizedBox(width: 12),
                 Text(
-                  code == 'uz'
-                      ? 'O’zbek tili'
-                      : code == 'ru'
-                      ? 'Rus tili'
-                      : 'Ingliz tili',
+                  context.tr('language_$code'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF0F172A),
+                    color: AppTheme.color_FF0F172A,
                   ),
                 ),
               ],
@@ -416,7 +421,6 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
       _focusNodes[firstEmpty].requestFocus();
       return;
     }
-
     FocusScope.of(context).unfocus();
     await viewModel.verifyOtp(
       _controllers.map((controller) => controller.text).join(),
@@ -428,7 +432,11 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
       setState(() => _progress = 1.0);
       await Future<void>.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.pushReplacementNamed(
+        context,
+        '/user-info',
+        arguments: widget.phoneNumber,
+      );
       return;
     }
 
@@ -471,23 +479,23 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
           autofillHints: const [AutofillHints.oneTimeCode],
           textAlign: TextAlign.center,
           maxLength: 1,
-          cursorColor: const Color(0xFF2B7FFF),
+          cursorColor: AppTheme.color_FF2B7FFF,
           textAlignVertical: TextAlignVertical.center,
 
           style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: AppTheme.color_FF0F172A,
           ),
           decoration: InputDecoration(
             counterText: '',
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppTheme.surface,
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(vertical: 14),
             hintText: (isFocused || hasValue) ? '' : '•',
             hintStyle: const TextStyle(
-              color: Color(0xFFCBD5E1),
+              color: AppTheme.color_FFCBD5E1,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
@@ -495,10 +503,10 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
                 color: hasError
-                    ? const Color(0xFFFF0000)
+                    ? AppTheme.color_FFFF0000
                     : hasValue
-                    ? const Color(0xFF2B7FFF)
-                    : const Color(0xFFE2E8F0),
+                    ? AppTheme.color_FF2B7FFF
+                    : AppTheme.color_FFE2E8F0,
                 width: hasError ? 1.5 : 1,
               ),
             ),
@@ -508,8 +516,8 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
                 color: hasError
-                    ? const Color(0xFFFF0000)
-                    : const Color(0xFF2B7FFF),
+                    ? AppTheme.color_FFFF0000
+                    : AppTheme.color_FF2B7FFF,
                 width: 1.5,
               ),
             ),
@@ -541,14 +549,14 @@ class _IncorrectCodeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       elevation: 8,
-      shadowColor: Colors.black38,
+      shadowColor: AppTheme.black38,
       borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 10, 16, 12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF00012),
+          color: AppTheme.color_FFF00012,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Column(
@@ -556,12 +564,12 @@ class _IncorrectCodeBanner extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.error_outline, color: Colors.white, size: 22),
+                Icon(Icons.error_outline, color: AppTheme.surface, size: 22),
                 SizedBox(width: 8),
                 Text(
-                  'Kod noto‘g‘ri',
+                  context.tr('otp_invalid_title'),
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -570,9 +578,9 @@ class _IncorrectCodeBanner extends StatelessWidget {
             ),
             SizedBox(height: 4),
             Text(
-              'Kiritilgan tasdiqlash kodi noto‘g‘ri. Iltimos, qaytadan urinib ko‘ring.',
+              context.tr('otp_invalid_message'),
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.surface,
                 fontSize: 14,
                 height: 1.25,
               ),
@@ -605,13 +613,13 @@ class _OtpLanguageButton extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.white, Color(0xFFD9B875)],
+          colors: [AppTheme.surface, AppTheme.color_FFD9B875],
           stops: [0.5, 1.0],
         ),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(47),
         ),
         child: InkWell(

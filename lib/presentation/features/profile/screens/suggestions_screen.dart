@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:file_selector/file_selector.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../../../widgets/header_screen.dart';
 
@@ -25,7 +26,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFF4F8FE),
+    backgroundColor: AppTheme.color_FFF4F8FE,
     body: SafeArea(
       child: SizedBox.expand(
         child: Stack(
@@ -35,14 +36,14 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Skrinshotlarni yuklash',
+                    Text(
+                      context.tr('upload_screenshot'),
                       style: TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 4),
@@ -52,8 +53,8 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                         padding: const EdgeInsets.all(13),
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF4F8FE),
-                          border: Border.all(color: const Color(0xFFDCE3EC)),
+                          color: AppTheme.color_FFF4F8FE,
+                          border: Border.all(color: AppTheme.color_FFDCE3EC),
                           borderRadius: BorderRadius.circular(11),
                         ),
                         child: Column(
@@ -62,12 +63,12 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                             SvgPicture.asset('assets/icons/doc.svg'),
                             const SizedBox(height: 6),
                             Text(
-                              _selectedFile?.name ?? 'Shu yerga yuklang',
+                              _selectedFile?.name ?? context.tr('upload_here'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Color(0xff475569),
+                                color: AppTheme.color_FF475569,
                               ),
                             ),
                           ],
@@ -75,31 +76,31 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text('Izoh', style: TextStyle(fontSize: 14)),
+                    Text(context.tr('comment'), style: const TextStyle(fontSize: 14)),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _suggestionController,
                       maxLines: 3,
                       style: const TextStyle(fontSize: 11),
                       decoration: InputDecoration(
-                        hintText: 'Qisqacha izoh',
+                        hintText: context.tr('problem_short'),
                         hintStyle: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF8392A7),
+                          color: AppTheme.color_FF8392A7,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF4F8FE),
+                        fillColor: AppTheme.color_FFF4F8FE,
                         contentPadding: const EdgeInsets.fromLTRB(10, 9, 10, 8),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(11),
                           borderSide: const BorderSide(
-                            color: Color(0xFFDCE3EC),
+                            color: AppTheme.color_FFDCE3EC,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(11),
                           borderSide: const BorderSide(
-                            color: Color(0xFFDCE3EC),
+                            color: AppTheme.color_FFDCE3EC,
                           ),
                         ),
                       ),
@@ -108,7 +109,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                 ),
               ),
             ),
-            const HeaderScreen(title: 'Ilova bo‘yicha takliflar'),
+            HeaderScreen(title: context.tr('suggestions')),
             Positioned(
               left: 0,
               right: 0,
@@ -116,8 +117,8 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
-                  border: Border(top: BorderSide(color: Color(0xFFE4E8EE))),
+                  color: AppTheme.surface,
+                  border: Border(top: BorderSide(color: AppTheme.color_FFE4E8EE)),
                 ),
                 child: GestureDetector(
                   onTap: _submit,
@@ -125,12 +126,12 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                     padding: EdgeInsets.symmetric(vertical: 12),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2F80FF),
+                      color: AppTheme.color_FF2F80FF,
                       borderRadius: BorderRadius.circular(22),
                     ),
-                    child: const Text(
-                      'Yuborish',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    child: Text(
+                      context.tr('submit_button'),
+                      style: TextStyle(fontSize: 16, color: AppTheme.surface),
                     ),
                   ),
                 ),
@@ -154,16 +155,16 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
 
     await showDialog<void>(
       context: context,
-      barrierColor: Colors.black54,
+      barrierColor: AppTheme.black54,
       builder: (_) => _SuggestionResultDialog(success: success),
     );
   }
 
   Future<void> _pickFile() async {
     try {
-      const acceptedTypes = <XTypeGroup>[
+      final acceptedTypes = <XTypeGroup>[
         XTypeGroup(
-          label: 'Rasmlar va hujjatlar',
+          label: context.tr('upload_files'),
           extensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
         ),
       ];
@@ -174,7 +175,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
     } on Exception catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Faylni tanlab bo‘lmadi')),
+        SnackBar(content: Text(context.tr('file_select_failed'))),
       );
     }
   }
@@ -192,7 +193,7 @@ class _SuggestionResultDialog extends StatelessWidget {
     child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        color: Colors.white,
+        color: AppTheme.surface,
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -206,10 +207,10 @@ class _SuggestionResultDialog extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppTheme.color_FFF1F5F9,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(Icons.close, size: 15, color: Color(0xFF334155)),
+                child: const Icon(Icons.close, size: 15, color: AppTheme.color_FF334155),
               ),
             ),
           ),
@@ -219,15 +220,15 @@ class _SuggestionResultDialog extends StatelessWidget {
             icon: success
                 ? 'assets/icons/marked_success.svg'
                 : 'assets/icons/failed.svg',
-            mainColor: success ? const Color(0xFF15985B) : const Color(0xffCE040E),
-            secondaryColor: success ? const Color(0xFF40DB93) : const Color(0xffFF666D),
+            mainColor: success ? AppTheme.color_FF15985B : AppTheme.color_FFCE040E,
+            secondaryColor: success ? AppTheme.color_FF40DB93 : AppTheme.color_FFFF666D,
             padding: 18,
           ),
           const SizedBox(height: 16),
           Text(
             success
-                ? 'Taklifingiz muvaffaqiyatli yuborildi'
-                : 'Xatolik yuz berdi qayta \nurinib ko’ring',
+                ? context.tr('suggestion_sent')
+                : context.tr('suggestion_failed'),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 20,
@@ -238,8 +239,8 @@ class _SuggestionResultDialog extends StatelessWidget {
           ),
           if (success) ...[
             const SizedBox(height: 8),
-            const Text(
-              'Sizning taklifingiz, ilovamiz rivojlanishiga\nhissa qo‘shadi, Rahmat!',
+            Text(
+              context.tr('suggestion_thanks'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -254,7 +255,7 @@ class _SuggestionResultDialog extends StatelessWidget {
             height: 48,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFF1F5F9),
+                backgroundColor: AppTheme.color_FFF1F5F9,
                 foregroundColor: AppTheme.textPrimary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -263,7 +264,7 @@ class _SuggestionResultDialog extends StatelessWidget {
               ),
               onPressed: () => Navigator.pop(context),
               child: Text(
-                success ? 'Bosh sahifaga o‘tish' : 'Ortga',
+                success ? context.tr('back_home') : context.tr('back'),
                 style: const TextStyle(fontSize: 16),
               ),
             ),

@@ -12,6 +12,7 @@ import 'package:yandex_maps_mapkit_lite/ui_view.dart';
 import 'package:yandex_maps_mapkit_lite/yandex_map.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../data/models/services/organization.dart';
 import '../../../widgets/header_navigation.dart';
@@ -29,12 +30,17 @@ class OrganizationProfileScreen extends StatefulWidget {
 }
 
 class _OrganizationProfileScreenState extends State<OrganizationProfileScreen> {
-  static const tabs = ['Ma’lumot', 'Xizmatlar', 'Advokatlar', 'Sharhlar'];
   int selectedTab = 0;
 
   @override
   Widget build(BuildContext context) {
     final organization = widget.organization;
+    final tabs = [
+      context.tr('about_label'),
+      context.tr('services'),
+      context.tr('lawyers'),
+      context.tr('reviews'),
+    ];
     return Scaffold(
       backgroundColor: AppTheme.pageBackground,
       body: SafeArea(
@@ -95,7 +101,7 @@ class _OrganizationIdentity extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        color: Colors.white,
+        color: AppTheme.surface,
       ),
 
       child: Stack(
@@ -110,8 +116,8 @@ class _OrganizationIdentity extends StatelessWidget {
                 center: Alignment(0.003, -1.5),
                 radius: 1.5,
                 colors: [
-                  Color(0xFFD9B875), // #D9B875
-                  Color(0x00FFFFFF),
+                  AppTheme.color_FFD9B875, // #D9B875
+                  AppTheme.color_00FFFFFF,
                 ],
               ),
 
@@ -129,7 +135,7 @@ class _OrganizationIdentity extends StatelessWidget {
                   height: 100,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(100),
-                    color: Colors.white,
+                    color: AppTheme.surface,
                   ),
                 ),
                 Positioned(
@@ -138,12 +144,12 @@ class _OrganizationIdentity extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.verified,
-                      color: Color(0xFF00A86B),
+                      color: AppTheme.color_FF00A86B,
                       size: 20,
                     ),
                   ),
@@ -163,18 +169,18 @@ class _OrganizationIdentity extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff1D1816),
+                    color: AppTheme.color_FF1D1816,
                   ),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                   margin: EdgeInsets.only(top: 8, bottom: 16),
                   decoration: BoxDecoration(
-                    color: Color(0xffF3F1F1),
+                    color: AppTheme.color_FFF3F1F1,
                     borderRadius: BorderRadius.circular(21),
                   ),
                   child: Text(
-                    organization.type,
+                    context.tr(organization.type),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -195,17 +201,17 @@ class _OrganizationIdentity extends StatelessWidget {
                     children: [
                       _StatItem(
                         icon: 'assets/icons/balance.svg',
-                        label: 'Advokatlar',
+                        label: context.tr('lawyers'),
                         value: '${organization.lawyerCount}+',
                       ),
                       _StatItem(
                         icon: 'assets/icons/hummer.svg',
-                        label: 'Qabullar',
+                        label: context.tr('appointments'),
                         value: '+980',
                       ),
                       _StatItem(
                         icon: 'assets/icons/star.svg',
-                        label: 'Reyting',
+                        label: context.tr('trust_rating'),
                         value: organization.rating.toStringAsFixed(1),
                         last: true,
                       ),
@@ -241,7 +247,7 @@ class _StatItem extends StatelessWidget {
         margin: EdgeInsets.only(right: last ? 0 : 6),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -323,7 +329,7 @@ class _ProfileTabsState extends State<_ProfileTabs> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(45),
       ),
       child: SingleChildScrollView(
@@ -346,7 +352,7 @@ class _ProfileTabsState extends State<_ProfileTabs> {
                 decoration: BoxDecoration(
                   color: widget.selected == index
                       ? AppTheme.buttonGold
-                      : Colors.transparent,
+                      : AppTheme.transparent,
                   borderRadius: BorderRadius.circular(45),
                 ),
                 child: Text(
@@ -355,7 +361,7 @@ class _ProfileTabsState extends State<_ProfileTabs> {
                   style: TextStyle(
                     fontSize: 14,
                     color: widget.selected == index
-                        ? Colors.white
+                        ? AppTheme.surface
                         : AppTheme.textSecondary,
                   ),
                 ),
@@ -398,30 +404,30 @@ class _AboutContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const _ContentCard(
-          title: 'Tavsif',
+        _ContentCard(
+          title: context.tr('about_label'),
           child: Text(
-            'ADVO Legal Group — fuqarolik, mehnat va biznes huquqi bo‘yicha professional yuridik xizmat ko‘rsatuvchi tashkilot.',
+            context.tr('organization_description'),
             style: _bodyStyle,
           ),
         ),
         _ContentCard(
-          title: 'Asosiy yo‘nalishlari',
+          title: context.tr('specialties'),
           child: Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: organization.tags.map((tag) => _Tag(text: tag)).toList(),
+            children: organization.tags.map((tag) => _Tag(text: context.tr(tag))).toList(),
           ),
         ),
         _ContentCard(
-          title: 'Joylashuv',
+          title: context.tr('location'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _OrganizationMap(organization: organization),
               const SizedBox(height: 6),
               Text(
-                '📍 ${organization.address}, Amir Temur shoh ko‘chasi 108-uy',
+                '📍 ${organization.address}, ${context.tr('organization_address_suffix')}',
                 style: _bodyStyle,
               ),
             ],
@@ -465,7 +471,7 @@ class _OrganizationMapState extends State<_OrganizationMap> {
                   ),
                 )
               : const ColoredBox(
-                  color: Color(0xFFE8EEF5),
+                  color: AppTheme.color_FFE8EEF5,
                   child: Center(
                     child: Icon(
                       Icons.map_outlined,
@@ -532,7 +538,7 @@ class _OrganizationMarker extends StatelessWidget {
               height: 28,
               padding: const EdgeInsets.all(2),
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surface,
                 shape: BoxShape.circle,
               ),
               child: ClipOval(child: RawImage(image: image, fit: BoxFit.cover)),
@@ -547,13 +553,13 @@ class _OrganizationMarker extends StatelessWidget {
 Future<void> _showMapOpenSheet(BuildContext context, Point position) async {
   await showModalBottomSheet<void>(
     context: context,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (sheetContext) => SafeArea(
       child: Container(
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(28),
         ),
         child: Column(
@@ -563,8 +569,8 @@ Future<void> _showMapOpenSheet(BuildContext context, Point position) async {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Ochish',
+                Text(
+                  context.tr('open'),
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 IconButton(
@@ -592,7 +598,7 @@ Future<void> _showMapOpenSheet(BuildContext context, Point position) async {
                 const SizedBox(width: 12),
                 _MapOpenOption(
                   icon: Icons.language,
-                  label: 'Brauzer',
+                  label: context.tr('browser'),
                   onTap: () => _launchMap(
                     sheetContext,
                     Uri.parse(
@@ -615,7 +621,7 @@ Future<void> _launchMap(BuildContext context, Uri uri) async {
   if (!launched && context.mounted) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Xaritani ochib bo‘lmadi')));
+    ).showSnackBar(SnackBar(content: Text(context.tr('map_open_failed'))));
   }
 }
 
@@ -677,7 +683,7 @@ class _ServicesContent extends StatelessWidget {
               padding: EdgeInsets.all(16),
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(28),
               ),
               child: Column(
@@ -702,7 +708,7 @@ class _ServicesContent extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '/so\'mdan',
+                        context.tr('per_from'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -749,9 +755,9 @@ class _ReviewsContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFFE8),
+            color: AppTheme.color_FFFFFFE8,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFFFEEA0), width: 1.5),
+            border: Border.all(color: AppTheme.color_FFFFEEA0, width: 1.5),
           ),
           child: Row(
             children: [
@@ -761,7 +767,7 @@ class _ReviewsContent extends StatelessWidget {
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
                   height: 1.0,
-                  color: Colors.black,
+                  color: AppTheme.black,
                 ),
               ),
               const Spacer(),
@@ -785,8 +791,8 @@ class _ReviewsContent extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${organization.reviewsCount} baholadi',
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                    '${organization.reviewsCount} ${context.tr('reviews_suffix')}',
+                    style: const TextStyle(fontSize: 14, color: AppTheme.black87),
                   ),
                 ],
               ),
@@ -803,8 +809,7 @@ class _ReviewsContent extends StatelessWidget {
               name: 'Madina. A',
               date: '2024–yil',
               rating: 4,
-              comment:
-                  'Dr. Sardor Tursunov — 12 yildan ortiq tajribaga ega terapevt. Bemorlarni umumiy',
+              comment: context.tr('review_legal_explanation'),
             ),
           ),
         ),
@@ -821,7 +826,7 @@ class _ReviewsContent extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -832,10 +837,10 @@ class _ReviewsContent extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFF0F0F0),
+                backgroundColor: AppTheme.color_FFF0F0F0,
                 child: const Icon(
                   Icons.person_outline,
-                  color: Color(0xFF5A6275),
+                  color: AppTheme.color_FF5A6275,
                   size: 22,
                 ),
               ),
@@ -850,7 +855,7 @@ class _ReviewsContent extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppTheme.black,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -913,7 +918,7 @@ class _ContentCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(

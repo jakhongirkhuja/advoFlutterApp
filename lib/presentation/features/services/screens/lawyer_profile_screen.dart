@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/home/lawyer.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 import '../../../widgets/header_navigation.dart';
@@ -20,12 +21,18 @@ class LawyerProfileScreen extends StatefulWidget {
 }
 
 class _LawyerProfileScreenState extends State<LawyerProfileScreen> {
-  static const tabs = ['Ma’lumot','Yutuqlarim','Xizmatlar', 'Sertifikatlar', 'Sharhlar'];
   int selectedTab = 0;
 
   @override
   Widget build(BuildContext context) {
     final lawyer = widget.lawyer;
+    final tabs = [
+      context.tr('about_label'),
+      context.tr('achievements'),
+      context.tr('services'),
+      context.tr('certificate'),
+      context.tr('reviews'),
+    ];
     final isSaved = context.watch<HomeViewModel>().isLawyerSaved(lawyer.id);
     return Scaffold(
       backgroundColor: AppTheme.pageBackground,
@@ -56,7 +63,7 @@ class _LawyerProfileScreenState extends State<LawyerProfileScreen> {
                 children: [
                   HeaderNavigation(
                     firstIconPath: 'assets/icons/back.svg',
-                    firstIconOnTap: () {},
+                    firstIconOnTap: () => Navigator.pop(context),
                     moveBack: true,
                   ),
                   HeaderNavigation(
@@ -72,14 +79,20 @@ class _LawyerProfileScreenState extends State<LawyerProfileScreen> {
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          color: Colors.white,
+          color: AppTheme.surface,
           child: Row(
             children: [
               IconButton(
-                onPressed: () => context.read<HomeViewModel>().toggleLawyerBookmark(lawyer.id),
+                onPressed: () => context
+                    .read<HomeViewModel>()
+                    .toggleLawyerBookmark(lawyer.id),
                 style: IconButton.styleFrom(
-                  backgroundColor: isSaved ? AppTheme.buttonGold : AppTheme.tagBackground,
-                  foregroundColor: isSaved ? Colors.white : AppTheme.textPrimary,
+                  backgroundColor: isSaved
+                      ? AppTheme.buttonGold
+                      : AppTheme.tagBackground,
+                  foregroundColor: isSaved
+                      ? AppTheme.surface
+                      : AppTheme.textPrimary,
                 ),
                 icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
               ),
@@ -92,7 +105,7 @@ class _LawyerProfileScreenState extends State<LawyerProfileScreen> {
                     arguments: lawyer,
                   ),
                   icon: const Icon(Icons.calendar_month_outlined, size: 17),
-                  label: const Text('Qabulga yozilish'),
+                  label: Text(context.tr('book_appointment')),
                 ),
               ),
             ],
@@ -115,7 +128,10 @@ class _LawyerIdentity extends StatelessWidget {
         : '${AppConfig.dummyImageBaseUrl}/lawyer-${lawyer.id}/160/160';
 
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(28)),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(28),
+      ),
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
@@ -124,9 +140,9 @@ class _LawyerIdentity extends StatelessWidget {
             height: 240,
             decoration: BoxDecoration(
               gradient: const RadialGradient(
-                center: Alignment(0, -1.3),
-                radius: 1.5,
-                colors: [Color(0xFFD9B875), Color(0x00FFFFFF)],
+                center: Alignment(0, -1.6),
+                radius: 1.1,
+                colors: [AppTheme.color_FFD9B875, AppTheme.color_00FFFFFF],
               ),
               borderRadius: BorderRadius.circular(28),
             ),
@@ -138,7 +154,10 @@ class _LawyerIdentity extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  decoration: const BoxDecoration(
+                    color: AppTheme.surface,
+                    shape: BoxShape.circle,
+                  ),
                   child: ClipOval(
                     child: Image.network(
                       imageUrl,
@@ -150,19 +169,31 @@ class _LawyerIdentity extends StatelessWidget {
                         height: 101,
                         color: AppTheme.avatarBackground,
                         alignment: Alignment.center,
-                        child: Text(
-                          _initials(lawyer.name),
-                          style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 22),
+                        child: Image.asset(
+                          'assets/images/default_user.jpg',
+                          fit: BoxFit.fill,
+                          height: 101,
                         ),
                       ),
                     ),
                   ),
                 ),
                 if (lawyer.isVerified)
-                  Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    child: const Icon(Icons.verified, color: AppTheme.success, size: 20),
+                  Positioned(
+                    bottom: 0,
+                    right: 5,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: AppTheme.surface,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.verified,
+                        color: AppTheme.success,
+                        size: 28,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -176,22 +207,58 @@ class _LawyerIdentity extends StatelessWidget {
                 Text(
                   lawyer.name,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1D1816)),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.color_FF1D1816,
+                  ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 6,
+                    horizontal: 10,
+                  ),
                   margin: const EdgeInsets.only(top: 8, bottom: 16),
-                  decoration: BoxDecoration(color: const Color(0xFFF3F1F1), borderRadius: BorderRadius.circular(21)),
-                  child: Text(lawyer.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppTheme.textChoco)),
+                  decoration: BoxDecoration(
+                    color: AppTheme.pageBackground,
+                    borderRadius: BorderRadius.circular(21),
+                  ),
+                  child: Text(
+                    context.tr(lawyer.title),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.textChoco,
+                    ),
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: AppTheme.pageBackground, borderRadius: BorderRadius.circular(22)),
+                  decoration: BoxDecoration(
+                    color: AppTheme.pageBackground,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
                   child: Row(
                     children: [
-                      _StatItem(label: 'Tajriba', value: '${lawyer.experienceYears} yil'),
-                      _StatItem(label: 'Qabullar', value: '+980', icon: Icons.how_to_reg, color: AppTheme.success),
-                      _StatItem(label: 'Reyting', value: lawyer.rating.toStringAsFixed(1), icon: Icons.star, color: AppTheme.star),
+                      _StatItem(
+                        iconPath: 'assets/icons/experience.svg',
+                        label: context.tr('experience'),
+                        value: '${lawyer.experienceYears}',
+                      ),
+                      _StatItem(
+                        iconPath: 'assets/icons/appointments.svg',
+                        label: context.tr('appointments'),
+                        value: '+980',
+                        icon: Icons.how_to_reg,
+                        color: AppTheme.success,
+                      ),
+                      _StatItem(
+                        iconPath: 'assets/icons/star.svg',
+                        label: context.tr('trust_rating'),
+                        value: lawyer.rating.toStringAsFixed(1),
+                        icon: Icons.star,
+                        color: AppTheme.star,
+                      ),
                     ],
                   ),
                 ),
@@ -209,8 +276,15 @@ class _StatItem extends StatelessWidget {
   final String value;
   final IconData? icon;
   final Color? color;
+  final String iconPath;
 
-  const _StatItem({required this.label, required this.value, this.icon, this.color});
+  const _StatItem({
+    required this.label,
+    required this.value,
+    this.icon,
+    this.color,
+    required this.iconPath,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -218,17 +292,29 @@ class _StatItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(right: 6),
         padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
-            Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textChoco)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: AppTheme.textChoco),
+            ),
             const SizedBox(height: 5),
             Row(
+              spacing: 3,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (icon != null) Icon(icon, size: 15, color: color),
-                if (icon != null) const SizedBox(width: 4),
-                Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                SvgPicture.asset(iconPath),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ],
             ),
           ],
@@ -243,13 +329,20 @@ class _ProfileTabs extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onSelected;
 
-  const _ProfileTabs({required this.tabs, required this.selected, required this.onSelected});
+  const _ProfileTabs({
+    required this.tabs,
+    required this.selected,
+    required this.onSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(45)),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(45),
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -258,9 +351,25 @@ class _ProfileTabs extends StatelessWidget {
             return GestureDetector(
               onTap: () => onSelected(index),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                decoration: BoxDecoration(color: isSelected ? AppTheme.buttonGold : Colors.transparent, borderRadius: BorderRadius.circular(45)),
-                child: Text(tabs[index], style: TextStyle(fontSize: 14, color: isSelected ? Colors.white : AppTheme.textSecondary)),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppTheme.buttonGold
+                      : AppTheme.transparent,
+                  borderRadius: BorderRadius.circular(45),
+                ),
+                child: Text(
+                  tabs[index],
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isSelected
+                        ? AppTheme.surface
+                        : AppTheme.textSecondary,
+                  ),
+                ),
               ),
             );
           }),
@@ -333,7 +442,7 @@ class _AchievementTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -342,16 +451,24 @@ class _AchievementTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: const BoxDecoration(
-              color: Color(0xFFF2F2F2),
+              color: AppTheme.pageBackground,
               shape: BoxShape.circle,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.insert_drive_file_outlined, size: 21, color: Colors.black87),
+                const Icon(
+                  Icons.insert_drive_file_outlined,
+                  size: 21,
+                  color: AppTheme.black87,
+                ),
                 Text(
                   achievement.fileType,
-                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 8,
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -361,9 +478,22 @@ class _AchievementTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Yutuqlarim', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
+                Text(
+                  context.tr('achievements'),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(achievement.size, style: const TextStyle(fontSize: 15, color: AppTheme.textChoco)),
+                Text(
+                  achievement.size,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: AppTheme.textChoco,
+                  ),
+                ),
               ],
             ),
           ),
@@ -383,25 +513,21 @@ class _AboutContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const _ContentCard(
-          title: 'Tavsif',
-          child: Text(
-            'Tajribali advokat fuqarolik va biznes huquqi bo‘yicha mijozlarga sud jarayonlari hamda huquqiy masalalarda yordam ko‘rsatadi.',
-            style: _bodyStyle,
-          ),
+        _ContentCard(
+          title: context.tr('about_label'),
+          child: Text(context.tr('lawyer_about_default'), style: _bodyStyle),
         ),
 
         _ContentCard(
-          title: 'Mutaxassisliklari',
+          title: context.tr('specialties'),
           child: Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
             children: [
-              for (final tag in lawyer.tags)
-                _Tag(text: tag),
+              for (final tag in lawyer.tags) _Tag(text: context.tr(tag)),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -415,8 +541,13 @@ class _LocationPreview extends StatelessWidget {
     return Container(
       height: 104,
       width: double.infinity,
-      decoration: BoxDecoration(color: const Color(0xFFE3E9DC), borderRadius: BorderRadius.circular(12)),
-      child: const Center(child: Icon(Icons.location_on, color: Colors.redAccent, size: 32)),
+      decoration: BoxDecoration(
+        color: AppTheme.color_FFE3E9DC,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Center(
+        child: Icon(Icons.location_on, color: AppTheme.danger, size: 32),
+      ),
     );
   }
 }
@@ -428,15 +559,24 @@ class _ServicesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final services = lawyer.tags.isEmpty ? const ['Huquqiy maslahat'] : lawyer.tags;
+    final services = lawyer.tags.isEmpty ? const ['legal_advice'] : lawyer.tags;
     return Column(
       children: services.map((service) {
         return _ContentCard(
-          title: service,
+          title: context.tr(service),
           child: Row(
             children: [
-              Text('${lawyer.pricePerMinute}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              const Text('/so\'mdan', style: TextStyle(fontSize: 14, color: AppTheme.textChoco)),
+              Text(
+                '${lawyer.pricePerMinute}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                context.tr('per_from'),
+                style: const TextStyle(fontSize: 14, color: AppTheme.textChoco),
+              ),
             ],
           ),
         );
@@ -444,6 +584,7 @@ class _ServicesContent extends StatelessWidget {
     );
   }
 }
+
 class CertificateItem {
   final String title;
   final String size;
@@ -459,28 +600,29 @@ class CertificateItem {
     this.fileType = 'PNG',
   });
 }
+
 class _CertificatesContent extends StatelessWidget {
   const _CertificatesContent();
 
   @override
   Widget build(BuildContext context) {
-    const certificates = [
+    final certificates = [
       CertificateItem(
-        title: 'Advokatlik guvohnomasi',
+        title: context.tr('certificate'),
         size: '1.2 Mb',
         date: '12.03.2022',
         fileUrl: 'https://example.com/files/advokatlik_guvohnomasi.png',
         fileType: 'PNG',
       ),
       CertificateItem(
-        title: 'Patent sertifikati',
+        title: context.tr('patent'),
         size: '2.4 Mb',
         date: '15.04.2022',
         fileUrl: 'https://example.com/files/patent_sertifikati.pdf',
         fileType: 'PDF',
       ),
       CertificateItem(
-        title: 'Diplom nusxasi',
+        title: context.tr('diploma'),
         size: '850 Kb',
         date: '01.01.2021',
         fileUrl: 'https://example.com/files/diplom_nusxasi.pdf',
@@ -495,6 +637,7 @@ class _CertificatesContent extends StatelessWidget {
     );
   }
 }
+
 class _CertificateTile extends StatelessWidget {
   final CertificateItem item;
 
@@ -506,9 +649,9 @@ class _CertificateTile extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Faylni yuklab bo\'lmadi')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.tr('download_failed'))));
       }
     }
   }
@@ -518,18 +661,18 @@ class _CertificateTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: AppTheme.black.withOpacity(0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
           onTap: () => _downloadFile(context),
@@ -542,7 +685,7 @@ class _CertificateTile extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFF2F2F2),
+                    color: AppTheme.pageBackground,
                     shape: BoxShape.circle,
                   ),
                   child: Column(
@@ -554,7 +697,7 @@ class _CertificateTile extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppTheme.black87,
                         ),
                       ),
                     ],
@@ -571,7 +714,7 @@ class _CertificateTile extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: AppTheme.color_FF0F172A,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -625,25 +768,49 @@ class _ReviewsContent extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFFFFFE8), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFFFEEA0), width: 1.5)),
+          decoration: BoxDecoration(
+            color: AppTheme.color_FFFFFFE8,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppTheme.color_FFFFEEA0, width: 1.5),
+          ),
           child: Row(
             children: [
-              Text(lawyer.rating.toStringAsFixed(1), style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+              Text(
+                lawyer.rating.toStringAsFixed(1),
+                style: const TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const Spacer(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('★★★★★', style: TextStyle(color: AppTheme.star, fontSize: 22)),
+                  const Text(
+                    '★★★★★',
+                    style: TextStyle(color: AppTheme.star, fontSize: 22),
+                  ),
                   const SizedBox(height: 8),
-                  Text('${lawyer.reviewsCount} baholadi', style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                  Text(
+                    context
+                        .tr('reviews_count')
+                        .replaceAll('{count}', '${lawyer.reviewsCount}'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.black87,
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
-        const _ReviewCard(name: 'Madina A.', text: 'Xizmatidan mamnunman, huquqiy masalani tushunarli qilib izohlab berdi.'),
-        const _ReviewCard(name: 'Azizbek R.', text: 'Professional yondashuv va tezkor maslahat uchun rahmat.'),
+        _ReviewCard(name: 'Madina A.', text: context.tr('review_satisfied')),
+        _ReviewCard(
+          name: 'Azizbek R.',
+          text: context.tr('review_professional'),
+        ),
       ],
     );
   }
@@ -660,16 +827,34 @@ class _ReviewCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const CircleAvatar(radius: 22, backgroundColor: AppTheme.tagBackground, child: Icon(Icons.person_outline, color: AppTheme.textChoco)),
+              const CircleAvatar(
+                radius: 22,
+                backgroundColor: AppTheme.tagBackground,
+                child: Icon(Icons.person_outline, color: AppTheme.textChoco),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-              const Text('★★★★★', style: TextStyle(color: AppTheme.star, fontSize: 14)),
+              Expanded(
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const Text(
+                '★★★★★',
+                style: TextStyle(color: AppTheme.star, fontSize: 14),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -692,17 +877,25 @@ class _ContentCard extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(28)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        Container(
-          height: 1,
-          margin: EdgeInsets.symmetric(vertical: 10),
-          color: AppTheme.textChoco.withValues(alpha: 0.2),
-        ),
-        child,
-      ]),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.textSecondary,),
+          ),
+          Container(
+            height: 1,
+            margin: EdgeInsets.symmetric(vertical: 10),
+            color: AppTheme.textChoco.withValues(alpha: 0.2),
+          ),
+          child,
+        ],
+      ),
     );
   }
 }
@@ -716,12 +909,27 @@ class _Tag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: AppTheme.tagBackground, borderRadius: BorderRadius.circular(12)),
-      child: Text(text, style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary)),
+      decoration: BoxDecoration(
+        color: AppTheme.tagBackground,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary),
+      ),
     );
   }
 }
 
-String _initials(String name) => name.split(' ').take(2).map((part) => part.isEmpty ? '' : part[0]).join().toUpperCase();
+String _initials(String name) => name
+    .split(' ')
+    .take(2)
+    .map((part) => part.isEmpty ? '' : part[0])
+    .join()
+    .toUpperCase();
 
-const _bodyStyle = TextStyle(fontSize: 16, height: 1.3, color: AppTheme.textChoco);
+const _bodyStyle = TextStyle(
+  fontSize: 16,
+  height: 1.3,
+  color: AppTheme.textChoco,
+);

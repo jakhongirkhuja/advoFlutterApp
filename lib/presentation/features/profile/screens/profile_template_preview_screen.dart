@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 
 class ProfileTemplatePreviewScreen extends StatelessWidget {
@@ -25,21 +26,14 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
     required this.reason,
   });
 
-  String get _documentText =>
-      'Offer of Employment and Employment Contract\n\n'
-      'Employee Name: $name\n'
-      'Date: $date\n'
-      'Address: Employee Address\n\n'
-      'Dear Employee Name:\n'
-      'We are pleased to offer you a position with $company.\n\n'
-      'Your start date, manager, compensation, benefits, and other terms of employment will be as set forth below and on EXHIBIT A.\n\n'
-      'TERMS OF EMPLOYMENT\n\n'
-      'Position and Duties. Company hereby employs you, and you agree to competently and professionally perform such duties as are customarily the responsibility of the position set forth in the job description attached as EXHIBIT A and reasonably assigned to you from time to time by your Manager.\n\n'
-      'Outside Business Activities. During your employment with Company, you shall devote competent energies, interests, and abilities to the performance of your duties under this Agreement. During the term of this Agreement, you shall not, without Company’s prior written consent, render any services to others for compensation or otherwise participate, advise, or render any other business activities that would interfere with the performance of your duties hereunder or compete with Company’s business.\n\n'
-      'Employment Classification. You shall be a Full-Time Employee and shall not be entitled to benefits except as specifically outlined herein.\n\n'
-      'Compensation/Benefits.\n\n'
-      '1. Wage. Company shall pay you the wage as set forth in the job description attached as EXHIBIT A.\n\n'
-      '2. Reimbursement of Expenses. You shall be reimbursed for all reasonable and necessary expenses paid or incurred by you in the performance of your duties.';
+  String _documentText(BuildContext context) => context
+      .tr('document_template_body')
+      .replaceAll('{name}', name)
+      .replaceAll('{date}', date)
+      .replaceAll('{company}', company)
+      .replaceAll('{position}', position)
+      .replaceAll('{manager}', manager)
+      .replaceAll('{reason}', reason);
 
   @override
   Widget build(BuildContext context) {
@@ -57,25 +51,25 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                   height: 366,
                   padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Stack(
                     children: [
                       SingleChildScrollView(
                       child: Text(
-                        _documentText,
+                        _documentText(context),
                           style: const TextStyle(
                             fontSize: 6.2,
                             height: 1.25,
-                            color: Color(0xFF1E293B),
+                            color: AppTheme.color_FF1E293B,
                           ),
                         ),
                       ),
                       Align(
                         alignment: Alignment.bottomRight,
                         child: Material(
-                          color: const Color(0xFFF1F5F9),
+                          color: AppTheme.color_FFF1F5F9,
                           shape: const CircleBorder(),
                           child: InkWell(
                             customBorder: const CircleBorder(),
@@ -93,7 +87,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                                     maxScale: 4,
                                     child: SingleChildScrollView(
                                       child: Text(
-                                        _documentText,
+                                        _documentText(context),
                                         style: const TextStyle(
                                           fontSize: 12,
                                           height: 1.5,
@@ -110,7 +104,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                               child: Icon(
                                 Icons.open_in_full,
                                 size: 14,
-                                color: Color(0xFF334155),
+                                color: AppTheme.color_FF334155,
                               ),
                             ),
                           ),
@@ -122,7 +116,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
               ),
             ),
             HeaderScreen(
-              title: 'Ishdan bo‘shash arizasi',
+              title: context.tr('resignation_application'),
               firstActionIconPath: showSearchAction
                   ? 'assets/icons/search.svg'
                   : null,
@@ -136,7 +130,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
               bottom: 0,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-                decoration: const BoxDecoration(color: Colors.white),
+                decoration: const BoxDecoration(color: AppTheme.surface),
                 child: Row(
                   children: [
                     Expanded(
@@ -145,7 +139,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(0, 48),
                           side: BorderSide.none,
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: AppTheme.color_FFF1F5F9,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(22),
                           ),
@@ -156,10 +150,10 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                             SvgPicture.asset('assets/icons/edit.svg'),
                             SizedBox(width: 6),
                             Text(
-                              'Tahrirlash',
+                              context.tr('edit_button'),
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: AppTheme.black,
                               ),
                             ),
                           ],
@@ -172,7 +166,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                         onPressed: () {},
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(0, 48),
-                          backgroundColor: const Color(0xFF2F80FF),
+                          backgroundColor: AppTheme.color_FF2F80FF,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(22),
                           ),
@@ -183,7 +177,7 @@ class ProfileTemplatePreviewScreen extends StatelessWidget {
                             SvgPicture.asset('assets/icons/upload.svg'),
                             SizedBox(width: 6),
                             Text(
-                              'Yuklab olish',
+                              context.tr('download_button'),
                               style: TextStyle(fontSize: 16),
                             ),
                           ],

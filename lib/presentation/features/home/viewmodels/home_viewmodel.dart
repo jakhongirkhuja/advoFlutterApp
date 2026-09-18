@@ -54,7 +54,7 @@ class HomeViewModel extends ChangeNotifier {
   List<ServiceCategory> _serviceCategories = const [];
   List<ServiceCategory> get serviceCategories => _serviceCategories;
 
-  String _locationName = 'Toshkent shahri';
+  String _locationName = 'tashkent_city';
   String get locationName => _locationName;
   List<Organization> _organizations = const [];
   List<Organization> get organizations => _organizations;

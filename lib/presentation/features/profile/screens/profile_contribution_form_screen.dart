@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 
 class ProfileContributionFormScreen extends StatefulWidget {
@@ -41,24 +42,24 @@ class _ProfileContributionFormScreenState
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Biz bilan birga rivojlaning',
+                      Text(
+                        context.tr('contribution_intro_title'),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Loyihamizni 2 milliondan ortiq foydalanuvchiga xizmat qiladigan tizimga aylantirish uchun sizning yordamingiz kerak.',
+                      Text(
+                        context.tr('contribution_intro_body'),
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.2,
                           color: AppTheme.textSecondary,
                         ),
                       ),
-                      const Divider(height: 24, color: Color(0xFFE4EAF1)),
-                      const Text('Summa', style: TextStyle(fontSize: 14)),
+                      const Divider(height: 24, color: AppTheme.color_FFE4EAF1),
+                      Text(context.tr('amount'), style: const TextStyle(fontSize: 14)),
                       const SizedBox(height: 6),
                       TextField(
                         style: const TextStyle(fontSize: 14),
@@ -84,7 +85,7 @@ class _ProfileContributionFormScreenState
                                   padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF1F5F9),
+                                    color: AppTheme.color_FFF1F5F9,
                                     borderRadius: BorderRadius.circular(21),
                                   ),
                                   child: Text(value, style: const TextStyle(fontSize: 14)),
@@ -100,7 +101,7 @@ class _ProfileContributionFormScreenState
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('To‘lov turi', style: TextStyle(fontSize: 15)),
+                      Text(context.tr('payment_type'), style: const TextStyle(fontSize: 15)),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -144,7 +145,7 @@ class _ProfileContributionFormScreenState
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(28),
                   ),
                   child: Row(
@@ -154,22 +155,22 @@ class _ProfileContributionFormScreenState
                         height: 42,
                         padding: EdgeInsets.all(10),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFF1F5F9),
+                          color: AppTheme.color_FFF1F5F9,
                           shape: BoxShape.circle,
                         ),
                         child: SvgPicture.asset('assets/icons/anonymous.svg'),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Anonim yuborish',
+                          context.tr('anonymous_submit'),
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
                       Transform.scale(
                         scale: 0.82,
                         child: CupertinoSwitch(
-                          activeTrackColor: Color(0xff2B7FFF),
+                          activeTrackColor: AppTheme.color_FF2B7FFF,
                           value: _anonymous,
                           onChanged: (value) => setState(() => _anonymous = value),
                         ),
@@ -180,27 +181,27 @@ class _ProfileContributionFormScreenState
               ],
             ),
           ),
-          const HeaderScreen(title: 'Loyihaga hissa qo‘shish'),
+          HeaderScreen(title: context.tr('contribution')),
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              color: Colors.white,
+              color: AppTheme.surface,
               padding: const EdgeInsets.all(16),
               child: SizedBox(
                 height: 48,
                 child: FilledButton(
                   onPressed: _canSubmit ? _submit : null,
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F80FF),
-                    disabledBackgroundColor: const Color(0xFFCBD5E1),
+                    backgroundColor: AppTheme.color_FF2F80FF,
+                    disabledBackgroundColor: AppTheme.color_FFCBD5E1,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(44),
                     ),
                   ),
-                  child: const Text(
-                    'Hissa qo‘shish',
+                  child: Text(
+                    context.tr('add_contribution'),
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -216,7 +217,7 @@ class _ProfileContributionFormScreenState
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(28),
     ),
     child: child,
@@ -231,15 +232,15 @@ class _ProfileContributionFormScreenState
     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+      borderSide: const BorderSide(color: AppTheme.color_FFE2E8F0, width: 1.0),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+      borderSide: const BorderSide(color: AppTheme.color_FFE2E8F0, width: 1.0),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+      borderSide: const BorderSide(color: AppTheme.color_FFE2E8F0, width: 1.0),
     ),
   );
 
@@ -248,7 +249,7 @@ class _ProfileContributionFormScreenState
 
   Future<void> _submit() => showDialog<void>(
     context: context,
-    barrierColor: Colors.black.withValues(alpha: .22),
+    barrierColor: AppTheme.black.withValues(alpha: .22),
     builder: (_) => const _ContributionSuccessDialog(),
   );
 }
@@ -258,12 +259,12 @@ class _ContributionSuccessDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Dialog(
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     insetPadding: const EdgeInsets.symmetric(horizontal: 20),
     child: Container(
       padding: const EdgeInsets.fromLTRB(11, 12, 11, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(32),
       ),
       child: Stack(
@@ -275,27 +276,27 @@ class _ContributionSuccessDialog extends StatelessWidget {
               const SizedBox(height: 12),
               CustomIconDesign(
                 icon: 'assets/icons/thankyou.svg',
-                mainColor: const Color(0xFFF1C8AFF),
-                secondaryColor: const Color(0xFF69AFFF),
+                mainColor: AppTheme.color_FF1C8AFF,
+                secondaryColor: AppTheme.color_FF69AFFF,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Rahmat, hissangiz qabul qilindi!',
+              Text(
+                context.tr('contribution_success'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF101828),
+                  color: AppTheme.color_FF101828,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Sizning yordamingiz loyiha rivojiga hissa\nqo‘shadi. Qo‘llab-quvvatlaganingizdan\nxursandmiz.',
+              Text(
+                context.tr('contribution_success_body'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.25,
-                  color: Color(0xFF475569),
+                  color: AppTheme.color_FF475569,
                 ),
               ),
               const SizedBox(height: 18),
@@ -309,15 +310,15 @@ class _ContributionSuccessDialog extends StatelessWidget {
                         (route) => false
                   ),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFF1F5F9),
-                    foregroundColor: const Color(0xFF101828),
+                    backgroundColor: AppTheme.color_FFF1F5F9,
+                    foregroundColor: AppTheme.color_FF101828,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(44),
                     ),
                   ),
                   child: Text(
-                    'Bosh sahifaga o‘tish',
+                    context.tr('back_home'),
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -333,10 +334,10 @@ class _ContributionSuccessDialog extends StatelessWidget {
                 width: 25,
                 height: 25,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF1F5F9),
+                  color: AppTheme.color_FFF1F5F9,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close, size: 15, color: Color(0xFF475569)),
+                child: const Icon(Icons.close, size: 15, color: AppTheme.color_FF475569),
               ),
             ),
           ),
@@ -372,7 +373,7 @@ class _PaymentOption extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           border: Border.all(
-            color: selected ? const Color(0xFF2F80FF) : const Color(0xFFDCE3EC),
+              color: selected ? AppTheme.color_FF2F80FF : AppTheme.color_FFDCE3EC,
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -394,7 +395,7 @@ class _PaymentOption extends StatelessWidget {
             ),
             Container(
               height: 1,
-              color: const Color(0xFFE4EAF1),
+              color: AppTheme.color_FFE4EAF1,
               margin: const EdgeInsets.only(top: 8, bottom: 10), // Tightened margin to clear 3px overflow
             ),
             Text(

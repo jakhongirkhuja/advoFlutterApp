@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../../../widgets/header_screen.dart';
 
@@ -20,29 +21,29 @@ class ActiveDevicesScreen extends StatelessWidget {
               _DeviceTile(
                 icon: 'assets/icons/ios.svg',
                 title: 'iPhone 15 Pro',
-                subtitle: 'Hozir faol',
+                subtitle: context.tr('currently_active'),
                 ip: 'IP: 185.74.22.123',
                 active: true,
 
                 onTap: () => _showDeviceDetails(context, 'iPhone 15 Pro','185.74.22.123',null),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Boshqa qurilmalar',
+              Text(
+                context.tr('other_devices'),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 12),
               _DeviceTile(
-                time: '5 daqiqa oldin',
+                time: context.tr('five_minutes_ago'),
                 icon: 'assets/icons/android.svg',
                 title: 'Samsung A12',
-                subtitle: 'Faol emas',
+                subtitle: context.tr('inactive'),
                 ip: 'IP: 185.74.22.123',
-                onTap: () => _showDeviceDetails(context, 'Samsung A12','185.74.22.123','5 daqiqa oldin'),
+                onTap: () => _showDeviceDetails(context, 'Samsung A12','185.74.22.123',context.tr('five_minutes_ago')),
               ),
             ],
           ),
-          const HeaderScreen(title: 'Faol qurilmalar'),
+          HeaderScreen(title: context.tr('active_devices')),
         ],
       ),
     ),
@@ -56,7 +57,7 @@ class ActiveDevicesScreen extends StatelessWidget {
       ) async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       elevation: 0,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -64,7 +65,7 @@ class ActiveDevicesScreen extends StatelessWidget {
       builder: (_) => Container(
         margin: const EdgeInsets.fromLTRB(6, 0, 6, 0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
         ),
         child: SafeArea(
@@ -92,8 +93,8 @@ class ActiveDevicesScreen extends StatelessWidget {
                   icon: name.startsWith('iPhone')
                       ? 'assets/icons/ios.svg'
                       : 'assets/icons/android.svg',
-                  mainColor: const Color(0xFF1C8AFF),
-                  secondaryColor: const Color(0xFF69AFFF),
+                  mainColor: AppTheme.color_FF1C8AFF,
+                  secondaryColor: AppTheme.color_FF69AFFF,
                 ),
                 const SizedBox(height: 7),
                 Column(
@@ -128,7 +129,7 @@ class ActiveDevicesScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 22,
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppTheme.surface,
                         child: SvgPicture.asset('assets/icons/ip.svg'),
                       ),
                       const SizedBox(width: 12),
@@ -144,14 +145,14 @@ class ActiveDevicesScreen extends StatelessWidget {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppTheme.danger,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Chiqarib yuborish',
+                    child: Text(
+                      context.tr('remove_device'),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -191,7 +192,7 @@ class _DeviceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    color: AppTheme.surface,
     borderRadius: BorderRadius.circular(28),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),
@@ -218,7 +219,7 @@ class _DeviceTile extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: AppTheme.black,
                         ),
                       ),
                       time != null

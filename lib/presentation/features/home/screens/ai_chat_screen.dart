@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 
 class AiChatScreen extends StatefulWidget {
@@ -27,9 +28,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
   String? _pendingName;
 
   static const suggestions = [
-    'Advokatlar kerak',
-    'Huquqiy maslahat kerak',
-    'Hujjat tayyorlash',
+    'ai_suggestion_lawyers',
+    'ai_suggestion_advice',
+    'ai_suggestion_documents',
   ];
 
   @override
@@ -49,7 +50,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
     setState(() {
       _messages.add(
         _ChatMessage(
-          text.isEmpty ? (pendingName ?? 'Fayl') : text,
+          text.isEmpty ? (pendingName ?? context.tr('file')) : text,
           true,
           file: pendingPath != null,
           filePath: pendingPath,
@@ -65,7 +66,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
       setState(() {
         _typing = false;
         _messages.add(
-          _ChatMessage('Sizga mos advokatlarni topdim:', false, lawyers: true),
+          _ChatMessage(context.tr('ai_lawyer_found'), false, lawyers: true),
         );
       });
       _toBottom();
@@ -75,14 +76,14 @@ class _AiChatScreenState extends State<AiChatScreen> {
   Future<void> _attach() async {
     final type = await showDialog<String>(
       context: context,
-      barrierColor: Colors.transparent,
+      barrierColor: AppTheme.transparent,
       builder: (context) => Align(
         alignment: Alignment.bottomLeft,
         child: Container(
           width: 272,
           padding: const EdgeInsets.only(bottom: 72,left: 16),
           child: Material(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(16),
 
             child: Padding(
@@ -92,18 +93,18 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 children: [
                   _AttachmentOption(
                     icon: 'assets/icons/camera_alt_outlined.svg',
-                    label: 'Kamera',
-                    onTap: () => Navigator.pop(context, 'Kamera'),
+                    label: context.tr('camera'),
+                    onTap: () => Navigator.pop(context, 'camera'),
                   ),
                   _AttachmentOption(
                     icon: 'assets/icons/photo_outlined.svg',
-                    label: 'Rasm',
-                    onTap: () => Navigator.pop(context, 'Rasm'),
+                    label: context.tr('image'),
+                    onTap: () => Navigator.pop(context, 'image'),
                   ),
                   _AttachmentOption(
                     icon: 'assets/icons/insert_drive_file_outlined.svg',
-                    label: 'Fayl',
-                    onTap: () => Navigator.pop(context, 'Fayl'),
+                    label: context.tr('file'),
+                    onTap: () => Navigator.pop(context, 'file'),
                   ),
                 ],
               ),
@@ -113,7 +114,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
       ),
     );
     if (type == null || !mounted) return;
-    if (type == 'Kamera') {
+    if (type == 'camera') {
       final image = await ImagePicker().pickImage(source: ImageSource.camera);
       if (image == null || !mounted) return;
       setState(() {
@@ -123,7 +124,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
       return;
     }
     final file = await openFile(
-      acceptedTypeGroups: type == 'Rasm'
+      acceptedTypeGroups: type == 'image'
           ? const [
               XTypeGroup(
                 label: 'Images',
@@ -163,24 +164,24 @@ class _AiChatScreenState extends State<AiChatScreen> {
     final selected = await showDialog<_HistoryItem>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eski suhbatlar'),
+        title: Text(context.tr('old_chats')),
         contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView(
             shrinkWrap: true,
-            children: const [
+            children: [
               _HistoryTile(
                 item: _HistoryItem(
-                  'Mehnat huquqi bo‘yicha maslahat',
+                  context.tr('ai_history_labor'),
                   '12.09.2026',
                 ),
               ),
               _HistoryTile(
-                item: _HistoryItem('Advokat qidirish', '08.09.2026'),
+                item: _HistoryItem(context.tr('ai_history_search'), '08.09.2026'),
               ),
               _HistoryTile(
-                item: _HistoryItem('Shartnoma tayyorlash', '01.09.2026'),
+                item: _HistoryItem(context.tr('ai_history_contract'), '01.09.2026'),
               ),
             ],
           ),
@@ -193,8 +194,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
         ..clear()
         ..add(_ChatMessage(selected.title, true))
         ..add(
-          const _ChatMessage(
-            'Suhbat davom ettirildi. Savolingizni yozishingiz mumkin.',
+          _ChatMessage(
+            context.tr('chat_resumed'),
             false,
           ),
         );
@@ -205,7 +206,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F6FA),
+      backgroundColor: AppTheme.color_FFF2F6FA,
       body: SafeArea(
         child: Stack(
           children: [
@@ -302,7 +303,7 @@ class _HeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    color: AppTheme.surface,
     shape: const CircleBorder(),
     child: InkWell(
       onTap: onTap,
@@ -328,7 +329,7 @@ class _HistoryTile extends StatelessWidget {
   Widget build(BuildContext context) => ListTile(
     contentPadding: const EdgeInsets.symmetric(horizontal: 4),
     leading: const CircleAvatar(
-      backgroundColor: Color(0xFFE8F2FF),
+      backgroundColor: AppTheme.color_FFE8F2FF,
       child: Icon(
         Icons.chat_bubble_outline,
         color: AppTheme.primaryBlue,
@@ -359,16 +360,16 @@ class _Welcome extends StatelessWidget {
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Color(0xFF67B4FF), Color(0xFF287FF0)],
+                colors: [AppTheme.color_FF67B4FF, AppTheme.color_FF287FF0],
               ),
             ),
-            child: const Icon(Icons.auto_awesome, color: Colors.white),
+            child: const Icon(Icons.auto_awesome, color: AppTheme.surface),
           ),
           const SizedBox(height: 9),
           const Text('ADVO AI', style: TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 7),
-          const Text(
-            'Savollaringizga tezkor va tushunarli javoblar oling.',
+          Text(
+            context.tr('ai_welcome'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
           ),
@@ -380,11 +381,11 @@ class _Welcome extends StatelessWidget {
             children: _AiChatScreenState.suggestions
                 .map(
                   (text) => ActionChip(
-                    label: Text(text, style: const TextStyle(fontSize: 11)),
+                    label: Text(context.tr(text), style: const TextStyle(fontSize: 11)),
                     avatar: const Icon(Icons.gavel, size: 14),
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppTheme.surface,
                     side: BorderSide.none,
-                    onPressed: () => onSuggestion(text),
+                    onPressed: () => onSuggestion(context.tr(text)),
                   ),
                 )
                 .toList(),
@@ -421,7 +422,7 @@ class _MessageBubble extends StatelessWidget {
         text: TextSpan(
           text: message.file ? '📎 ${message.text}' : message.text,
           style: TextStyle(
-            color: message.user ? Colors.white : const Color(0xFF172033),
+            color: message.user ? AppTheme.surface : AppTheme.color_FF172033,
             fontSize: 13,
             height: 1.35,
           ),
@@ -437,7 +438,7 @@ class _MessageBubble extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: message.user ? AppTheme.primaryBlue : Colors.white,
+          color: message.user ? AppTheme.primaryBlue : AppTheme.surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: content,
@@ -454,7 +455,7 @@ class _LawyerCard extends StatelessWidget {
     padding: const EdgeInsets.all(7),
 
     decoration: BoxDecoration(
-      color: const Color(0xFFF8FAFC),
+      color: AppTheme.color_FFF8FAFC,
       borderRadius: BorderRadius.circular(12),
     ),
     child: Row(
@@ -489,13 +490,13 @@ class _LawyerCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xff0F172A),
+                  color: AppTheme.color_FF0F172A,
                 ),
               ),
               Wrap(
                 children: [
-                  const Text(
-                    'Yuridik maslahatchi',
+                  Text(
+                    context.tr('legal_consultant'),
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppTheme.textChoco,
@@ -511,8 +512,8 @@ class _LawyerCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Text(
-                    '5 yil tajriba',
+                  Text(
+                    '5 ${context.tr('years_experience')}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppTheme.textChoco,
@@ -529,15 +530,15 @@ class _LawyerCard extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
-                      color: Color(0xff0F172A),
+                  color: AppTheme.color_FF0F172A,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    '(89 ta sharh)',
+                    '(89 ${context.tr('reviews_suffix')})',
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: Color(0xff475569),
+                  color: AppTheme.color_FF475569,
                       fontSize: 14,
                     ),
                   ),
@@ -561,7 +562,7 @@ class _TypingBubble extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(14),
       ),
       child: const Text(
@@ -608,16 +609,16 @@ class _FileAttachment extends StatelessWidget {
               ),
             )
           else
-            const Icon(Icons.insert_drive_file_outlined, color: Colors.white),
+            const Icon(Icons.insert_drive_file_outlined, color: AppTheme.surface),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
               message.text,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: const TextStyle(color: AppTheme.surface, fontSize: 12),
             ),
           ),
           const SizedBox(width: 6),
-          const Icon(Icons.open_in_new, color: Colors.white, size: 16),
+          const Icon(Icons.open_in_new, color: AppTheme.surface, size: 16),
         ],
       ),
     );
@@ -648,8 +649,8 @@ class _Composer extends StatelessWidget {
           ? const EdgeInsets.fromLTRB(12, 4, 4, 4)
           : const EdgeInsets.fromLTRB(8, 8, 4, 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFF2B7FFF), width: 1),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.color_FF2B7FFF, width: 1),
         borderRadius: BorderRadius.circular(54),
       ),
       child: Column(
@@ -671,7 +672,7 @@ class _Composer extends StatelessWidget {
                         errorBuilder: (_, __, ___) => Container(
                           width: 102,
                           height: 102,
-                          color: const Color(0xFFE2E8F0),
+                          color: AppTheme.color_FFE2E8F0,
                           child: const Icon(Icons.insert_drive_file_outlined),
                         ),
                       ),
@@ -685,7 +686,7 @@ class _Composer extends StatelessWidget {
                           width: 25,
                           height: 25,
                           decoration: const BoxDecoration(
-                            color: Colors.white70,
+                            color: AppTheme.white70,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.close, size: 16),
@@ -709,7 +710,7 @@ class _Composer extends StatelessWidget {
                       child: Icon(
                         Icons.add,
                         size: 22,
-                        color: Color(0xFF334155),
+                        color: AppTheme.color_FF334155,
                       ),
                     ),
                   ),
@@ -719,8 +720,8 @@ class _Composer extends StatelessWidget {
                     controller: controller,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => onSend(),
-                    decoration: const InputDecoration(
-                      hintText: 'Bo‘sh qoldiring',
+                    decoration: InputDecoration(
+                      hintText: context.tr('leave_empty'),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
@@ -734,13 +735,13 @@ class _Composer extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFF1F5F9),
+                      color: AppTheme.color_FFF1F5F9,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.arrow_upward_rounded,
                       size: 22,
-                      color: Color(0xFF334155),
+                      color: AppTheme.color_FF334155,
                     ),
                   ),
                 ),
@@ -777,13 +778,13 @@ class _AttachmentOption extends StatelessWidget {
             height: 40,
             padding: EdgeInsets.all(10),
             decoration: const BoxDecoration(
-              color: Color(0xFFF1F6FC),
+              color: AppTheme.color_FFF1F6FC,
               shape: BoxShape.circle,
             ),
             child: SvgPicture.asset(icon),
           ),
           const SizedBox(width: 12),
-          Text(label, style: const TextStyle(fontSize: 16, color: Color(0xff0F172A))),
+          Text(label, style: const TextStyle(fontSize: 16, color: AppTheme.color_FF0F172A)),
         ],
       ),
     ),

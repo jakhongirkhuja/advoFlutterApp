@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 import 'profile_template_form_screen.dart';
 import 'profile_template_preview_screen.dart';
@@ -28,7 +29,7 @@ class ProfileTemplatesScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       borderRadius: BorderRadius.circular(19),
                     ),
                     child: Column(
@@ -38,7 +39,7 @@ class ProfileTemplatesScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundColor: const Color(0xFFF1F5F9),
+                              backgroundColor: AppTheme.color_FFF1F5F9,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SvgPicture.asset('assets/icons/doc.svg'),
@@ -51,22 +52,22 @@ class ProfileTemplatesScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) =>
-                                        const ProfileTemplatePreviewScreen(
-                                          name: 'Ism Familiya Otangizning ismi',
+                                      ProfileTemplatePreviewScreen(
+                                          name: context.tr('full_name_hint'),
                                           phone: '+998 90 123 45 67',
-                                          company: 'ABC MChJ',
-                                          position: 'Menejer',
-                                          manager: 'Rahbarning ism-familiyasi',
+                                          company: context.tr('company_hint'),
+                                          position: context.tr('position_hint'),
+                                          manager: context.tr('manager_hint'),
                                           date: '01.01.2026',
-                                          reason: 'Shaxsiy sabablar',
+                                          reason: context.tr('reason_hint'),
                                         ),
                                   ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Ishdan bo‘shash arizasi',
+                                    Text(
+                                      context.tr('resignation_application'),
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
@@ -112,11 +113,11 @@ class ProfileTemplatesScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: AppTheme.pageBackground,
-                            border: Border.all(color: const Color(0xffE2E8F0)),
+                            border: Border.all(color: AppTheme.color_FFE2E8F0),
                             borderRadius: BorderRadius.circular(11),
                           ),
-                          child: const Text(
-                            'Ishdan bo‘shash uchun tayyor ariza shabloni',
+                          child: Text(
+                            context.tr('template_description'),
                             style: TextStyle(
                               fontSize: 14,
                               color: AppTheme.textSecondary,
@@ -127,7 +128,7 @@ class ProfileTemplatesScreen extends StatelessWidget {
                         Container(
                           height: 1,
                           margin: EdgeInsets.symmetric(vertical: 10),
-                          color: Color(0xffE2E8F0),
+                          color: AppTheme.color_FFE2E8F0,
                         ),
                         Row(
                           children: [
@@ -137,14 +138,14 @@ class ProfileTemplatesScreen extends StatelessWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8FFF5),
+                                color: AppTheme.color_FFE8FFF5,
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Text(
-                                'Sotib olingan',
+                              child: Text(
+                                context.tr('purchased'),
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Color(0xFF00A86B),
+                                  color: AppTheme.color_FF00A86B,
                                 ),
                               ),
                             ),
@@ -159,11 +160,11 @@ class ProfileTemplatesScreen extends StatelessWidget {
                               ),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Color(0xff2B7FFF),
+                                  color: AppTheme.color_FF2B7FFF,
                                   borderRadius: BorderRadius.circular(42),
                                 ),
                                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                                child: Text('To\'ldirish', style:  TextStyle(color: Colors.white, fontSize: 16),),
+                                child: Text(context.tr('fill_button'), style:  TextStyle(color: AppTheme.surface, fontSize: 16),),
                               ),
                             )
                           ],
@@ -175,7 +176,7 @@ class ProfileTemplatesScreen extends StatelessWidget {
               ),
             ),
           ),
-          const HeaderScreen(title: 'Shablonlarim'),
+          HeaderScreen(title: context.tr('my_templates')),
         ],
       ),
     ),
@@ -195,13 +196,13 @@ class ProfileTemplatesScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 62, 12, 74),
               children: const [
                 _IntroCard(),
-                _FormCard(title: 'Shaxsiy ma’lumotlar', fields: ['F.I.Sh.', 'Telefon raqam']),
-                _FormCard(title: 'Ish joyi', fields: ['Tashkilot nomi', 'Lavozimingiz', 'Rahbarning F.I.Sh.']),
-                _FormCard(title: 'Ariza ma’lumotlari', fields: ['Ishdan bo‘shash sanasi', 'Ishdan bo‘shash sababi (ixtiyoriy)']),
+                _FormCard(title: context.tr('personal_info'), fields: ['F.I.Sh.', 'Telefon raqam']),
+                _FormCard(title: context.tr('workplace'), fields: [context.tr('organization_name'), context.tr('position'), context.tr('manager_name')]),
+                _FormCard(title: context.tr('application_info'), fields: [context.tr('resignation_date'), context.tr('resignation_reason')]),
               ],
             ),
           ),
-          const HeaderScreen(title: 'Ishdan bo‘shash arizasi'),
+          HeaderScreen(title: context.tr('resignation_application')),
           Positioned(
             left: 12,
             right: 12,
@@ -210,8 +211,8 @@ class ProfileTemplatesScreen extends StatelessWidget {
               height: 44,
               child: FilledButton(
                 onPressed: () => setState(() => _page = 2),
-                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2F80FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22))),
-                child: const Text('Davom etish', style: TextStyle(fontSize: 10)),
+                style: FilledButton.styleFrom(backgroundColor: AppTheme.color_FF2F80FF, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22))),
+                child: Text(context.tr('continue_button'), style: const TextStyle(fontSize: 10)),
               ),
             ),
           ),
@@ -229,24 +230,24 @@ class ProfileTemplatesScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 62, 12, 70),
             child: Container(
               padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              child: const SingleChildScrollView(
+              decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(20)),
+              child: SingleChildScrollView(
                 child: Text(
-                  'Ishdan bo‘shash arizasi\n\nHurmatli rahbar,\n\nMeni egallab turgan lavozimimdan bo‘shatishingizni so‘rayman.\n\nSana: ______________\nImzo: ______________',
+                  context.tr('document_template_body'),
                   style: TextStyle(fontSize: 10, height: 1.5),
                 ),
               ),
             ),
           ),
-          const HeaderScreen(title: 'Ishdan bo‘shash arizasi'),
+          HeaderScreen(title: context.tr('resignation_application')),
           Positioned(
             left: 12,
             right: 12,
             bottom: 8,
             child: Row(children: [
-              Expanded(child: OutlinedButton(onPressed: () => setState(() => _page = 1), child: const Text('Tahrirlash', style: TextStyle(fontSize: 10)))),
+              Expanded(child: OutlinedButton(onPressed: () => setState(() => _page = 1), child: Text(context.tr('edit_button'), style: const TextStyle(fontSize: 10)))),
               const SizedBox(width: 8),
-              Expanded(child: FilledButton(onPressed: () {}, child: const Text('Yuklab olish', style: TextStyle(fontSize: 10)))),
+              Expanded(child: FilledButton(onPressed: () {}, child: Text(context.tr('download_button'), style: const TextStyle(fontSize: 10)))),
             ]),
           ),
         ],
@@ -262,11 +263,11 @@ class _IntroCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 8),
     padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+    decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(20)),
     child: const Row(children: [
-      CircleAvatar(radius: 16, backgroundColor: Color(0xFFF1F5F9), child: Icon(Icons.description_outlined, size: 17, color: AppTheme.textSecondary)),
+    CircleAvatar(radius: 16, backgroundColor: AppTheme.color_FFF1F5F9, child: Icon(Icons.description_outlined, size: 17, color: AppTheme.textSecondary)),
       SizedBox(width: 8),
-      Text('Ishdan bo‘shash arizasi', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+      Text(context.tr('resignation_application'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
     ]),
   );
 }
@@ -280,7 +281,7 @@ class _FormCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 8),
     padding: const EdgeInsets.fromLTRB(8, 10, 8, 4),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+    decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(20)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
       ...fields.map((field) => Padding(

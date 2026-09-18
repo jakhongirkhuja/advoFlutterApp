@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../core/routes/app_router.dart';
 import '../../core/config/app_config.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../data/models/home/lawyer.dart';
 import '../features/home/viewmodels/home_viewmodel.dart';
 
@@ -21,9 +22,9 @@ class LawyerCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFECECEC)),
+        border: Border.all(color: AppTheme.color_FFECECEC),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +72,7 @@ class LawyerCard extends StatelessWidget {
                           const Icon(
                             Icons.verified,
                             size: 20,
-                            color: Color(0xFF3E9B6B),
+                            color: AppTheme.color_FF3E9B6B,
                           ),
                         ],
                       ],
@@ -80,7 +81,7 @@ class LawyerCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '${lawyer.title}',
+                          context.tr(lawyer.title),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.textChoco,
@@ -138,6 +139,7 @@ class LawyerCard extends StatelessWidget {
                   ),
                   child: SvgPicture.asset(
                     isSaved ? 'assets/icons/bookmarkfilled.svg' : 'assets/icons/bookmark.svg',
+                    colorFilter: ColorFilter.mode(AppTheme.primaryGold, BlendMode.srcATop),
                   ),
                 ),
               )
@@ -150,7 +152,7 @@ class LawyerCard extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 4,
-                children: lawyer.tags.take(2).map(_tag).toList(),
+                children: lawyer.tags.take(2).map((tag) => _tag(context.tr(tag))).toList(),
               ),
               if(lawyer.tags.length>2) ...[
                 const SizedBox(width: 8),
@@ -195,8 +197,8 @@ class LawyerCard extends StatelessWidget {
                     color: AppTheme.buttonGold,
                     borderRadius: BorderRadius.circular(42),
                   ),
-                  child: Text('Ko\'rish', style: TextStyle(
-                      color: Colors.white,
+                  child: Text(context.tr('view'), style: TextStyle(
+                      color: AppTheme.surface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500
                   ),),

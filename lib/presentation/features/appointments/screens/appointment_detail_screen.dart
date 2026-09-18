@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/appointments/appointment.dart';
 import '../../../widgets/header_navigation.dart';
 
@@ -58,14 +60,14 @@ class AppointmentDetailScreen extends StatelessWidget {
               bottom: 0,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                color: Colors.white,
+                color: AppTheme.surface,
                 child: Row(
                   children: [
                     Expanded(
                       child: _BottomButton(
-                        label: 'Qayta belgilash',
-                        backgroundColor: const Color(0xFFF3F1F1),
-                        foregroundColor: Colors.black,
+                        label: context.tr('reschedule'),
+                        backgroundColor: AppTheme.color_FFF3F1F1,
+                        foregroundColor: AppTheme.black,
                         onTap: () {},
                       ),
                     ),
@@ -100,7 +102,7 @@ class _AppointmentIdentity extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Stack(
@@ -113,7 +115,7 @@ class _AppointmentIdentity extends StatelessWidget {
               gradient: const RadialGradient(
                 center: Alignment(0, -1.5),
                 radius: 1.5,
-                colors: [Color(0xFFD9B875), Color(0x00FFFFFF)],
+                colors: [AppTheme.color_FFD9B875, AppTheme.color_00FFFFFF],
               ),
               borderRadius: BorderRadius.circular(22),
             ),
@@ -126,9 +128,10 @@ class _AppointmentIdentity extends StatelessWidget {
                 Container(
                   width: 100,
                   height: 100,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(100),
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     image: appointment.avatarUrl != null
                         ? DecorationImage(
                             image: NetworkImage(appointment.avatarUrl!),
@@ -137,16 +140,7 @@ class _AppointmentIdentity extends StatelessWidget {
                         : null,
                   ),
                   child: appointment.avatarUrl == null
-                      ? Center(
-                          child: Text(
-                            _initials(appointment.lawyerName),
-                            style: const TextStyle(
-                              color: AppTheme.primaryBlue,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24,
-                            ),
-                          ),
-                        )
+                      ? Image.asset('assets/images/default_user.jpg', fit: BoxFit.fill,)
                       : null,
                 ),
                 Positioned(
@@ -155,12 +149,12 @@ class _AppointmentIdentity extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.verified,
-                      color: Color(0xFF00A86B),
+                    color: AppTheme.color_FF00A86B,
                       size: 20,
                     ),
                   ),
@@ -180,18 +174,18 @@ class _AppointmentIdentity extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff1D1816),
+                    color: AppTheme.color_FF1D1816,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                   margin: const EdgeInsets.only(top: 8, bottom: 20),
                   decoration: BoxDecoration(
-                    color: const Color(0xffF3F1F1),
+                    color: AppTheme.color_FFF3F1F1,
                     borderRadius: BorderRadius.circular(21),
                   ),
                   child: Text(
-                    appointment.lawyerTitle,
+                    context.tr(appointment.lawyerTitle),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 14,
@@ -211,17 +205,17 @@ class _AppointmentIdentity extends StatelessWidget {
                     children: [
                       _StatItem(
                         icon: 'assets/icons/calendar.svg',
-                        label: 'Tajriba',
-                        value: '${appointment.experienceYears} yil',
+                        label: context.tr('experience'),
+                        value: '${appointment.experienceYears} ${context.tr('year')}',
                       ),
-                      const _StatItem(
+                      _StatItem(
                         icon: 'assets/icons/hummer.svg',
-                        label: 'Qabullar',
+                        label: context.tr('appointments'),
                         value: '+980',
                       ),
                       _StatItem(
                         icon: 'assets/icons/star.svg',
-                        label: 'Reyting',
+                        label: context.tr('rating'),
                         value: appointment.rating.toStringAsFixed(1),
                         last: true,
                       ),
@@ -257,7 +251,7 @@ class _StatItem extends StatelessWidget {
         margin: EdgeInsets.only(right: last ? 0 : 6),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -273,7 +267,7 @@ class _StatItem extends StatelessWidget {
                 if (icon.endsWith('.svg'))
                   SvgPicture.asset(icon, width: 16, height: 16)
                 else
-                  Icon(Icons.star, size: 16, color: Colors.amber),
+                  Icon(Icons.star, size: 16, color: AppTheme.star),
                 const SizedBox(width: 4),
                 Text(
                   value,
@@ -301,7 +295,7 @@ class _DetailsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
@@ -310,8 +304,8 @@ class _DetailsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Tafsilotlar',
+              Text(
+                context.tr('details'),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Row(
@@ -321,16 +315,16 @@ class _DetailsCard extends StatelessWidget {
                     width: 6,
                     height: 6,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF00B27A),
+                      color: AppTheme.color_FF00B27A,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Text(
-                    'To\'langan',
+                  Text(
+                    context.tr('paid'),
                     style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF00B27A),
+                      color: AppTheme.color_FF00B27A,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -342,21 +336,22 @@ class _DetailsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: AppTheme.color_FFF9FAFB,
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppTheme.color_FFE2E8F0)
             ),
             child: Column(
               children: [
-                _DetailRow(label: 'Xizmat turi:', value: appointment.topic),
+                _DetailRow(label: '${context.tr('service_type')}:', value: context.tr(appointment.topic)),
                 const SizedBox(height: 12),
                 _DetailRow(
-                  label: 'Sana:',
-                  value: '${_formatDate(appointment.dateLabel)}, ${appointment.timeLabel}',
+                  label: '${context.tr('date')}:',
+                  value: '${_formatDate(context, appointment.dateLabel)}, ${appointment.timeLabel}',
                 ),
                 const SizedBox(height: 12),
-                _DetailRow(label: 'Format:', value: appointment.consultationType),
+                _DetailRow(label: context.tr('format_label'), value: context.tr(appointment.consultationType)),
                 const SizedBox(height: 12),
-                const _DetailRow(label: 'Narxi:', value: '150 000 so\'m'),
+                _DetailRow(label: context.tr('price_label'), value: '150 000 so\'m'),
               ],
             ),
           ),
@@ -365,9 +360,9 @@ class _DetailsCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     if (raw.toLowerCase() == 'today' || raw.toLowerCase() == 'bugun') {
-      return 'Bugun';
+      return context.tr('today');
     }
     // Expected format: 09.07.2026 -> 7-sentabr
     final parts = raw.split('.');
@@ -375,11 +370,8 @@ class _DetailsCard extends StatelessWidget {
     final day = int.tryParse(parts[1]);
     final month = int.tryParse(parts[0]);
     if (day == null || month == null || month < 1 || month > 12) return raw;
-    const months = [
-      'yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun',
-      'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'
-    ];
-    return '$day-${months[month - 1]}';
+    final date = DateTime(2026, month, day);
+    return DateFormat('d MMMM', Localizations.localeOf(context).languageCode).format(date);
   }
 }
 
@@ -396,11 +388,11 @@ class _DetailRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 15, color: Color(0xff64748B)),
+          style: const TextStyle(fontSize: 15, color: AppTheme.color_FF64748B),
         ),
         Text(
           value,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xff1E293B)),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.color_FF1E293B),
         ),
       ],
     );
@@ -416,20 +408,20 @@ class _ProblemCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Muammo haqida',
+            context.tr('problem_about'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           Text(
-            'Mulk masalasi bo‘yicha huquqiy maslahat olish.',
-            style: TextStyle(fontSize: 16, height: 1.4, color: Color(0xff475569)),
+            context.tr('legal_advice'),
+          style: TextStyle(fontSize: 16, height: 1.4, color: AppTheme.color_FF475569),
           ),
         ],
       ),
@@ -449,9 +441,9 @@ class _DocumentsCardState extends State<_DocumentsCard> {
 
   Future<void> _pickDocument() async {
     try {
-      const acceptedTypes = <XTypeGroup>[
+      final acceptedTypes = <XTypeGroup>[
         XTypeGroup(
-          label: 'Hujjatlar',
+          label: context.tr('documents'),
           extensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
         ),
       ];
@@ -479,7 +471,7 @@ class _DocumentsCardState extends State<_DocumentsCard> {
     } on Exception catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hujjatni tanlab bo‘lmadi')),
+        SnackBar(content: Text(context.tr('file_select_failed'))),
       );
     }
   }
@@ -490,14 +482,14 @@ class _DocumentsCardState extends State<_DocumentsCard> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Hujjatlar',
+          Text(
+            context.tr('documents'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
@@ -509,10 +501,10 @@ class _DocumentsCardState extends State<_DocumentsCard> {
           Center(
             child: TextButton.icon(
               onPressed: _pickDocument,
-              icon: const Icon(Icons.add, size: 20, color: Color(0xff64748B)),
-              label: const Text(
-                'Hujjat qo‘shish',
-                style: TextStyle(color: Color(0xff64748B), fontSize: 15, fontWeight: FontWeight.w500),
+              icon: const Icon(Icons.add, size: 20, color: AppTheme.color_FF64748B),
+              label: Text(
+                context.tr('add_document'),
+                style: TextStyle(color: AppTheme.color_FF64748B, fontSize: 15, fontWeight: FontWeight.w500),
               ),
             ),
           ),
@@ -525,8 +517,8 @@ class _DocumentsCardState extends State<_DocumentsCard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.color_FFF1F5F9),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -536,10 +528,10 @@ class _DocumentsCardState extends State<_DocumentsCard> {
             height: 44,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: AppTheme.color_FFF8FAFC,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: SvgPicture.asset('assets/icons/pdf.svg', errorBuilder: (_, __, ___) => const Icon(Icons.insert_drive_file_outlined, color: Color(0xff64748B))),
+            child: SvgPicture.asset('assets/icons/pdf.svg', errorBuilder: (_, __, ___) => const Icon(Icons.insert_drive_file_outlined, color: AppTheme.color_FF64748B)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -554,14 +546,14 @@ class _DocumentsCardState extends State<_DocumentsCard> {
                 ),
                 Text(
                   _formatFileSize(document.size),
-                  style: const TextStyle(fontSize: 13, color: Color(0xff64748B)),
+                  style: const TextStyle(fontSize: 13, color: AppTheme.color_FF64748B),
                 ),
               ],
             ),
           ),
           IconButton(
             onPressed: () => setState(() => _documents.remove(document)),
-            icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 22),
+            icon: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 22),
           ),
         ],
       ),
@@ -643,8 +635,8 @@ class AppointmentActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final start = appointmentDateTime(appointment);
     final text = start != null && DateTime.now().isBefore(start)
-        ? 'Boshlash'
-        : 'Ko‘rish';
+        ? context.tr('start')
+        : context.tr('view');
     return SizedBox(
       width: double.infinity,
       height: height,
@@ -652,13 +644,13 @@ class AppointmentActionButton extends StatelessWidget {
         onPressed: () => openAppointmentMeeting(context, appointment),
         style: TextButton.styleFrom(
           backgroundColor: backgroundColor,
-          foregroundColor: Colors.white,
+          foregroundColor: AppTheme.surface,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
         child: Text(
           text,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: fontSize),
+          style: TextStyle(color: AppTheme.surface, fontWeight: FontWeight.w600, fontSize: fontSize),
         ),
       ),
     );
@@ -721,7 +713,7 @@ Future<void> openAppointmentMeeting(BuildContext context, Appointment appointmen
   final meetingUrl = appointment.meetingUrl;
   if (meetingUrl == null || meetingUrl.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Google Meet havolasi mavjud emas')),
+      SnackBar(content: Text(context.tr('meet_link_missing'))),
     );
     return;
   }
@@ -729,7 +721,7 @@ Future<void> openAppointmentMeeting(BuildContext context, Appointment appointmen
   final opened = await launchUrl(Uri.parse(meetingUrl), mode: LaunchMode.externalApplication);
   if (!opened && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Google Meetni ochib bo‘lmadi')),
+      SnackBar(content: Text(context.tr('meet_open_failed'))),
     );
   }
 }

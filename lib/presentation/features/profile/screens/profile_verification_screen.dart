@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 
 enum _VerificationStatus { notUploaded, ready, underReview, verified, rejected }
@@ -18,14 +19,14 @@ class ProfileVerificationScreen extends StatefulWidget {
 
 class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
   final Map<String, XFile?> _files = {
-    'Passport (old tomoni)': null,
-    'Passport (orqa tomoni)': null,
-    'Hujjat ushlab turgan selfi': null,
+    'passport_front': null,
+    'passport_back': null,
+    'selfie_with_document': null,
   };
   final Map<String, _VerificationStatus> _statuses = {
-    'Passport (old tomoni)': _VerificationStatus.notUploaded,
-    'Passport (orqa tomoni)': _VerificationStatus.notUploaded,
-    'Hujjat ushlab turgan selfi': _VerificationStatus.notUploaded,
+    'passport_front': _VerificationStatus.notUploaded,
+    'passport_back': _VerificationStatus.notUploaded,
+    'selfie_with_document': _VerificationStatus.notUploaded,
   };
 
   bool _isVerified(String title) =>
@@ -35,8 +36,8 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
     if (_isVerified(title)) return;
 
     final file = await openFile(
-      acceptedTypeGroups: const [
-        XTypeGroup(label: 'Rasmlar', extensions: ['jpg', 'jpeg', 'png']),
+      acceptedTypeGroups: [
+        XTypeGroup(label: context.tr('upload_files'), extensions: ['jpg', 'jpeg', 'png']),
       ],
     );
     if (!mounted || file == null) return;
@@ -58,7 +59,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.white,
+    backgroundColor: AppTheme.surface,
     body: SafeArea(
       child: Stack(
         children: [
@@ -71,7 +72,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
               children: [
                 Column(
                   children: [
-                    CustomIconDesign(icon: 'assets/icons/verify.svg', mainColor: Color(0xff15985B), secondaryColor: Color(0xff40DB93)),
+                    CustomIconDesign(icon: 'assets/icons/verify.svg', mainColor: AppTheme.color_FF15985B, secondaryColor: AppTheme.color_FF40DB93),
                     const SizedBox(height: 12),
                     const Text(
                       'Profilingizni tasdiqlang',
@@ -95,7 +96,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Column(
@@ -118,7 +119,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                   margin: const EdgeInsets.only(top: 8),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child:  Column(
@@ -129,7 +130,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                         children: [
                           Image.asset('assets/images/info.png'),
                           Text(
-                            'Eslatma',
+                            context.tr('verification_note'),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -143,8 +144,8 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                         children: [
                           SvgPicture.asset('assets/icons/note_ok.svg'),
                           Text(
-                            'Yorug‘ joyda, matn aniq ko‘rinsin',
-                            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                            context.tr('verification_tip_clear'),
+                            style: TextStyle(fontSize: 14, color: AppTheme.color_FF334155),
                           ),
                         ],
                       ),
@@ -154,8 +155,8 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                         children: [
                           SvgPicture.asset('assets/icons/note_ok.svg'),
                           Text(
-                            'Yuzingiz va hujjat birga ko‘rinsin',
-                            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                            context.tr('verification_tip_selfie'),
+                            style: TextStyle(fontSize: 14, color: AppTheme.color_FF334155),
                           ),
                         ],
                       ),
@@ -165,8 +166,8 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                         children: [
                           SvgPicture.asset('assets/icons/note_fail.svg'),
                           Text(
-                            'Noodatiy yoki chala rasmlar rad etiladi',
-                            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                            context.tr('verification_tip_rejected'),
+                            style: TextStyle(fontSize: 14, color: AppTheme.color_FF334155),
                           ),
                         ],
                       ),
@@ -188,7 +189,7 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: 'Hujjatlar xavfsiz serverga yuklanadi va faqat moderatorlar ko‘radi',
+                          text: context.tr('verification_security'),
                           style: TextStyle(
                             fontSize: 14,
                             color: AppTheme.textSecondary,
@@ -199,17 +200,17 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                Text('1–3 kun ichida tekshiramiz', textAlign: TextAlign.center,)
+                Text(context.tr('verification_time'), textAlign: TextAlign.center,)
               ],
             ),
           ),
-          const HeaderScreen(title: 'Profilni tasdiqlash'),
+          HeaderScreen(title: context.tr('verification')),
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              color: Colors.white,
+              color: AppTheme.surface,
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
               child: SizedBox(
                 height: 48,
@@ -218,12 +219,12 @@ class _ProfileVerificationScreenState extends State<ProfileVerificationScreen> {
                       ? _submitFiles
                       : null,
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F80FF),
+                    backgroundColor: AppTheme.color_FF2F80FF,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(22),
                     ),
                   ),
-                  child: const Text('Yuborish', style: TextStyle(fontSize: 16)),
+                  child: Text(context.tr('submit_button'), style: const TextStyle(fontSize: 16)),
                 ),
               ),
             ),
@@ -263,7 +264,7 @@ class _UploadCard extends StatelessWidget {
 
         decoration: BoxDecoration(
           color: AppTheme.pageBackground,
-          border: Border.all(color: const Color(0xFFF8FAFC)),
+          border: Border.all(color: AppTheme.color_FFF8FAFC),
           borderRadius: BorderRadius.circular(11),
         ),
           child: Column(
@@ -273,7 +274,7 @@ class _UploadCard extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: Color(0xffF1F5F9)
+                color: AppTheme.color_FFF1F5F9
               ),
               padding: EdgeInsets.all(6),
               child: SvgPicture.asset(
@@ -284,7 +285,7 @@ class _UploadCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              title,
+              context.tr(title),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 6),
@@ -322,22 +323,22 @@ class _StatusLabel extends StatelessWidget {
         ),
       _VerificationStatus.ready => (
           'Yuklashga tayyor',
-          const Color(0xFF2F80FF),
+          AppTheme.color_FF2F80FF,
           Icons.check_circle_outline,
         ),
       _VerificationStatus.underReview => (
           'Tekshirilmoqda',
-          const Color(0xFFF59E0B),
+          AppTheme.color_FFF59E0B,
           Icons.hourglass_empty,
         ),
       _VerificationStatus.verified => (
           'Tasdiqlangan',
-          const Color(0xFF15985B),
+          AppTheme.color_FF15985B,
           Icons.verified,
         ),
       _VerificationStatus.rejected => (
           'Rad etilgan',
-          const Color(0xFFDC2626),
+          AppTheme.color_FFDC2626,
           Icons.error_outline,
         ),
     };

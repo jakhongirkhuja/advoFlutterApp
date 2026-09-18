@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 
 class PartnershipScreen extends StatelessWidget {
@@ -22,8 +23,8 @@ class PartnershipScreen extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bu qurilmada telefon qilish ilovasi topilmadi.'),
+        SnackBar(
+          content: Text(context.tr('phone_app_unavailable')),
         ),
       );
     }
@@ -40,7 +41,7 @@ class PartnershipScreen extends StatelessWidget {
             itemCount: numbers.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) => Material(
-              color: Colors.white,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(49),
 
               child: InkWell(
@@ -62,7 +63,7 @@ class PartnershipScreen extends StatelessWidget {
               ),
             ),
           ),
-          const HeaderScreen(title: 'Reklama va hamkorlik'),
+          HeaderScreen(title: context.tr('partnership')),
         ],
       ),
     ),

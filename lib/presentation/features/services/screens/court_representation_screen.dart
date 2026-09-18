@@ -42,7 +42,7 @@ class _CourtRepresentationScreenState extends State<CourtRepresentationScreen> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       borderRadius: BorderRadius.circular(22),
                     ),
                     padding: const EdgeInsets.symmetric(
@@ -77,7 +77,7 @@ class _CourtRepresentationScreenState extends State<CourtRepresentationScreen> {
                                 child: const Icon(
                                   Icons.keyboard_arrow_down,
                                   size: 17,
-                                  color: Color(0xFF777777),
+                                  color: AppTheme.textMuted,
                                 ),
                               ),
                             ],

@@ -56,9 +56,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 17),
                   _SearchField(
-                    hintText:
-                        AppLocalizations.of(context)?.translate('search') ??
-                        'Izlash',
+                    hintText: context.tr('search'),
                   ),
                 ],
               ),
@@ -70,19 +68,13 @@ class HomeScreen extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
-                color: Colors.white,
+                color: AppTheme.surface,
               ),
               child: Column(
                 children: [
                   SectionHeader(
-                    title:
-                        AppLocalizations.of(
-                          context,
-                        )?.translate('legal_services') ??
-                        'Xizmatlar',
-                    action:
-                        AppLocalizations.of(context)?.translate('see_all') ??
-                        'Barchasi',
+                    title: context.tr('services'),
+                    action: context.tr('see_all'),
                     onTap: () => _showComingSoon(context),
                   ),
                   const SizedBox(height: 10),
@@ -98,14 +90,8 @@ class HomeScreen extends StatelessWidget {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 16),
               child: SectionHeader(
-                title:
-                    AppLocalizations.of(
-                      context,
-                    )?.translate('popular_lawyers') ??
-                    'Mashhur advokatlar',
-                action:
-                    AppLocalizations.of(context)?.translate('see_all') ??
-                    'Barchasi',
+                title: context.tr('popular_lawyers'),
+                action: context.tr('see_all'),
                 onTap: () => _showComingSoon(context),
               ),
             ),
@@ -131,8 +117,8 @@ class HomeScreen extends StatelessWidget {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 16),
               child: SectionHeader(
-                title: 'Mashhur tashkilotlar',
-                action: 'Barchasi',
+                title: context.tr('popular_organizations'),
+                action: context.tr('see_all'),
                 onTap: () =>
                     Navigator.pushNamed(context, AppRouter.organizations),
               ),
@@ -159,8 +145,7 @@ class HomeScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          AppLocalizations.of(context)?.translate('coming_soon') ??
-              'Bu bo‘lim tez orada ishga tushadi',
+          context.tr('coming_soon'),
         ),
       ),
     );
@@ -191,9 +176,9 @@ class _TopBar extends StatelessWidget {
                     child: CircularProgressIndicator(
                       value: 0.80,
                       strokeWidth: 2.5,
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppTheme.surface,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xff51A2FF),
+                        AppTheme.color_FF51A2FF,
                       ),
                     ),
                   ),
@@ -202,7 +187,7 @@ class _TopBar extends StatelessWidget {
                     width: 45, // 48 - (strokeWidth * 2) - spacing = 38
                     height: 45,
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       shape: BoxShape.circle,
                     ),
                     child: ClipOval(
@@ -221,12 +206,12 @@ class _TopBar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(45),
                 ),
                 child: const Text(
                   '42%',
-                  style: TextStyle(fontSize: 10, color: Color(0xFF334155)),
+                  style: TextStyle(fontSize: 10, color: AppTheme.color_FF334155),
                 ),
               ),
             ),
@@ -241,18 +226,16 @@ class _TopBar extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.location_on_outlined,
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     size: 16,
                   ),
                   const SizedBox(width: 2),
                   Expanded(
                     child: Text(
-                      locationName == 'Toshkent shahri'
-                          ? 'Tashkent, sh'
-                          : locationName,
+                      context.tr(locationName),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 15, color: Colors.white),
+                      style: const TextStyle(fontSize: 15, color: AppTheme.surface),
                     ),
                   ),
                 ],
@@ -262,7 +245,7 @@ class _TopBar extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppTheme.surface,
                 ),
               ),
             ],
@@ -296,17 +279,17 @@ class _SearchField extends StatelessWidget {
         child: TextField(
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: const TextStyle(color: Color(0xFF475569), fontSize: 14),
+            hintStyle: const TextStyle(color: AppTheme.color_FF475569, fontSize: 14),
             prefixIcon: Padding(
               padding: const EdgeInsets.all(12.0),
               child: SvgPicture.asset('assets/icons/search.svg'),
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppTheme.surface,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(61),
-              borderSide: const BorderSide(color: Colors.transparent, width: 0),
+              borderSide: const BorderSide(color: AppTheme.transparent, width: 0),
             ),
           ),
         ),
@@ -354,7 +337,7 @@ class _OrganizationTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(28),
         ),
         child: Column(
@@ -388,7 +371,7 @@ class _OrganizationTile extends StatelessWidget {
                         height: 40,
                         padding: const EdgeInsets.all(10),
                         decoration: const BoxDecoration(
-                          color: Colors.white,
+                          color: AppTheme.surface,
                           shape: BoxShape.circle,
                         ),
                         child: SvgPicture.asset(
@@ -427,7 +410,7 @@ class _OrganizationTile extends StatelessWidget {
                             child: Icon(
                               Icons.verified,
                               size: 16,
-                              color: Color(0xFF00A878),
+                              color: AppTheme.color_FF00A878,
                             ),
                           ),
                         ),
@@ -447,15 +430,15 @@ class _OrganizationTile extends StatelessWidget {
                     '${organization.rating}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, color: AppTheme.black),
                   ),
                   Text(
-                    '(${organization.reviewsCount} ta sharh)',
+                    '(${organization.reviewsCount} ${context.tr('reviews_suffix')})',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Color(0xff475569),
+                      color: AppTheme.color_FF475569,
                     ),
                   ),
                 ],
@@ -498,7 +481,7 @@ class _ServicesGrid extends StatelessWidget {
         itemBuilder: (context, index) {
           final category = categories[index];
           return Material(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(16),
             child: InkWell(
               onTap: () {
@@ -511,7 +494,7 @@ class _ServicesGrid extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFECECEC)),
+                  border: Border.all(color: AppTheme.color_FFECECEC),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,7 +517,7 @@ class _ServicesGrid extends StatelessWidget {
                         right: 7,
                       ),
                       child: Text(
-                        category.title.replaceAll(' ', '\n'),
+                        context.tr(category.title).replaceAll(' ', '\n'),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -562,7 +545,7 @@ class _HomeLoadingCard extends StatelessWidget {
     return Container(
       height: 130,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),

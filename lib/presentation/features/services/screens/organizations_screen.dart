@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/services/organization.dart';
 import '../../../../presentation/widgets/header_screen.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
@@ -57,7 +58,7 @@ class _OrganizationsScreenState extends State<OrganizationsScreen> {
               ),
             ),
             HeaderScreen(
-              title: 'Tashkilotlar',
+              title: context.tr('organizations'),
               firstActionIconPath: 'assets/icons/search.svg',
               onFirstActionTap: () =>
                   Navigator.pushNamed(context, AppRouter.search),
@@ -83,9 +84,9 @@ class OrganizationCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFECECEC)),
+        border: Border.all(color: AppTheme.color_FFECECEC),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +111,7 @@ class OrganizationCard extends StatelessWidget {
                       child: Text(
                         _initials(organization.name),
                         style: const TextStyle(
-                          color: Color(0xFF31527A),
+                          color: AppTheme.color_FF31527A,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
@@ -142,7 +143,7 @@ class OrganizationCard extends StatelessWidget {
                           const Icon(
                             Icons.verified,
                             size: 17,
-                            color: Color(0xFF3E9B6B),
+                            color: AppTheme.color_FF3E9B6B,
                           ),
                         ],
                       ],
@@ -151,7 +152,7 @@ class OrganizationCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '${organization.type}',
+                          context.tr(organization.type),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.textChoco,
@@ -182,7 +183,7 @@ class OrganizationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          '(${organization.reviewsCount} ta sharh)',
+                          '(${organization.reviewsCount} ${context.tr('reviews_suffix')})',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             color: AppTheme.textChoco,
@@ -221,7 +222,7 @@ class OrganizationCard extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 4,
-                children: organization.tags.take(2).map(_tag).toList(),
+                children: organization.tags.take(2).map((tag) => _tag(context.tr(tag))).toList(),
               ),
               if (organization.tags.length > 2) ...[
                 const SizedBox(width: 8),
@@ -269,7 +270,7 @@ class OrganizationCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(organization.lawyerCount>15? '15+' : organization.lawyerCount.toString(), style: TextStyle(fontSize: 16),),
-                      Text('Advakatlar', style: TextStyle(fontSize: 14, color: AppTheme.textChoco),)
+                      Text(context.tr('lawyers'), style: TextStyle(fontSize: 14, color: AppTheme.textChoco),)
                     ],
                   )
                 ],
@@ -287,9 +288,9 @@ class OrganizationCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(42),
                   ),
                   child: Text(
-                    'Ko\'rish',
+                    context.tr('view'),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -322,4 +323,3 @@ class OrganizationCard extends StatelessWidget {
     return parts.take(2).map((part) => part[0]).join().toUpperCase();
   }
 }
-

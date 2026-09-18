@@ -7,6 +7,7 @@ import '../../../../core/config/app_config.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/phone_formatter.dart';
 import '../../../../data/models/auth/user_model.dart';
 import '../../../widgets/header_screen.dart';
@@ -20,7 +21,7 @@ class ProfileContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _ProfileShell(
-    title: 'Profil',
+    title: context.tr('profile'),
     showBack: false,
     onEdit: () =>
         Navigator.pushNamed(context, AppRouter.profileDetails, arguments: user),
@@ -42,7 +43,7 @@ class ProfileDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _ProfileShell(
-    title: 'Shaxsiy ma’lumotlar',
+    title: context.tr('personal_info'),
     showBottomNavigation: false,
     onEdit: () =>
         Navigator.pushNamed(context, AppRouter.profileEdit, arguments: user),
@@ -92,7 +93,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   @override
   Widget build(BuildContext context) => _ProfileShell(
-    title: 'Shaxsiy ma’lumotlar',
+    title: context.tr('personal_info'),
     showBottomNavigation: false,
     child: _Details(
       user: widget.user,
@@ -218,7 +219,7 @@ class _Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    color: AppTheme.surface,
     shape: const CircleBorder(),
     child: InkWell(
       onTap: onTap,
@@ -242,22 +243,22 @@ class _Menu extends StatelessWidget {
       const SizedBox(height: 12),
       _Tile(
         icon: 'assets/icons/verified_user_outlined.svg',
-        title: 'Profilni tasdiqlash',
+        title: context.tr('verification'),
         onTap: () => Navigator.pushNamed(context, AppRouter.profileVerification),
       ),
       _Tile(
         icon: 'assets/icons/description_outlined.svg',
-        title: 'Hujjat shablonlarim',
+        title: context.tr('my_templates'),
         onTap: () => Navigator.pushNamed(context, AppRouter.profileTemplates),
       ),
       _Tile(
         icon: 'assets/icons/history.svg',
-        title: 'Tarix',
+        title: context.tr('history'),
         onTap: () => Navigator.pushNamed(context, AppRouter.history),
       ),
       _Tile(
         icon: 'assets/icons/card_giftcard_outlined.svg',
-        title: 'Loyihaga hissa qo‘shish',
+        title: context.tr('contribution'),
         onTap: () => Navigator.pushNamed(context, AppRouter.profileContribution),
       ),
       // _Tile(
@@ -267,22 +268,22 @@ class _Menu extends StatelessWidget {
       // ),
       _Tile(
         icon: 'assets/icons/lightbulb_outline.svg',
-        title: 'Ilova bo‘yicha takliflar',
+        title: context.tr('suggestions'),
         onTap: () => Navigator.pushNamed(context, AppRouter.suggestions),
       ),
       _Tile(
         icon: 'assets/icons/campaign_outlined.svg',
-        title: 'Reklama va hamkorlik',
+        title: context.tr('partnership'),
         onTap: () => Navigator.pushNamed(context, AppRouter.partnership),
       ),
       _Tile(
         icon: 'assets/icons/devices_other.svg',
-        title: 'Faol qurilmalar',
+        title: context.tr('active_devices'),
         onTap: () => Navigator.pushNamed(context, AppRouter.activeDevices),
       ),
       _Tile(
         icon: 'assets/icons/language.svg',
-        title: 'Til',
+        title: context.tr('language'),
         undertitle: _languageName(
           context.watch<LocaleProvider>().currentLanguageCode,
         ),
@@ -290,17 +291,17 @@ class _Menu extends StatelessWidget {
       ),
       _Tile(
         icon: 'assets/icons/lock_outline.svg',
-        title: 'Maxfiylik siyosati',
+        title: context.tr('privacy_policy'),
         onTap: () => Navigator.pushNamed(context, AppRouter.profilePrivacy),
       ),
       _Tile(
         icon: 'assets/icons/phone_verify.svg',
-        title: 'Ishonch raqami',
+        title: context.tr('trust_number'),
         onTap: () => Navigator.pushNamed(context, AppRouter.trustNumber),
       ),
       _Tile(
         icon: 'assets/icons/help_outline.svg',
-        title: 'Yordam markazi',
+        title: context.tr('help_center'),
         onTap: () => Navigator.pushNamed(context, AppRouter.helpCenter),
       ),
       // _Tile(
@@ -310,7 +311,7 @@ class _Menu extends StatelessWidget {
       // ),
       _Tile(
         icon: 'assets/icons/logout.svg',
-        title: 'Tizimdan chiqish',
+        title: context.tr('logout'),
         onTap: () => context.read<AuthViewModel>().logout(),
         exit: true,
       ),
@@ -331,14 +332,14 @@ class _Menu extends StatelessWidget {
 
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       elevation: 0,
       builder: (sheetContext) => StatefulBuilder(
         builder: (context, setModalState) => Container(
           margin: const EdgeInsets.fromLTRB(6, 0, 6, 0),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
           decoration: BoxDecoration(
-            color: const Color(0xFFF5F6F8),
+            color: AppTheme.color_FFF5F6F8,
             borderRadius: BorderRadius.only(topRight: Radius.circular(28), topLeft: Radius.circular(28)),
           ),
           child: SafeArea(
@@ -354,12 +355,12 @@ class _Menu extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1F2937),
+                          color: AppTheme.color_FF1F2937,
                         ),
                       ),
                     ),
                     Material(
-                      color: const Color(0xFFEAF0F7),
+                      color: AppTheme.color_FFEAF0F7,
                       shape: const CircleBorder(),
                       child: InkWell(
                         onTap: () => Navigator.pop(sheetContext),
@@ -392,12 +393,12 @@ class _Menu extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: selected
-                              ? const Color(0xFFEAF3FF)
-                              : const Color(0xFFF8FAFC),
+                              ? AppTheme.color_FFEAF3FF
+                              : AppTheme.color_FFF8FAFC,
                           border: Border.all(
                             color: selected
-                                ? const Color(0xFF2F80FF)
-                                : const Color(0xFFE0E7EF),
+                                ? AppTheme.color_FF2F80FF
+                                : AppTheme.color_FFE0E7EF,
                           ),
                           borderRadius: BorderRadius.circular(24),
                         ),
@@ -405,7 +406,7 @@ class _Menu extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 17,
-                              backgroundColor: Colors.white,
+                              backgroundColor: AppTheme.surface,
                               child: Text(
                                 language['flag'] ?? '',
                                 style: const TextStyle(fontSize: 17),
@@ -423,8 +424,8 @@ class _Menu extends StatelessWidget {
                                   ? Icons.check_circle
                                   : Icons.radio_button_unchecked,
                               color: selected
-                                  ? const Color(0xFF2F80FF)
-                                  : const Color(0xFFE0E7EF),
+                                  ? AppTheme.color_FF2F80FF
+                                  : AppTheme.color_FFE0E7EF,
                               size: 20,
                             ),
                           ],
@@ -439,7 +440,7 @@ class _Menu extends StatelessWidget {
                   height: 48,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF2F80FF),
+                      backgroundColor: AppTheme.color_FF2F80FF,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
@@ -448,7 +449,7 @@ class _Menu extends StatelessWidget {
                       await localeProvider.setLocale(Locale(selectedCode));
                       if (sheetContext.mounted) Navigator.pop(sheetContext);
                     },
-                    child: const Text('Saqlash', style: TextStyle(fontSize: 16)),
+                    child: Text(context.tr('save_button'), style: const TextStyle(fontSize: 16)),
                   ),
                 ),
               ],
@@ -469,7 +470,7 @@ class _Banner extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: const Color(0xFFE3BE71),
+      color: AppTheme.color_FFE3BE71,
       borderRadius: BorderRadius.circular(28),
     ),
     child: Row(
@@ -506,7 +507,7 @@ class _Banner extends StatelessWidget {
                         ? user.fio
                         : '${user.firstName} ${user.lastName}',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.surface,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
@@ -515,7 +516,7 @@ class _Banner extends StatelessWidget {
                     const SizedBox(width: 8),
                     const Icon(
                       Icons.verified,
-                      color: Color(0xFF198C72),
+                      color: AppTheme.color_FF198C72,
                       size: 20,
                     ),
                   ],
@@ -524,7 +525,7 @@ class _Banner extends StatelessWidget {
               const SizedBox(height: 5),
               Text(
                 formatPhoneNumber(user.phoneNumber),
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(color: AppTheme.surface, fontSize: 16),
               ),
             ],
           ),
@@ -555,7 +556,7 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: Material(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(28),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -567,7 +568,7 @@ class _Tile extends StatelessWidget {
             children: [
               CircleAvatar(
                 backgroundColor: exit
-                    ? Color(0xffFFE2E2)
+                    ? AppTheme.color_FFFFE2E2
                     : AppTheme.pageBackground,
                 radius: 21,
                 child: SvgPicture.asset(icon),
@@ -582,7 +583,7 @@ class _Tile extends StatelessWidget {
                       undertitle!,
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Color(0xff475569),
+                        color: AppTheme.color_FF475569,
                       ),
                     ),
                   ],
@@ -593,7 +594,7 @@ class _Tile extends StatelessWidget {
                   Icon(
                     Icons.chevron_right,
                     size: 18,
-                    color: exit ? Color(0xffE7000B) : AppTheme.textMuted,
+                    color: exit ? AppTheme.color_FFE7000B : AppTheme.textMuted,
                   ),
             ],
           ),
@@ -666,7 +667,7 @@ class _Details extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4.0),
+                        border: Border.all(color: AppTheme.surface, width: 4.0),
                       ),
                       child: ClipOval(
                         child: Image.network(
@@ -694,7 +695,7 @@ class _Details extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 10,
                         backgroundColor: AppTheme.buttonGold,
-                        child: Icon(Icons.add, size: 14, color: Colors.white),
+                        child: Icon(Icons.add, size: 14, color: AppTheme.surface),
                       ),
                     ),
                 ],
@@ -702,7 +703,7 @@ class _Details extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _Card(
-              title: 'Shaxsiy ma’lumotlar',
+              title: context.tr('personal_info'),
               children: [
                 _Field('Ismi', controller: firstName, enabled: editing),
                 _Field('Familiya', controller: lastName, enabled: editing),
@@ -723,7 +724,7 @@ class _Details extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _Card(
-              title: 'Manzil',
+              title: context.tr('address'),
               children: [
                 _Select('Viloyat', region, editing, onRegion, const [
                   'Toshkent',
@@ -746,7 +747,7 @@ class _Details extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onSave,
               icon: const Icon(Icons.edit_outlined, size: 16),
-              label: const Text('Tahrirlash'),
+              label: Text(context.tr('edit_button')),
             ),
           ),
         ),
@@ -764,7 +765,7 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
@@ -808,7 +809,7 @@ class _Field extends StatelessWidget {
           width: 15,
           height: 15,
           colorFilter: ColorFilter.mode(
-            enabled ? AppTheme.textSecondary : Colors.grey.shade400,
+            enabled ? AppTheme.textSecondary : AppTheme.textLight,
             BlendMode.srcIn,
           ),
         ),
@@ -841,14 +842,14 @@ class _Field extends StatelessWidget {
             isDense: true,
             suffixIcon: _buildSuffixIcon(),
             filled: true,
-            fillColor: const Color(0xFFFAF9F8),
+            fillColor: AppTheme.color_FFFAF9F8,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFFECE8E4)),
+              borderSide: const BorderSide(color: AppTheme.color_FFECE8E4),
             ),
           ),
         ),
@@ -866,14 +867,14 @@ Future<void> _pickBirthDate(
     context: context,
     builder: (context) => Container(
       height: 300,
-      color: Colors.white,
+      color: AppTheme.surface,
       child: Column(
         children: [
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () => Navigator.pop(context, selectedDate),
-              child: const Text('Tayyor'),
+              child: Text(context.tr('done_button')),
             ),
           ),
           Expanded(
@@ -934,14 +935,14 @@ class _Select extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             filled: true,
-            fillColor: const Color(0xFFFAF9F8),
+                  fillColor: AppTheme.color_FFFAF9F8,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFECE8E4)),
+              borderSide: const BorderSide(color: AppTheme.color_FFECE8E4),
             ),
           ),
         ),
@@ -959,7 +960,7 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) => CircleAvatar(
     radius: size / 2,
-    backgroundColor: const Color(0xFFDCE8EF),
+    backgroundColor: AppTheme.color_FFDCE8EF,
     backgroundImage: user.fullAvatarUrl.isNotEmpty
         ? NetworkImage(user.fullAvatarUrl)
         : null,

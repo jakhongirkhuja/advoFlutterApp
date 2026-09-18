@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/locale_provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../auth/viewmodels/auth_viewmodel.dart';
 import 'profile_content.dart';
@@ -50,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                     : Icons.radio_button_unchecked,
                 color: code == localeProvider.currentLanguageCode
                     ? Theme.of(sheetContext).colorScheme.primary
-                    : Colors.grey,
+                    : AppTheme.textMuted,
               ),
               onTap: () => Navigator.pop(sheetContext, code),
             );

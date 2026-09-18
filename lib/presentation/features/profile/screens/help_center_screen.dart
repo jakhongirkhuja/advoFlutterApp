@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 
 class HelpCenterScreen extends StatelessWidget {
@@ -18,7 +19,7 @@ class HelpCenterScreen extends StatelessWidget {
                   _HelpCard(),
                 ],
               ),
-              const HeaderScreen(title: 'Yordam markazi'),
+              HeaderScreen(title: context.tr('help_center')),
             ],
           ),
         ),
@@ -32,17 +33,17 @@ class _HelpCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(28),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Tez-tez so‘raladiganlar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            _Question(title: 'Qabulga yozilish', answer: 'Qabulga yozilish uchun kerakli advokatni tanlang va xizmat turini belgilang.'),
-            _Question(title: 'Qabulni bekor qilish', answer: 'Qabul tafsilotlarini ochib, bekor qilish tugmasini bosing.'),
-            _Question(title: 'Dorilar eslatmasi', answer: 'Kerakli eslatmani bildirishnomalar bo‘limidan sozlashingiz mumkin.'),
-            _Question(title: 'To‘lovlar', answer: 'To‘lovlar tarixi profilingizdagi tegishli bo‘limda ko‘rsatiladi.'),
+            Text(context.tr('faq'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            _Question(title: context.tr('appointment_booking'), answer: context.tr('appointment_booking_answer')),
+            _Question(title: context.tr('cancel_appointment'), answer: context.tr('cancel_appointment_answer')),
+            _Question(title: context.tr('reminder'), answer: context.tr('reminder_answer')),
+            _Question(title: context.tr('payments'), answer: context.tr('payments_answer')),
           ],
         ),
       );
@@ -57,21 +58,21 @@ class _Question extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(top: 12),
     decoration: BoxDecoration(
-      color: const Color(0xFFFAF9F8),
+      color: AppTheme.color_FFFAF9F8,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(width: 1, color: Color(0xffE2E8F0))
+      border: Border.all(width: 1, color: AppTheme.color_FFE2E8F0)
     ),
     child: Theme(
       // Removes the ripple splash effect on click
       data: Theme.of(context).copyWith(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
+        splashColor: AppTheme.transparent,
+        highlightColor: AppTheme.transparent,
       ),
       child: ExpansionTile(
         shape: const Border(),
-        iconColor: Color(0xff475569),
-        backgroundColor: Colors.transparent,
-        collapsedBackgroundColor: Colors.transparent,
+        iconColor: AppTheme.color_FF475569,
+        backgroundColor: AppTheme.transparent,
+        collapsedBackgroundColor: AppTheme.transparent,
         tilePadding: const EdgeInsets.symmetric(horizontal: 10),
         childrenPadding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
         title: Text(title, style: const TextStyle(fontSize: 16)),

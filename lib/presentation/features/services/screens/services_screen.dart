@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:Vatandoshlar/presentation/widgets/section_header.dart';
 
 import '../../../../core/routes/app_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/home/service_category.dart';
 import '../../../../presentation/widgets/public_bottom_navigation_bar.dart';
@@ -17,6 +18,8 @@ class ServicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
+    final l10n = AppLocalizations.of(context);
+    String tr(String key) => l10n?.translate(key) ?? key;
     return Scaffold(
       backgroundColor: AppTheme.pageBackground,
       body: SafeArea(
@@ -32,57 +35,57 @@ class ServicesScreen extends StatelessWidget {
                 children: [
                   _ServicesGrid(categories: viewModel.serviceCategories),
                   const SizedBox(height: 12),
-                  const SectionHeader(title: 'Xizmat turlari'),
+                  SectionHeader(title: tr('service_categories')),
                   const SizedBox(height: 12),
                   _ServiceRow(
                     icon: Icons.people_outline,
-                    title: 'Huquqiy maslahat',
+                    title: tr('legal_advice'),
                     onTap: () => Navigator.pushNamed(
                       context,
                       AppRouter.courtRepresentation,
                       arguments: CourtRepresentationArgs(
-                        title: 'Huquqiy maslahat',
-                        about: 'Huquqiy maslahat Haqida ma\'lumot',
-                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                        title: tr('legal_advice'),
+                        about: '${tr('legal_advice')} ${tr('about_label')}',
+                        description: tr('detailed_description'),
                       ),
                     ),
                   ),
                   _ServiceRow(
                     icon: Icons.family_restroom,
-                    title: 'Oila huquqi',
+                    title: tr('family_law'),
                     onTap: () => Navigator.pushNamed(
                       context,
                       AppRouter.courtRepresentation,
                       arguments: CourtRepresentationArgs(
-                        title: 'Oila huquqi',
-                        about: 'Oila huquqi Haqida ma\'lumot',
-                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                        title: tr('family_law'),
+                        about: '${tr('family_law')} ${tr('about_label')}',
+                        description: tr('detailed_description'),
                       ),
                     ),
                   ),
                   _ServiceRow(
                     icon: Icons.groups_outlined,
-                    title: 'Fuqarolik huquqi',
+                    title: tr('civil_law'),
                     onTap: () => Navigator.pushNamed(
                       context,
                       AppRouter.courtRepresentation,
                       arguments: CourtRepresentationArgs(
-                        title: 'Fuqarolik huquqi',
-                        about: 'Fuqarolik huquqi Haqida ma\'lumot',
-                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                        title: tr('civil_law'),
+                        about: '${tr('civil_law')} ${tr('about_label')}',
+                        description: tr('detailed_description'),
                       ),
                     ),
                   ),
                   _ServiceRow(
                     icon: Icons.gavel,
-                    title: 'Sud va nizolar',
+                    title: tr('court_disputes'),
                     onTap: () => Navigator.pushNamed(
                       context,
                       AppRouter.courtRepresentation,
                       arguments: CourtRepresentationArgs(
-                        title: 'Sud va nizolar',
-                        about: 'Sud va nizolar Haqida ma\'lumot',
-                        description: 'Batafsil tavsif bu yerda joylashadi.',
+                        title: tr('court_disputes'),
+                        about: '${tr('court_disputes')} ${tr('about_label')}',
+                        description: tr('detailed_description'),
                       ),
                     ),
                   ),
@@ -90,7 +93,7 @@ class ServicesScreen extends StatelessWidget {
               ),
               HeaderScreen(
                 showBackIcon: false,
-                title: 'Xizmatlar',
+                title: tr('services'),
                 firstActionIconPath: 'assets/icons/bookmark.svg',
                 onFirstActionTap: () =>
                     Navigator.pushNamed(context, AppRouter.savedLawyers),
@@ -109,8 +112,8 @@ class ServicesScreen extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFFF5F5F5).withValues(alpha: 0.0),
-                        const Color(0xFFF5F5F5),
+                        AppTheme.pageBackground.withValues(alpha: 0.0),
+                        AppTheme.pageBackground,
                       ],
                     ),
                   ),
@@ -149,6 +152,8 @@ class _FeaturePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    String tr(String key) => l10n?.translate(key) ?? key;
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
@@ -168,8 +173,8 @@ class _FeaturePanel extends StatelessWidget {
                 Expanded(
                   child: _FeatureTile(
                     icon: 'assets/icons/compains.svg',
-                    title: 'Tashkilotlar',
-                    subtitle: 'Ishonchli yuridik tashkilotlarni toping',
+                    title: tr('organizations'),
+                    subtitle: tr('find_reliable_organizations'),
                     onTap: onOrganizationsTap,
                   ),
                 ),
@@ -177,8 +182,8 @@ class _FeaturePanel extends StatelessWidget {
                 Expanded(
                   child: _FeatureTile(
                     icon: 'assets/icons/lawyer.svg',
-                    title: 'Advokatlar',
-                    subtitle: 'Tajribali advokatlarni toping',
+                    title: tr('lawyers'),
+                    subtitle: tr('find_experienced_lawyers'),
                     onTap: onLawyersTap,
                   ),
                 ),
@@ -187,8 +192,8 @@ class _FeaturePanel extends StatelessWidget {
             const SizedBox(height: 6),
             _FeatureTile(
               icon: 'assets/icons/templetes.svg',
-              title: 'Hujjatlar shablonlari',
-              subtitle: 'Tayyor huquqiy hujjat shablonlaridan foydalaning',
+              title: tr('templates'),
+              subtitle: tr('use_ready_templates'),
               expanded: true,
               onTap: onTemplatesTap,
             ),
@@ -223,7 +228,7 @@ class _FeatureTile extends StatelessWidget {
         height: 140,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -274,7 +279,7 @@ class _ServiceRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
         child: InkWell(
           onTap: onTap,
@@ -342,7 +347,7 @@ class _ServicesGrid extends StatelessWidget {
         itemBuilder: (context, index) {
           final category = categories[index];
           return Material(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(16),
             child: InkWell(
               onTap: () {
@@ -355,7 +360,7 @@ class _ServicesGrid extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFECECEC)),
+                  border: Border.all(color: AppTheme.color_FFECECEC),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +383,7 @@ class _ServicesGrid extends StatelessWidget {
                         right: 7,
                       ),
                       child: Text(
-                        category.title.replaceAll(' ', '\n'),
+                        context.tr(category.title).replaceAll(' ', '\n'),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

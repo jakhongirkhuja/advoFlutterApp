@@ -15,6 +15,7 @@ import 'core/routes/app_router.dart';
 import 'core/services/location_sync_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_mode_provider.dart';
 import 'data/api/api_client.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/home_repository.dart';
@@ -82,6 +83,7 @@ Future<void> main() async {
           create: (_) => AppointmentsViewModel(HomeRepository(apiClient)),
         ),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeModeProvider()),
       ],
       child: const VatandoshlarApp(),
     ),
@@ -127,6 +129,7 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final themeModeProvider = context.watch<ThemeModeProvider>();
     final authViewModel = context.watch<AuthViewModel>();
     final isAuthenticated = authViewModel.status == AuthStatus.authenticated;
 
@@ -148,6 +151,8 @@ class _VatandoshlarAppState extends State<VatandoshlarApp>
       navigatorKey: AppRouter.navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeModeProvider.themeMode,
       locale: localeProvider.locale,
       supportedLocales: const [Locale('uz'), Locale('en'), Locale('ru')],
       localizationsDelegates: const [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../widgets/header_screen.dart';
 import 'profile_template_preview_screen.dart';
 
@@ -43,7 +44,7 @@ class _ProfileTemplateFormScreenState extends State<ProfileTemplateFormScreen> {
     const showSearchAction = true;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -56,29 +57,29 @@ class _ProfileTemplateFormScreenState extends State<ProfileTemplateFormScreen> {
                 children: [
                   const _TemplateIntroCard(),
                   _TemplateFormCard(
-                    title: 'Shaxsiy ma’lumotlar',
-                    fields: {'F.I.Sh.': _name, 'Telefon raqam': _phone},
+                    title: context.tr('personal_info'),
+                    fields: {'full_name': _name, 'phone_label': _phone},
                   ),
                   _TemplateFormCard(
-                    title: 'Ish joyi',
+                    title: context.tr('workplace'),
                     fields: {
-                      'Tashkilot nomi': _company,
-                      'Lavozimingiz': _position,
-                      'Rahbarning F.I.Sh.': _manager,
+                      'organization_name': _company,
+                      'position': _position,
+                      'manager_name': _manager,
                     },
                   ),
                   _TemplateFormCard(
-                    title: 'Ariza ma’lumotlari',
+                    title: context.tr('application_info'),
                     fields: {
-                      'Ishdan bo‘shash sanasi': _date,
-                      'Ishdan bo‘shash sababi (ixtiyoriy)': _reason,
+                      'resignation_date': _date,
+                      'resignation_reason': _reason,
                     },
                   ),
                 ],
               ),
             ),
             HeaderScreen(
-              title: 'Ishdan bo‘shash arizasi',
+              title: context.tr('resignation_application'),
               firstActionIconPath: showSearchAction
                   ? 'assets/icons/search.svg'
                   : null,
@@ -91,7 +92,7 @@ class _ProfileTemplateFormScreenState extends State<ProfileTemplateFormScreen> {
               right: 0,
               bottom: 0,
             child: Container(
-              color: Colors.white,
+              color: AppTheme.surface,
               height: 68,
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -103,37 +104,37 @@ class _ProfileTemplateFormScreenState extends State<ProfileTemplateFormScreen> {
                     MaterialPageRoute(
                       builder: (_) => ProfileTemplatePreviewScreen(
                         name: _name.text.trim().isEmpty
-                            ? 'Ism Familiya Otangizning ismi'
+                            ? context.tr('full_name_hint')
                             : _name.text,
                         phone: _phone.text.trim().isEmpty
-                            ? '+998 90 123 45 67'
+                            ? context.tr('phone_hint')
                             : _phone.text,
                         company: _company.text.trim().isEmpty
-                            ? 'ABC MChJ'
+                            ? context.tr('company_hint')
                             : _company.text,
                         position: _position.text.trim().isEmpty
-                            ? 'Menejer'
+                            ? context.tr('position_hint')
                             : _position.text,
                         manager: _manager.text.trim().isEmpty
-                            ? 'Rahbarning ism-familiyasi'
+                            ? context.tr('manager_hint')
                             : _manager.text,
                         date: _date.text.trim().isEmpty
-                            ? '01.01.2026'
+                            ? context.tr('date_hint')
                             : _date.text,
                         reason: _reason.text.trim().isEmpty
-                            ? 'Shaxsiy sabablar'
+                            ? context.tr('reason_hint')
                             : _reason.text,
                       ),
                     ),
                   ),
                   style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF2F80FF),
+                      backgroundColor: AppTheme.color_FF2F80FF,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(22),
                       ),
                     ),
-                    child: const Text(
-                      'Davom etish',
+                    child: Text(
+                      context.tr('continue_button'),
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -155,7 +156,7 @@ class _TemplateIntroCard extends StatelessWidget {
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(28),
     ),
     child: Column(
@@ -165,13 +166,13 @@ class _TemplateIntroCard extends StatelessWidget {
             Image.asset('assets/images/info.png'),
             SizedBox(width: 8),
             Text(
-              'Ishdan bo‘shash arizasi',
+              context.tr('resignation_application'),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
         Text(
-          'Arizani tayyorlash uchun quyidagi ma’lumotlarni kiriting.',
+          context.tr('application_fill_instruction'),
           style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
         ),
       ],
@@ -190,7 +191,7 @@ class _TemplateFormCard extends StatelessWidget {
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
@@ -206,26 +207,22 @@ class _TemplateFormCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(entry.key, style: const TextStyle(fontSize: 14)),
+                Text(context.tr(entry.key), style: const TextStyle(fontSize: 14)),
                 const SizedBox(height: 6),
                 TextField(
                   controller: entry.value,
-                  maxLines: entry.key.contains('sababi') ? 2 : 1,
+                  maxLines: entry.key == 'resignation_reason' ? 2 : 1,
                   style: const TextStyle(fontSize: 16),
                   decoration: InputDecoration(
-                    hintText: entry.key == 'Telefon raqam'
-                        ? '+998 __ ___ __ __'
-                        : entry.key == 'Ishdan bo‘shash sanasi'
-                        ? 'Masalan: ABC MChJ'
-                        : entry.key.contains('sababi')
-                        ? 'Sababni kiriting...'
-                        : entry.key == 'F.I.Sh.'
-                        ? 'Ism Familiya Otangizning ismi'
-                        : entry.key == 'Tashkilot nomi'
-                        ? 'Masalan: ABC MChJ'
-                        : entry.key == 'Lavozimingiz'
-                        ? 'Masalan: Menejer'
-                        : 'Rahbarning ism-familiyasi',
+                    hintText: switch (entry.key) {
+                      'phone_label' => context.tr('phone_hint'),
+                      'resignation_date' => context.tr('date_hint'),
+                      'resignation_reason' => context.tr('reason_hint'),
+                      'full_name' => context.tr('full_name_hint'),
+                      'organization_name' => context.tr('company_hint'),
+                      'position' => context.tr('position_hint'),
+                      _ => context.tr('manager_hint'),
+                    },
                     hintStyle: const TextStyle(
                       fontSize: 16,
                       color: AppTheme.textSecondary,
@@ -236,15 +233,15 @@ class _TemplateFormCard extends StatelessWidget {
                     contentPadding: const EdgeInsets.all(9),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                      borderSide: const BorderSide(color: AppTheme.color_FFE2E8F0, width: 1),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                      borderSide: const BorderSide(color: AppTheme.color_FFE2E8F0, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                      borderSide: const BorderSide(color: AppTheme.color_FFE2E8F0, width: 1),
                     ),
                   ),
                 )

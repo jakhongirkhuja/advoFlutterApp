@@ -46,7 +46,7 @@ class HeaderScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               AppTheme.pageBackground,
-              const Color(0xFFF5F5F5).withValues(alpha: 0.4),
+              AppTheme.pageBackground.withValues(alpha: 0.4),
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class ServiceCategory {
@@ -46,7 +47,7 @@ class ServiceCategory {
 
   static Color _hexToColor(dynamic hexInput) {
     if (hexInput is! String || hexInput.isEmpty) {
-      return Colors.transparent;
+      return AppTheme.transparent;
     }
 
     String hex = hexInput.replaceAll('#', '').trim();
@@ -59,7 +60,7 @@ class ServiceCategory {
     }
 
     final intColor = int.tryParse(hex, radix: 16);
-    return intColor != null ? Color(intColor) : Colors.transparent;
+    return intColor != null ? Color(intColor) : AppTheme.transparent;
   }
 
   static String _colorToHex(Color color) {

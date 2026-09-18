@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import '../../core/theme/app_theme.dart';
 
 class CustomIconDesign extends StatelessWidget {
   final String icon;
@@ -21,14 +22,14 @@ class CustomIconDesign extends StatelessWidget {
         borderRadius: BorderRadius.circular(home?12:16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xff0A0D12).withValues(alpha: home?0.1:0.3),
+            color: AppTheme.color_FF0A0D12.withValues(alpha: home?0.1:0.3),
             offset: Offset(0, 4),
             blurRadius: 6,
             spreadRadius: -2,
           ),
           // 0px 12px 16px -4px #0A0D1214
           BoxShadow(
-            color: Color(0xff0A0D12).withValues(alpha:  home?0.1:0.2),
+            color: AppTheme.color_FF0A0D12.withValues(alpha:  home?0.1:0.2),
             offset: Offset(0, 12),
             blurRadius: 16,
             spreadRadius: -4,
@@ -38,7 +39,7 @@ class CustomIconDesign extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFFD0D8E5),
+            AppTheme.color_FFD0D8E5,
             mainColor,
           ],
         ),
@@ -60,7 +61,7 @@ class CustomIconDesign extends StatelessWidget {
           ),
         ),
         child: SvgPicture.asset(icon,
-          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcATop),),
+          colorFilter: ColorFilter.mode(AppTheme.surface, BlendMode.srcATop),),
       ),
     );
   }

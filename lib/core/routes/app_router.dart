@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../presentation/features/auth/screens/login_screen.dart';
 import '../../presentation/features/auth/screens/otp_screen.dart';
+import '../../presentation/features/auth/screens/user_info_fill.dart';
 import '../../presentation/features/home/screens/home_screen.dart';
 import '../../presentation/features/home/screens/ai_chat_screen.dart';
 import '../../presentation/features/profile/screens/profile_screen.dart';
@@ -47,6 +48,7 @@ class AppRouter {
 
   static const login = '/login';
   static const otp = '/otp';
+  static const userInfo = '/user-info';
   static const home = '/home';
   static const aiAssistant = '/ai-assistant';
   static const profile = '/profile';
@@ -177,6 +179,13 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => phone is String
               ? OtpScreen(phoneNumber: phone)
+              : const LoginScreen(),
+        );
+      case userInfo:
+        final phone = settings.arguments;
+        return MaterialPageRoute(
+          builder: (_) => phone is String
+              ? UserInfoFill(phoneNumber: phone)
               : const LoginScreen(),
         );
       default:

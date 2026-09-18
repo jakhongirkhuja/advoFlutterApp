@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../widgets/header_screen.dart';
 
@@ -19,27 +20,27 @@ class TemplatesScreen extends StatelessWidget {
             children: [
               ListView(
                 padding: const EdgeInsets.fromLTRB(12, 70, 12, 24),
-                children: const [
+                children: [
                   _TemplateCard(
                     first: true,
                     price: 12000,
-                    title: 'Ishdan bo‘shash arizasi',
-                    description: "Ishdan bo‘shash uchun tayyor ariza shabloni",
+                    title: 'resignation_application',
+                    description: 'template_description',
                   ),
                   _TemplateCard(
                     price: 18000,
-                    title: 'Ishdan bo‘shash arizasi',
-                    description: "Ishdan bo‘shash uchun tayyor ariza shabloni",
+                    title: 'resignation_application',
+                    description: 'template_description',
                   ),
                   _TemplateCard(
                     price: 24000,
-                    title: 'Ishdan bo‘shash arizasi',
-                    description: "Ishdan bo‘shash uchun tayyor ariza shabloni",
+                    title: 'resignation_application',
+                    description: 'template_description',
                   ),
                 ],
               ),
               HeaderScreen(
-                title: 'Hujjat shablonlari',
+                title: context.tr('templates'),
                 firstActionIconPath: 'assets/icons/search.svg',
                 onFirstActionTap: () => Navigator.pushNamed(context, AppRouter.search),
                 secondActionIconPath: 'assets/icons/filter.svg',
@@ -114,7 +115,7 @@ class _TemplateCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      context.tr(title),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -156,7 +157,7 @@ class _TemplateCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              description,
+              context.tr(description),
               style: const TextStyle(fontSize: 14, color: AppTheme.textChoco),
             ),
           ),
@@ -188,8 +189,8 @@ class _TemplateCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Text(
-                      'Shablon narxi',
+                    Text(
+                      context.tr('template_price'),
                       style: TextStyle(fontSize: 14, color: AppTheme.textChoco),
                     ),
                   ],
@@ -209,7 +210,7 @@ class _TemplateCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    first ? 'Sotib olish' : 'Ko‘rish',
+                    first ? context.tr('purchase') : context.tr('view'),
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),
@@ -242,7 +243,7 @@ class _PurchaseSheetState extends State<_PurchaseSheet> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: Container(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
         decoration: const BoxDecoration(
@@ -256,9 +257,9 @@ class _PurchaseSheetState extends State<_PurchaseSheet> {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Sotib olish',
+                      context.tr('purchase'),
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -276,15 +277,15 @@ class _PurchaseSheetState extends State<_PurchaseSheet> {
               Container(
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(28),
                 ),
                 child: Column(
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'To‘lov turi',
+                        context.tr('payment_type'),
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -343,9 +344,9 @@ class _PurchaseSheetState extends State<_PurchaseSheet> {
                       borderRadius: BorderRadius.circular(22),
                     ),
                   ),
-                  child: const Text(
-                    'To‘lovni amalga oshirish',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                  child: Text(
+                    context.tr('make_payment'),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -372,14 +373,14 @@ class _PriceLine extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Text(
-              'Shablon narxi:',
+              '${context.tr('template_price')}:',
               style: TextStyle(fontSize: 16),
             ),
           ),
@@ -396,7 +397,7 @@ class _PriceLine extends StatelessWidget {
             'so\'m',
             style: const TextStyle(
               fontSize: 20,
-              color: Colors.black,
+      color: AppTheme.black,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -424,7 +425,7 @@ class _Payment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFF7F5F4),
+      color: AppTheme.color_FFF7F5F4,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -435,7 +436,7 @@ class _Payment extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             border: Border.all(
-              color: selected ? AppTheme.buttonGold : AppTheme.textChoco.withValues(alpha: 0.2),
+              color: selected ? AppTheme.buttonGold : AppTheme.divider,
               width: 1,
             ),
             borderRadius: BorderRadius.circular(16),

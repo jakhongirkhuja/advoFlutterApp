@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/appointments/appointment.dart';
 import '../../appointments/screens/appointment_detail_screen.dart';
 import '../../appointments/viewmodels/appointments_viewmodel.dart';
@@ -27,10 +28,10 @@ class HistoryScreen extends StatelessWidget {
                 if (viewModel.isLoading)
                   const Center(child: CircularProgressIndicator(strokeWidth: 2))
                 else if (viewModel.appointments.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 80),
                     child: Center(
-                      child: Text('Bu bo‘limda tarix mavjud emas'),
+                      child: Text(context.tr('history_empty')),
                     ),
                   )
                 else
@@ -40,7 +41,7 @@ class HistoryScreen extends StatelessWidget {
                   ),
               ],
             ),
-            const HeaderScreen(title: 'Tarix'),
+            HeaderScreen(title: context.tr('history')),
           ],
         ),
       ),
@@ -59,7 +60,7 @@ class _HistoryAppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 12),
     decoration: BoxDecoration(
-      color: const Color(0xFFE8E4E3),
+      color: AppTheme.divider,
       borderRadius: BorderRadius.circular(24),
     ),
     child: Column(
@@ -82,8 +83,8 @@ class _HistoryAppointmentCard extends StatelessWidget {
                 Icons.circle,
                 size: 6,
                 color: appointment.status == 'Bekor qilingan'
-                    ? Colors.red
-                    : Colors.grey,
+                    ? AppTheme.danger
+                    : AppTheme.textMuted,
               ),
               const SizedBox(width: 6),
               Text(
@@ -91,8 +92,8 @@ class _HistoryAppointmentCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   color: appointment.status == 'Bekor qilingan'
-                      ? Colors.red
-                      : Colors.grey[700],
+                      ? AppTheme.danger
+                      : AppTheme.textMuted,
                 ),
               ),
             ],
@@ -101,7 +102,7 @@ class _HistoryAppointmentCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -148,13 +149,13 @@ class _HistoryAppointmentCard extends StatelessWidget {
                             const Icon(
                               Icons.verified,
                               size: 17,
-                              color: Color(0xFF00B27A),
+                              color: AppTheme.color_FF00B27A,
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${appointment.lawyerTitle}  •  ${appointment.experienceYears} yil tajriba',
+                          '${context.tr(appointment.lawyerTitle)}  •  ${appointment.experienceYears} ${context.tr('years_experience')}',
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.textChoco,
@@ -171,7 +172,7 @@ class _HistoryAppointmentCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '(${appointment.reviewsCount} ta sharh)',
+                              '(${appointment.reviewsCount} ${context.tr('reviews_suffix')})',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppTheme.textChoco,
@@ -189,9 +190,9 @@ class _HistoryAppointmentCard extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _HistoryTag(label: appointment.topic),
+                  _HistoryTag(label: context.tr(appointment.topic)),
                   _HistoryTag(
-                    label: appointment.consultationType,
+                    label: context.tr(appointment.consultationType),
                     icon: 'assets/icons/camera.svg',
                   ),
                 ],
@@ -212,16 +213,16 @@ class _HistoryAppointmentCard extends StatelessWidget {
                     ),
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF4F4F4),
+                    backgroundColor: AppTheme.color_FFF4F4F4,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: const Text(
-                    'Tafsilot',
+                  child: Text(
+                    context.tr('details'),
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: AppTheme.black87,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -246,7 +247,7 @@ class _HistoryTag extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
-      color: const Color(0xFFF5F5F5),
+      color: AppTheme.pageBackground,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
@@ -257,7 +258,7 @@ class _HistoryTag extends StatelessWidget {
           label,
           style: const TextStyle(
             fontSize: 12,
-            color: Color(0xFF444444),
+            color: AppTheme.color_FF444444,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -277,16 +278,16 @@ class _HistoryFiltersState extends State<_HistoryFilters> {
   int _selectedIndex = 0;
 
   final List<String> _filters = [
-    'Barchasi',
-    'Yevro protakol',
-    'Advokat qabulı',
+    'filter_all',
+    'euro_protocol',
+    'lawyer_appointments',
   ];
 
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(4),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(41),
     ),
     child: Row(
@@ -294,7 +295,7 @@ class _HistoryFiltersState extends State<_HistoryFilters> {
         _filters.length,
             (index) => Expanded(
           child: _Filter(
-            text: _filters[index],
+            text: context.tr(_filters[index]),
             selected: _selectedIndex == index,
             onTap: () => setState(() => _selectedIndex = index),
           ),
@@ -323,7 +324,7 @@ class _Filter extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFF2F80FF) : Colors.transparent,
+        color: selected ? AppTheme.color_FF2F80FF : AppTheme.transparent,
         borderRadius: BorderRadius.circular(41),
       ),
       child: Text(
@@ -332,7 +333,7 @@ class _Filter extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-          color: selected ? Colors.white : AppTheme.textSecondary,
+          color: selected ? AppTheme.surface : AppTheme.textSecondary,
         ),
       ),
     ),

@@ -10,18 +10,23 @@ class AppointmentsViewModel extends ChangeNotifier {
     loadAppointments();
   }
 
-  static const filters = ['Barchasi', 'Kelgusi', 'O‘tgan', 'Bekor qilingan'];
+  static const filters = [
+    'filter_all',
+    'filter_upcoming',
+    'filter_past',
+    'filter_cancelled',
+  ];
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
 
-  String _selectedFilter = 'Barchasi';
+  String _selectedFilter = 'filter_all';
   String get selectedFilter => _selectedFilter;
 
   List<Appointment> _appointments = const [];
 
   List<Appointment> get appointments {
-    if (_selectedFilter == 'Barchasi') return _appointments;
+    if (_selectedFilter == 'filter_all') return _appointments;
     return _appointments
         .where((appointment) => appointment.status == _selectedFilter)
         .toList();

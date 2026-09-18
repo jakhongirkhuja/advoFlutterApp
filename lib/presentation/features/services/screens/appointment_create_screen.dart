@@ -1,9 +1,12 @@
+import 'package:Vatandoshlar/presentation/widgets/custom_icon_design.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../data/models/home/lawyer.dart';
 import '../../../widgets/header_navigation.dart';
 
@@ -21,8 +24,8 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
   int _step = 0;
   DateTime _selectedDate = DateTime.now();
   String _time = '09:00';
-  String _service = 'Sudda vakillik';
-  String _consultationType = 'Video orqali';
+  String _service = 'court_representation';
+  String _consultationType = 'video_call';
   String _payment = 'Payme';
   final _problemController = TextEditingController();
   final List<_AppointmentDocument> _documents = [];
@@ -63,10 +66,10 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
                         : setState(() => _step--),
                     moveBack: true,
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        'Qabulga yozilish',
+                        context.tr('book_appointment'),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -84,7 +87,7 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          color: Colors.white,
+          color: AppTheme.surface,
           child: SizedBox(
             height: 44,
             child: FilledButton(
@@ -98,7 +101,9 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
                   borderRadius: BorderRadius.circular(22),
                 ),
               ),
-              child: Text(_step == 2 ? 'Tasdiqlash' : 'Davom etish'),
+              child: Text(
+                _step == 2 ? context.tr('confirm') : context.tr('continue'),
+              ),
             ),
           ),
         ),
@@ -107,9 +112,9 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
   }
 
   Future<void> _pickDocuments() async {
-    const types = <XTypeGroup>[
+    final types = <XTypeGroup>[
       XTypeGroup(
-        label: 'Hujjatlar',
+        label: context.tr('documents'),
         extensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
       ),
     ];
@@ -158,20 +163,22 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
     }
   }
 
-  String get selectedDateLabel =>
-      '${_selectedDate.day}-${_monthName(_selectedDate.month)}';
+  String get selectedDateLabel => DateFormat(
+    'd MMMM',
+    Localizations.localeOf(context).languageCode,
+  ).format(_selectedDate);
 
   void _confirmAppointment() {
     showDialog<void>(
       context: context,
-      barrierColor: Colors.black26,
+      barrierColor: AppTheme.black.withValues(alpha: 0.26),
       builder: (dialogContext) => Dialog(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppTheme.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
           padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(26),
           ),
           child: Column(
@@ -181,21 +188,21 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
                 alignment: Alignment.topRight,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Color(0xffF3F1F1),
+                    color: AppTheme.color_FFF3F1F1,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Icon(Icons.close, size: 18),
                 ),
               ),
-              Image.asset('assets/images/success.png'),
+              CustomIconDesign(icon: 'assets/icons/note_ok.svg', mainColor: AppTheme.color_FF15985B, secondaryColor: AppTheme.color_FF40DB93),
               const SizedBox(height: 12),
-              const Text(
-                'To‘lov tasdiqlandi!',
+              Text(
+                context.tr('payment_confirmed'),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'To‘lov muvaffaqiyatli amalga oshirildi. Siz mutaxassis qabuliga muvaffaqiyatli yozildingiz.',
+              Text(
+                context.tr('payment_success'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -213,9 +220,15 @@ class _AppointmentCreateScreenState extends State<AppointmentCreateScreen> {
                   ),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.tagBackground,
-                    foregroundColor: Colors.black87,
+                    foregroundColor: AppTheme.black87,
                   ),
-                  child: const Text('Qabullar bo‘limiga o‘tish', style: TextStyle(color: AppTheme.textChoco, fontSize: 16),),
+                  child: Text(
+                    context.tr('go_to_appointments'),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -239,7 +252,7 @@ class _LawyerSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
@@ -290,7 +303,7 @@ class _LawyerSummary extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '${lawyer.title}',
+                      context.tr(lawyer.title),
                       style: const TextStyle(
                         fontSize: 14,
                         color: AppTheme.textChoco,
@@ -307,7 +320,7 @@ class _LawyerSummary extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${lawyer.experienceYears} yil tajriba',
+                      '${lawyer.experienceYears} ${context.tr('years_experience')}',
                       style: const TextStyle(
                         fontSize: 14,
                         color: AppTheme.textChoco,
@@ -315,19 +328,30 @@ class _LawyerSummary extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4,),
+                const SizedBox(height: 4),
                 Row(
                   children: [
-                    SvgPicture.asset('assets/icons/star.svg', height: 16, width: 16,),
+                    SvgPicture.asset(
+                      'assets/icons/star.svg',
+                      height: 16,
+                      width: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${lawyer.rating}',
-                      style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 14),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '(${lawyer.comment_count} ta sharh)',
-                      style: const TextStyle(fontWeight: FontWeight.w500, color: AppTheme.textChoco, fontSize: 14),
+                      '(${lawyer.comment_count} ${context.tr('reviews_suffix')})',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.textChoco,
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -360,7 +384,7 @@ class _ScheduleStep extends StatelessWidget {
     return Column(
       children: [
         _SectionCard(
-          title: 'Sana tanlang',
+          title: context.tr('select_date_time'),
           child: Column(
             children: [
               SingleChildScrollView(
@@ -371,7 +395,7 @@ class _ScheduleStep extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 6),
                       child: _DateBox(
                         date: date,
-                        title: _dateTitle(date),
+                        title: _dateTitle(context, date),
                         selected: _sameDay(state._selectedDate, date),
                         onTap: () =>
                             state.setState(() => state._selectedDate = date),
@@ -402,7 +426,7 @@ class _ScheduleStep extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Kalendardan ochish',
+                        context.tr('open_calendar'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -417,7 +441,7 @@ class _ScheduleStep extends StatelessWidget {
           ),
         ),
         _SectionCard(
-          title: 'Vaqt tanlang',
+          title: context.tr('time'),
           child: Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -434,22 +458,22 @@ class _ScheduleStep extends StatelessWidget {
           ),
         ),
         _SectionCard(
-          title: 'Xizmat turini tanlang',
+          title: context.tr('service_type'),
           child: Column(
             children: [
               _SelectionRow(
-                title: 'Sudda vakillik',
-                selected: state._service == 'Sudda vakillik',
-                onTap: () =>
-                    state.setState(() => state._service = 'Sudda vakillik'),
+                title: context.tr('court_representation'),
+                selected: state._service == 'court_representation',
+                onTap: () => state.setState(
+                  () => state._service = 'court_representation',
+                ),
               ),
               const SizedBox(height: 6),
               _SelectionRow(
-                title: 'Da’vo arizasini tayyorlash',
-                selected: state._service == 'Da’vo arizasini tayyorlash',
-                onTap: () => state.setState(
-                  () => state._service = 'Da’vo arizasini tayyorlash',
-                ),
+                title: context.tr('claim_application'),
+                selected: state._service == 'claim_application',
+                onTap: () =>
+                    state.setState(() => state._service = 'claim_application'),
               ),
             ],
           ),
@@ -469,20 +493,20 @@ class _DetailsStep extends StatelessWidget {
     return Column(
       children: [
         _SectionCard(
-          title: 'Qabul turini tanlang',
+          title: context.tr('select_consultation'),
           child: _SelectionRow(
-            title: state._consultationType,
+            title: context.tr(state._consultationType),
             selected: true,
             onTap: () {},
           ),
         ),
         _SectionCard(
-          title: 'Muammo haqida qisqacha',
+          title: context.tr('problem_short'),
           child: TextField(
             controller: state._problemController,
             maxLines: 1,
-            decoration: const InputDecoration(
-              hintText: 'Qarzdorlikni undirish',
+            decoration: InputDecoration(
+              hintText: context.tr('debt_collection'),
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 14,
@@ -492,14 +516,14 @@ class _DetailsStep extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(12)),
                 borderSide: BorderSide.none,
               ),
-              fillColor: Color(0xFFFCFBFA),
+              fillColor: AppTheme.pageBackground,
               filled: true,
             ),
             style: const TextStyle(fontSize: 14),
           ),
         ),
         _SectionCard(
-          title: 'Hujjat biriktirish (ixtiyoriy)',
+          title: context.tr('attach_optional'),
           child: Column(
             children: [
               ...state._documents.map(
@@ -514,18 +538,27 @@ class _DetailsStep extends StatelessWidget {
                   onTap: state._pickDocuments,
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: EdgeInsets.symmetric(vertical: 15),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFCFBFA),
+                      color: AppTheme.pageBackground,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset('assets/icons/document_upload.svg'),
+                          CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: SvgPicture.asset(
+                              'assets/icons/document_upload.svg',
+                              colorFilter: ColorFilter.mode(
+                                AppTheme.textSecondary,
+                                BlendMode.srcATop,
+                              ),
+                            ),
+                          ),
                           Text(
-                            '+Hujjat biriktirish',
+                            '+${context.tr('attach_document')}',
                             style: TextStyle(
                               fontSize: 16,
                               color: AppTheme.textChoco,
@@ -547,7 +580,7 @@ class _DetailsStep extends StatelessWidget {
                       children: [
                         SvgPicture.asset('assets/icons/plus.svg'),
                         Text(
-                          'Hujjat qo\'shish',
+                          context.tr('add_document'),
                           style: TextStyle(
                             color: AppTheme.textChoco,
                             fontSize: 16,
@@ -575,7 +608,7 @@ class _PaymentStep extends StatelessWidget {
     return Column(
       children: [
         _SectionCard(
-          title: 'To‘lov turi',
+          title: context.tr('payment'),
           child: Row(
             children: [
               _PaymentBox(
@@ -600,26 +633,32 @@ class _PaymentStep extends StatelessWidget {
           ),
         ),
         _SectionCard(
-          title: 'Tafsilotlar',
+          title: context.tr('details'),
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFBFAF9),
+              color: AppTheme.color_FFFBFAF9,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFFE8E4E3),
-                width: 1,
-              ),
+              border: Border.all(color: AppTheme.divider, width: 1),
             ),
             child: Column(
               children: [
-                _DetailRow(label: 'Xizmat turi:', value: state._service),
                 _DetailRow(
-                  label: 'Sana:',
+                  label: '${context.tr('service_type')}:',
+                  value: context.tr(state._service),
+                ),
+                _DetailRow(
+                  label: '${context.tr('date')}:',
                   value: '${state.selectedDateLabel}, ${state._time}',
                 ),
-                _DetailRow(label: 'Format:', value: state._consultationType),
-                const _DetailRow(label: 'Narxi:', value: '150 000 so‘m'),
+                _DetailRow(
+                  label: context.tr('format_label'),
+                  value: context.tr(state._consultationType),
+                ),
+                _DetailRow(
+                  label: context.tr('price_label'),
+                  value: '150 000 so‘m',
+                ),
               ],
             ),
           ),
@@ -642,7 +681,7 @@ class _SectionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 9),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(22),
       ),
       child: Column(
@@ -681,10 +720,10 @@ class _DateBox extends StatelessWidget {
         width: 70,
         padding: const EdgeInsets.fromLTRB(5, 9, 5, 8),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.buttonGold : const Color(0xFFF8F7F6),
+          color: selected ? AppTheme.buttonGold : AppTheme.color_FFF8FAFC,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: selected ? AppTheme.buttonGold : const Color(0xFFE7E2DE),
+            color: selected ? AppTheme.buttonGold : AppTheme.color_FFE2E8F0,
           ),
         ),
         child: Column(
@@ -693,7 +732,7 @@ class _DateBox extends StatelessWidget {
               title,
               style: TextStyle(
                 fontSize: 12,
-                color: selected ? Colors.white : const Color(0xFF344054),
+                color: selected ? AppTheme.surface : AppTheme.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -702,25 +741,28 @@ class _DateBox extends StatelessWidget {
               height: 57,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: selected ? Colors.white : const Color(0xFFFCFBFA),
+                color: selected ? AppTheme.surface : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE7E2DE)),
+                border: Border.all(color: AppTheme.color_FFE2E8F0),
               ),
               child: Text(
                 '${date.day}',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppTheme.black,
                 ),
               ),
             ),
             const SizedBox(height: 5),
             Text(
-              _monthName(date.month),
+              DateFormat(
+                'MMM',
+                Localizations.localeOf(context).languageCode,
+              ).format(date),
               style: TextStyle(
                 fontSize: 12,
-                color: selected ? Colors.white : const Color(0xFF475467),
+                color: selected ? AppTheme.surface : AppTheme.color_FF475467,
               ),
             ),
           ],
@@ -749,7 +791,7 @@ class _TimeBox extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 9.6),
       decoration: BoxDecoration(
-        color: selected ? AppTheme.buttonGold : const Color(0xFFF8F7F6),
+        color: selected ? AppTheme.buttonGold : AppTheme.pageBackground,
         image: disabled
             ? const DecorationImage(
                 image: AssetImage('assets/images/data_bg.png'),
@@ -759,7 +801,7 @@ class _TimeBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: BoxBorder.all(
           width: 1,
-          color: selected ? Colors.transparent : Color(0xffE8E4E3),
+          color: selected ? AppTheme.transparent : AppTheme.color_FFE2E8F0,
         ),
       ),
       child: Text(
@@ -770,8 +812,8 @@ class _TimeBox extends StatelessWidget {
           color: disabled
               ? AppTheme.textMuted
               : selected
-              ? Colors.white
-              : Colors.black,
+              ? AppTheme.surface
+              : AppTheme.black,
         ),
       ),
     ),
@@ -795,9 +837,9 @@ class _SelectionRow extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFFFFFBF1) : const Color(0xFFF8F7F6),
+        color: selected ? AppTheme.color_FFEFF6FF : AppTheme.pageBackground,
         border: Border.all(
-          color: selected ? AppTheme.buttonGold : const Color(0xFFE7E2DE),
+          color: selected ? AppTheme.buttonGold : AppTheme.color_FFE2E8F0,
         ),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -808,13 +850,13 @@ class _SelectionRow extends StatelessWidget {
               title,
               style: TextStyle(
                 fontSize: 16,
-                color: selected ? AppTheme.primaryGold : Colors.black,
+                color: selected ? AppTheme.primaryGold : AppTheme.black,
               ),
             ),
           ),
           Icon(
             selected ? Icons.check_circle : Icons.circle_outlined,
-            color: selected ? AppTheme.buttonGold : AppTheme.textLight,
+            color: selected ? AppTheme.buttonGold : AppTheme.color_FFE2E8F0,
             size: 24,
           ),
         ],
@@ -846,9 +888,9 @@ class _PaymentBox extends StatelessWidget {
           margin: const EdgeInsets.only(right: 6),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.color_FFF8FAFC,
             border: Border.all(
-              color: selected ? AppTheme.buttonGold : const Color(0xFFE7E2DE),
+              color: selected ? AppTheme.buttonGold : AppTheme.color_FFE7E2DE,
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -880,8 +922,8 @@ class _DocumentRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
     decoration: BoxDecoration(
-      color: const Color(0xFFFCFBFA),
-      border: Border.all(color: const Color(0xFFE8E4E3)),
+      color: AppTheme.color_FFFCFBFA,
+      border: Border.all(color: AppTheme.divider),
       borderRadius: BorderRadius.circular(12),
     ),
     child: Row(
@@ -912,9 +954,9 @@ class _DocumentRow extends StatelessWidget {
           ),
         ),
         InkWell(
-            onTap: onDelete,
-            child: SvgPicture.asset('assets/icons/remove.svg')),
-        
+          onTap: onDelete,
+          child: SvgPicture.asset('assets/icons/remove.svg'),
+        ),
       ],
     ),
   );
@@ -946,7 +988,11 @@ class _DetailRow extends StatelessWidget {
         ),
         Text(
           value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1D1816)),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.color_FF1D1816,
+          ),
         ),
       ],
     ),
@@ -969,33 +1015,17 @@ bool _sameDay(DateTime first, DateTime second) =>
     first.month == second.month &&
     first.day == second.day;
 
-String _dateTitle(DateTime date) {
+String _dateTitle(BuildContext context, DateTime date) {
   final today = DateTime.now();
   final difference = DateTime(
     date.year,
     date.month,
     date.day,
   ).difference(DateTime(today.year, today.month, today.day)).inDays;
-  if (difference == 0) return 'Bugun';
-  if (difference == 1) return 'Ertaga';
-  const weekdays = ['Du', 'Se', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'];
-  return weekdays[date.weekday - 1];
-}
-
-String _monthName(int month) {
-  const months = [
-    'Yan',
-    'Fev',
-    'Mar',
-    'Apr',
-    'May',
-    'Iyun',
-    'Iyul',
-    'Avg',
-    'Sen',
-    'Okt',
-    'Noy',
-    'Dek',
-  ];
-  return months[month - 1];
+  if (difference == 0) return context.tr('today');
+  if (difference == 1) return context.tr('tomorrow');
+  return DateFormat(
+    'EEE',
+    Localizations.localeOf(context).languageCode,
+  ).format(date);
 }
