@@ -138,14 +138,14 @@ class ProfileTemplatesScreen extends StatelessWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: AppTheme.color_FFE8FFF5,
-                                borderRadius: BorderRadius.circular(12),
+                                color: AppTheme.color_FFECFDF5,
+                                borderRadius: BorderRadius.circular(21),
                               ),
                               child: Text(
                                 context.tr('purchased'),
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: AppTheme.color_FF00A86B,
+                                  color: AppTheme.color_FF009966,
                                 ),
                               ),
                             ),

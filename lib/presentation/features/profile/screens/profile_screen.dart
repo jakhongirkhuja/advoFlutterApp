@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../auth/screens/login_screen.dart';
 import '../../auth/viewmodels/auth_viewmodel.dart';
+import '../../../../data/models/auth/user_model.dart';
 import 'profile_content.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -15,12 +15,10 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthViewModel>();
 
-    if (auth.status != AuthStatus.authenticated) {
-      return const LoginScreen();
-    }
-
-    final user = auth.currentUser;
-    return user == null ? const LoginScreen() : ProfileContent(user: user);
+    // The profile page is currently available from the public navigation.
+    // Use an empty model until authentication-backed profile data is loaded.
+    final user = auth.currentUser ?? UserModel.fromJson(const <String, dynamic>{});
+    return ProfileContent(user: user);
   }
 
   String _languageName(String code) {

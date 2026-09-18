@@ -145,7 +145,7 @@ class ActiveDevicesScreen extends StatelessWidget {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppTheme.danger,
+                      backgroundColor: AppTheme.color_FFFB2C36,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
@@ -192,7 +192,7 @@ class _DeviceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: AppTheme.surface,
+    color: AppTheme.color_FFFFFFFF,
     borderRadius: BorderRadius.circular(28),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),

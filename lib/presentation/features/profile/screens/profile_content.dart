@@ -470,7 +470,15 @@ class _Banner extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: AppTheme.color_FFE3BE71,
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          AppTheme.color_FF69AFFF,
+          AppTheme.color_FF1C8AFF,
+        ],
+        stops: [0.0, 1.0],
+      ),
       borderRadius: BorderRadius.circular(28),
     ),
     child: Row(
@@ -484,7 +492,7 @@ class _Banner extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Image.network(
-            '${AppConfig.dummyImageBaseUrl}/lawyer-${user.id}/320/240',
+            'sds/lawyer/320/240',
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Container(
               width: 74,
@@ -516,7 +524,7 @@ class _Banner extends StatelessWidget {
                     const SizedBox(width: 8),
                     const Icon(
                       Icons.verified,
-                      color: AppTheme.color_FF198C72,
+                      color: AppTheme.color_FFFFFFFF,
                       size: 20,
                     ),
                   ],
@@ -671,7 +679,7 @@ class _Details extends StatelessWidget {
                       ),
                       child: ClipOval(
                         child: Image.network(
-                          '${AppConfig.dummyImageBaseUrl}/lawyer-${user.id}/320/240',
+                          '320/240',
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
@@ -847,10 +855,20 @@ class _Field extends StatelessWidget {
               horizontal: 10,
               vertical: 10,
             ),
-            border: OutlineInputBorder(
+            enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: const BorderSide(color: AppTheme.color_FFECE8E4),
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppTheme.color_FFECE8E4),
+            ),
+            // Border when enabled is set to false
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppTheme.color_FFECE8E4),
+            ),
+
           ),
         ),
       ],
@@ -948,33 +966,5 @@ class _Select extends StatelessWidget {
         ),
       ],
     ),
-  );
-}
-
-class _Avatar extends StatelessWidget {
-  final UserModel user;
-  final double size;
-
-  const _Avatar({required this.user, required this.size});
-
-  @override
-  Widget build(BuildContext context) => CircleAvatar(
-    radius: size / 2,
-    backgroundColor: AppTheme.color_FFDCE8EF,
-    backgroundImage: user.fullAvatarUrl.isNotEmpty
-        ? NetworkImage(user.fullAvatarUrl)
-        : null,
-    child: user.fullAvatarUrl.isEmpty
-        ? Text(
-            (user.fio.isNotEmpty ? user.fio : 'P')
-                .substring(0, 1)
-                .toUpperCase(),
-            style: TextStyle(
-              fontSize: size * .34,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.textSecondary,
-            ),
-          )
-        : null,
   );
 }

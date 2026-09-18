@@ -46,8 +46,8 @@ class CustomIconDesign extends StatelessWidget {
 
       ),
       child: Container(
-        width: home?38:55,
-        height: home?38:55,
+        width: home?38:53,
+        height: home?38:53,
         padding: EdgeInsets.all(padding),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(home?12:16),

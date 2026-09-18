@@ -49,6 +49,10 @@ class AppTheme {
   static const Color color_FF374151 = Color(0xFF374151);
   static const Color color_FF3E9B6B = Color(0xFF3E9B6B);
   static const Color color_FF40DB93 = Color(0xFF40DB93);
+
+  static const Color color_FFECFDF5 = Color(0xFFECFDF5);
+  static const Color color_FF009966 = Color(0xFF009966);
+
   static const Color color_FF444444 = Color(0xFF444444);
   static const Color color_FF475467 = Color(0xFF475467);
   static const Color color_FF475569 = Color(0xFF475569);
@@ -90,7 +94,7 @@ class AppTheme {
   static const Color color_FFE8FFF5 = Color(0xFFE8FFF5);
   static const Color color_FFEAF0F7 = Color(0xFFEAF0F7);
   static const Color color_FFEAF3FF = Color(0xFFEAF3FF);
-  static const Color color_FFECE8E4 = Color(0xFFECE8E4);
+  static const Color color_FFECE8E4 = Color(0xFFE2E8F0);
   static const Color color_FFECECEC = Color(0xFFECECEC);
   static const Color color_FFEFF6FF = Color(0xFFEFF6FF);
   static const Color color_FFF00012 = Color(0xFFF00012);
@@ -112,7 +116,7 @@ class AppTheme {
   static const Color color_FFF8F9FA = Color(0xFFF8F9FA);
   static const Color color_FFF8FAFC = Color(0xFFF8FAFC);
   static const Color color_FFF9FAFB = Color(0xFFF9FAFB);
-  static const Color color_FFFAF9F8 = Color(0xFFFAF9F8);
+  static const Color color_FFFAF9F8 = Color(0xFFF8FAFC);
   static const Color color_FFFB2C36 = Color(0xFFFB2C36);
   static const Color color_FFFBFAF9 = Color(0xFFF8FAFC);
   static const Color color_FFFCFBFA = Color(0xFFFCFBFA);
