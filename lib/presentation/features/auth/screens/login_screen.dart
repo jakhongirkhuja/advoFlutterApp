@@ -414,9 +414,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
+
             Positioned(
               top: 10,
-              right: 10,
+              right: 16,
               child: _LanguageButton(
                 key: _languageKey,
                 onTap: () => _chooseLanguage(context),

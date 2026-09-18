@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../viewmodels/auth_viewmodel.dart';
@@ -83,142 +84,207 @@ class _OtpScreenState extends State<OtpScreen> {
         ? '+998 ${phone.substring(0, 2)} ${phone.substring(2, 5)} ${phone.substring(5, 7)} ${phone.substring(7)}'
         : widget.phoneNumber;
     final canVerify = _controllers.every((c) => c.text.isNotEmpty);
-
+    final double progress = 0.9;
     return Scaffold(
+
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 92),
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  CustomIconDesign(
-                    icon: 'assets/icons/otp.svg',
-                    mainColor: const Color(0xff1C8AFF),
-                    secondaryColor: const Color(0xff69AFFF),
+            Column(
+              children: [
+                const SizedBox(height: 100),
+                CustomIconDesign(
+                  icon: 'assets/icons/otp.svg',
+                  mainColor: const Color(0xff1C8AFF),
+                  secondaryColor: const Color(0xff69AFFF),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  localizations?.translate('otp_title') ?? 'Kodni kiriting',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff0F172A),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    localizations?.translate('otp_title') ?? 'Kodni kiriting',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff0F172A),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '$formattedPhone ',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
-                          ),
+                ),
+                const SizedBox(height: 4),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$formattedPhone ',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0F172A),
                         ),
-                        TextSpan(
-                          text: 'raqamiga yuborilgan 4 xonali kodni kiriting.',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF475569),
-                          ),
+                      ),
+                      TextSpan(
+                        text: 'raqamiga yuborilgan\n4 xonali kodni kiriting.',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF475569),
                         ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10,
+                  children: List.generate(4, (index) => _buildPinField(index)),
+                ),
+                const SizedBox(height: 16),
+                if (!_canResend)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10,
-                    children: List.generate(
-                      4,
-                      (index) => _buildPinField(index),
-                    ),
+                    children: [
+                      Text(
+                        'Qayta yuborish ',
+                        style: TextStyle(
+                          color: Color(0xff475569),
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${_formatTime(_timerSeconds)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Kodni olmadingizmi?',
+                        style: TextStyle(
+                          color: Color(0xff475569),
+                          fontSize: 16,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await viewModel.sendOtp(widget.phoneNumber);
+                          _startTimer();
+                        },
+                        child: const Text('Qayta yuborish'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  if (!_canResend)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Qayta yuborish ',style: TextStyle(
-                          color: Color(0xff475569),
-                          fontSize: 16
-                        ),),
-                        Text(
-                          '${_formatTime(_timerSeconds)}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF0F172A),
-                          ),
-                        ),
-                      ],
-                    )
-                  else
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Kodni olmadingizmi?', style: TextStyle(
-                          color: Color(0xff475569),
-                          fontSize: 16
-                        ),),
-                        TextButton(
-
-                          onPressed: () async {
-                            await viewModel.sendOtp(widget.phoneNumber);
-                            _startTimer();
-                          },
-                          child: const Text('Qayta yuborish'),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
+              ],
             ),
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              height: 62,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                padding: const EdgeInsets.only(top: 4),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      const Color(0xFF2B7FFF),
+                      const Color(0xFF2B7FFF),
+                      Colors.white,
+                    ],
+                    stops: [
+                      0.0,
+                      progress.clamp(0.0, 1.0),
+                      ((progress + 0.1) + 0.05).clamp(0.0, 1.0),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20),
+                  ),
                 ),
-                child: ElevatedButton(
-                  onPressed: canVerify && viewModel.status != AuthStatus.loading
-                      ? () async {
-                          await viewModel.verifyOtp(
-                            _controllers.map((c) => c.text).join(),
-                          );
-                          if (context.mounted &&
-                              viewModel.status == AuthStatus.authenticated) {
-                            Navigator.of(
-                              context,
-                            ).popUntil((route) => route.isFirst);
-                          }
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2B7FFF),
-                    disabledBackgroundColor: const Color(0xFFA9C9FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                child: Container(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(24),
+                      topLeft: Radius.circular(24),
                     ),
                   ),
-                  child: viewModel.status == AuthStatus.loading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Kodni tasdiqlash'),
+                  child: GestureDetector(
+                    onTap: canVerify && viewModel.status != AuthStatus.loading
+                        ? () async {
+                            await viewModel.verifyOtp(
+                              _controllers.map((c) => c.text).join(),
+                            );
+                            if (context.mounted &&
+                                viewModel.status == AuthStatus.authenticated) {
+                              Navigator.of(
+                                context,
+                              ).popUntil((route) => route.isFirst);
+                            }
+                          }
+                        : null,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
+                      height: 48,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(57),
+                        color: Colors.blue,
+                      ),
+                      child: Center(
+                        child: viewModel.status == AuthStatus.loading
+                            ? const CircularProgressIndicator(color: Colors.white) : const Text(
+                          'Kodni tasdiqlash',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            Positioned(
+              top: 10,
+              left: 16,
+              child: Container(
+                width: 44,
+                height: 44,
+                padding: const EdgeInsets.all(1),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(47),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.white, Color(0xFFD9B875)],
+                    stops: [0.5, 1.0],
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(47),
+                  ),
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).pop(),
+                    customBorder: const CircleBorder(),
+                    child: Center(
+                      child: SvgPicture.asset('assets/icons/back.svg'),
+                    ),
+                  ),
                 ),
               ),
             ),
             Positioned(
               top: 10,
-              right: 10,
+              right: 16,
               child: _OtpLanguageButton(onTap: () => _chooseLanguage(context)),
             ),
           ],
@@ -228,23 +294,72 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Future<void> _chooseLanguage(BuildContext context) async {
-    final provider = context.read<LocaleProvider>();
-    final selected = await showDialog<String>(
+    final localeProvider = context.read<LocaleProvider>();
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    final selected = await showMenu<String>(
       context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Tilni tanlang'),
-        children: LocaleProvider.supportedLanguages
-            .map(
-              (item) => SimpleDialogOption(
-                onPressed: () => Navigator.pop(context, item['code']),
-                child: Text('${item['flag']}  ${item['name']}'),
-              ),
-            )
-            .toList(),
+      elevation: 0,
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      // Set position explicitly 65px from the top
+      position: RelativeRect.fromLTRB(
+        overlay.size.width,
+        105.0,
+        22.0,
+        overlay.size.height,
       ),
+      menuPadding: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      popUpAnimationStyle: AnimationStyle.noAnimation,
+      items: LocaleProvider.supportedLanguages.map((language) {
+        final code = language['code']!;
+        final isSelected = code == localeProvider.currentLanguageCode;
+
+        return PopupMenuItem<String>(
+          value: code,
+          height: 48,
+          padding: EdgeInsets.zero, // Remove default Flutter menu item padding
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isSelected
+                    ? const Color(0xFFBEDBFF)
+                    : Colors.transparent,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Text(language['flag']!, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 12),
+                Text(
+                  code == 'uz'
+                      ? 'O’zbek tili'
+                      : code == 'ru'
+                      ? 'Rus tili'
+                      : 'Ingliz tili',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
-    if (selected != null && context.mounted)
-      await provider.setLocale(Locale(selected));
+
+    if (selected != null && context.mounted) {
+      await localeProvider.setLocale(Locale(selected));
+    }
   }
 
   Widget _buildPinField(int index) {
@@ -283,7 +398,9 @@ class _OtpScreenState extends State<OtpScreen> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: hasValue ? const Color(0xFF2B7FFF) : const Color(0xFFE2E8F0),
+              color: hasValue
+                  ? const Color(0xFF2B7FFF)
+                  : const Color(0xFFE2E8F0),
               width: 1,
             ),
           ),
