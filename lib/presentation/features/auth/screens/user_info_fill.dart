@@ -3,134 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 import '../../../widgets/custom_icon_design.dart';
 import '../viewmodels/auth_viewmodel.dart';
-import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/locale_provider.dart';
 
-class OtpScreen extends StatefulWidget {
+class UserInfoFill extends StatefulWidget {
   final String phoneNumber;
 
-  const OtpScreen({super.key, required this.phoneNumber});
+  const UserInfoFill({super.key, required this.phoneNumber});
 
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  State<UserInfoFill> createState() => _UserInfoFillState();
 }
 
-class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
+class _UserInfoFillState extends State<UserInfoFill>  {
   final List<TextEditingController> _controllers = List.generate(
     4,
-    (_) => TextEditingController(),
+        (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
-  int _timerSeconds = 30;
-  Timer? _timer;
   Timer? _bannerTimer;
-  bool _canResend = false;
   bool _incorrectCode = false;
   bool _showErrorBanner = false;
   double _progress = 0.5;
 
   @override
-  void initState() {
-    super.initState();
-    _startTimer();
-    _startSmsAutofill();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _bannerTimer?.cancel();
-    cancel();
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
-    super.dispose();
-  }
-
-  Future<void> _startSmsAutofill() async {
-    try {
-      listenForCode(smsCodeRegexPattern: r'\b\d{4}\b');
-    } catch (error) {
-      debugPrint('[SMS autofill] listener unavailable: $error');
-    }
-
-    try {
-      final signature = await SmsAutoFill().getAppSignature;
-      debugPrint('[SMS autofill] app signature: $signature');
-    } catch (error) {
-      debugPrint('[SMS autofill] app signature unavailable: $error');
-    }
-  }
-
-  @override
-  void codeUpdated() {
-    final match = RegExp(r'\b\d{4}\b').firstMatch(code ?? '');
-    final receivedCode = match?.group(0);
-    if (receivedCode == null || !mounted) return;
-
-    for (var index = 0; index < _controllers.length; index++) {
-      _controllers[index].value = TextEditingValue(
-        text: receivedCode[index],
-        selection: const TextSelection.collapsed(offset: 1),
-      );
-    }
-
-    setState(() {
-      _incorrectCode = false;
-      _showErrorBanner = false;
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _submitOtp(context.read<AuthViewModel>());
-      }
-    });
-  }
-
-  void _startTimer() {
-    setState(() {
-      _timerSeconds = 30;
-      _canResend = false;
-    });
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_timerSeconds == 0) {
-        setState(() {
-          _canResend = true;
-          _timer?.cancel();
-        });
-      } else {
-        setState(() {
-          _timerSeconds--;
-        });
-      }
-    });
-  }
-
-  String _formatTime(int seconds) {
-    int mins = seconds ~/ 60;
-    int secs = seconds % 60;
-    return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
-
-  @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<AuthViewModel>();
-    final localizations = AppLocalizations.of(context);
-
-    final phone = widget.phoneNumber
-        .replaceFirst('+998', '')
-        .replaceAll(RegExp(r'\D'), '');
-    final formattedPhone = phone.length == 9
-        ? '+998 ${phone.substring(0, 2)} ${phone.substring(2, 5)} ${phone.substring(5, 7)} ${phone.substring(7)}'
-        : widget.phoneNumber;
     final canVerify = _controllers.every((controller) => controller.text.isNotEmpty);
     final canSubmit = canVerify && viewModel.status != AuthStatus.loading;
     final progress = _progress;
@@ -149,7 +49,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  localizations?.translate('otp_title') ?? 'Kodni kiriting',
+                  'Profilingizni yarating',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -161,15 +61,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                   TextSpan(
                     children: [
                       TextSpan(
-                        text: '$formattedPhone ',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'raqamiga yuborilgan\n4 xonali kodni kiriting.',
+                        text: 'Davom etish uchun ism va familiyangizni kiriting.',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF475569),
@@ -180,52 +72,8 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 10,
-                  children: List.generate(4, (index) => _buildPinField(index)),
-                ),
-                const SizedBox(height: 16),
-                if (!_canResend)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Qayta yuborish ',
-                        style: TextStyle(
-                          color: Color(0xff475569),
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        _formatTime(_timerSeconds),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Kodni olmadingizmi?',
-                        style: TextStyle(
-                          color: Color(0xff475569),
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          await viewModel.sendOtp(widget.phoneNumber);
-                          _startTimer();
-                        },
-                        child: const Text('Qayta yuborish'),
-                      ),
-                    ],
-                  ),
+
+
               ],
             ),
             Positioned(
@@ -282,7 +130,7 @@ class _OtpScreenState extends State<OtpScreen> with CodeAutoFill {
                       child: Center(
                         child: viewModel.status == AuthStatus.loading
                             ? const CircularProgressIndicator(color: Colors.white) : const Text(
-                          'Kodni tasdiqlash',
+                          'Davom etish',
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
@@ -593,7 +441,7 @@ class _OtpLanguageButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final code = context.watch<LocaleProvider>().currentLanguageCode;
     final language = LocaleProvider.supportedLanguages.firstWhere(
-      (item) => item['code'] == code,
+          (item) => item['code'] == code,
       orElse: () => LocaleProvider.supportedLanguages.first,
     );
     return Container(

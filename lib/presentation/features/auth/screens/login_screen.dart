@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String _completePhoneNumber = '';
   bool _termsAccepted = false;
   bool _isValidPhone = false;
+  double _progress = 0.2;
 
   late final MaskTextInputFormatter _maskFormatter;
 
@@ -112,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<AuthViewModel>();
     final localizations = AppLocalizations.of(context);
-    final double progress = 0.9;
+    final progress = _progress;
     final canContinue = _termsAccepted && _isValidPhone;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F6FA),
@@ -378,6 +379,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: GestureDetector(
                     onTap: canContinue
                         ? () async {
+                            setState(() => _progress = 0.5);
+                            await Future<void>.delayed(
+                              const Duration(milliseconds: 300),
+                            );
                             final otp = await viewModel.sendOtp(
                               _completePhoneNumber,
                             );
@@ -404,7 +409,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(57),
                         color: canContinue
                             ? const Color(0xFF2B7FFF)
-                            : const Color(0xFF2B7FFF).withValues(alpha: 0.4),
+                            : const Color(0xFF2B7FFF).withValues(alpha: 0.2),
                       ),
                       child: const Center(
                         child: Text(
